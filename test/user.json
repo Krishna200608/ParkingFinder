@@ -1,0 +1,22 @@
+{
+	"Users": [
+		{
+			"username": "john_doe",
+			"email": "john@example.com",
+			"password": "SecurePass123",
+			"role": "driver"
+		},
+		{
+			"username": "susan_host",
+			"email": "susan.host@example.com",
+			"password": "HostSecure456!",
+			"role": "host"
+		},
+		{
+			"username": "admin_user",
+			"email": "admin@example.com",
+			"password": "AdminMaster789!",
+			"role": "admin"
+		}
+	]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "parkingfinder-root",
+  "version": "1.0.0",
+  "description": "Root for ParkingFinder MERN project",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm run dev --prefix backend",
+    "client": "npm start --prefix frontend"
+  },
+  "keywords": [],
+  "author": "Krishna",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
