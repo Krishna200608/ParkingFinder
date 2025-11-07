@@ -5,9 +5,15 @@
   "main": "index.js",
   "scripts": {
     "start": "npm run dev",
+
+    // run both servers together
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+
+    // backend: run backend's actual dev script
     "server": "npm run dev --prefix backend",
-    "client": "npm start --prefix frontend"
+
+    // frontend: Vite uses `npm run dev` not `npm start`
+    "client": "npm run dev --prefix frontend"
   },
   "keywords": [],
   "author": "Krishna",

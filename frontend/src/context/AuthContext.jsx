@@ -1,45 +1,46 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// 1. Create the Context
 const AuthContext = createContext();
 
-// 2. Create the Provider component
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
 
-  // 3. Check localStorage on initial load
+  // On initial load, check localStorage for user info
   useEffect(() => {
-    // Try to find user data in localStorage
     const storedUser = localStorage.getItem('userInfo');
     if (storedUser) {
       setUserInfo(JSON.parse(storedUser));
     }
   }, []);
 
-  // 4. Define the login/logout functions
+  // Login function: save to state and localStorage
   const login = (userData) => {
-    // Set state
-    setUserInfo(userData);
-    // Persist to localStorage
-    localStorage.setItem('userInfo', JSON.stringify(userData));
+    // Make sure we store all user data, including the role
+    const userDataToStore = {
+      _id: userData._id,
+      name: userData.name,
+      email: userData.email,
+      role: userData.role, // <-- ENSURE ROLE IS SAVED
+      token: userData.token,
+    };
+    setUserInfo(userDataToStore);
+    localStorage.setItem('userInfo', JSON.stringify(userDataToStore));
   };
 
+  // Logout function: clear state and localStorage
   const logout = () => {
-    // Clear state
     setUserInfo(null);
-    // Remove from localStorage
     localStorage.removeItem('userInfo');
   };
 
-  // 5. Provide the state and functions to children
   return (
-    <AuthContext.Provider value={{ userInfo, login, logout, setUserInfo }}>
+    <AuthContext.Provider value={{ userInfo, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// 6. Create a custom hook for easy access
+// Custom hook to easily access auth context
 export const useAuth = () => {
   return useContext(AuthContext);
 };

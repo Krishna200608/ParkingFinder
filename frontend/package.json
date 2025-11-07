@@ -13,8 +13,10 @@
     "@tailwindcss/vite": "^4.1.16",
     "axios": "^1.13.1",
     "react": "^19.2.0",
+    "react-datepicker": "^8.8.0",
     "react-dom": "^19.2.0",
     "react-hot-toast": "^2.6.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.9.5",
     "tailwindcss": "^4.1.16"
   },
