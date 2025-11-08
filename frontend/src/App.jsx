@@ -14,40 +14,47 @@ import MapPage from "./pages/MapPage";
 import HostDashboardPage from "./pages/HostDashboardPage";
 import EditSpotPage from "./pages/EditSpotPage";
 import AddSpotPage from "./pages/AddSpotPage";
+import AboutPage from "./pages/AboutPage";
+import PricingPage from "./pages/PricingPage";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
-  return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 text-gray-800 overflow-hidden">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-6 w-full">
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/find" element={<MapPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+	return (
+		<div className="flex flex-col w-full min-h-screen bg-gray-50 text-gray-800 overflow-hidden">
+			<Header />
+			<main className="flex-grow container mx-auto px-4 py-6 w-full">
+				<Routes>
+					{/* Public */}
+					<Route path="/" element={<HomePage />} />
+					<Route path="/find" element={<MapPage />} />
+					<Route path="/login" element={<LoginPage />} />
+					<Route path="/register" element={<RegisterPage />} />
 
-          {/* Driver protected */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-          </Route>
+					{/* Driver protected */}
+					<Route element={<ProtectedRoute />}>
+						<Route path="/dashboard" element={<DashboardPage />} />
+					</Route>
 
-          {/* Host protected */}
-          <Route element={<HostRoute />}>
-            <Route path="/host/dashboard" element={<HostDashboardPage />} />
-            <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
-            <Route path="/host/add-spot" element={<AddSpotPage />} />
-          </Route>
-        </Routes>
-      </main>
+					{/* Host protected */}
+					<Route element={<HostRoute />}>
+						<Route path="/host/dashboard" element={<HostDashboardPage />} />
+						<Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
+						<Route path="/host/add-spot" element={<AddSpotPage />} />
+					</Route>
+					<Route path="/about" element={<AboutPage />} />
+					<Route path="/pricing" element={<PricingPage />} />
+					<Route path="/contact" element={<ContactPage />} />
+				</Routes>
+			</main>
 
-      <Toaster position="top-center" />
+			<Toaster position="top-center" />
 
-      <footer className="bg-white border-t py-4 text-center text-sm text-gray-600">
-        © {new Date().getFullYear()} Parking Finder — Smart, Seamless, Sustainable.
-      </footer>
-    </div>
-  );
+			<footer className="bg-white border-t py-4 text-center text-sm text-gray-600">
+				© {new Date().getFullYear()} Parking Finder — Smart, Seamless,
+				Sustainable.
+			</footer>
+		</div>
+	);
 }
 
 export default App;
