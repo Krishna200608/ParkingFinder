@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="./screenshots/logo.png" alt="Parking Finder Logo" width="40" height="40"/>
+</p>
+
+
 # Parking Finder — Smart Parking Solution
 
 A full-stack MERN application that enables drivers to find and book parking spaces in real time, while allowing hosts to list, manage, and track their parking spots.
