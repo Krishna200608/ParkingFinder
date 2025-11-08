@@ -244,22 +244,6 @@ http://localhost:5173
 
 ---
 
-## Developer
-
-**Name:** Krishna
-**Role:** IT Engineer / Full Stack MERN Developer
-**Email:** [support@parkingfinder.com](mailto:support@parkingfinder.com)
-**GitHub:** [your-github](https://github.com/your-github)
-
----
-
-## License
-
-This project is licensed under the **MIT License**.
-You are free to use, modify, and distribute this codebase with attribution.
-
----
-
 ## Contribution
 
 Contributions are welcome!
