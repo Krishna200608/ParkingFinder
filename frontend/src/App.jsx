@@ -13,6 +13,7 @@ import DashboardPage from "./pages/DashboardPage";
 import MapPage from "./pages/MapPage";
 import HostDashboardPage from "./pages/HostDashboardPage";
 import EditSpotPage from "./pages/EditSpotPage";
+import AddSpotPage from "./pages/AddSpotPage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route element={<HostRoute />}>
             <Route path="/host/dashboard" element={<HostDashboardPage />} />
             <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
+            <Route path="/host/add-spot" element={<AddSpotPage />} />
           </Route>
         </Routes>
       </main>

@@ -4,6 +4,7 @@ import {
   getMyBookings,
   getBookingById,
   cancelBooking,
+  getBookedSlotsForSpot
 } from '../controllers/bookings.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 
@@ -14,6 +15,8 @@ router.use(protect);
 
 router.route('/')
   .post(protect,createBooking); // Create a new booking
+
+router.get("/spot/:spotId", getBookedSlotsForSpot);
 
 router.route('/me')
   .get(protect, getMyBookings); // Get all of the user's own bookings

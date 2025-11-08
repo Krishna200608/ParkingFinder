@@ -89,7 +89,7 @@ export const createBooking = async (req, res) => {
 			totalCost,
 			notes,
 			status: "confirmed",
-			paymentStatus: "pending",
+			paymentStatus: "paid",
 		});
 
 		const createdBooking = await booking.save();
@@ -192,4 +192,52 @@ export const cancelBooking = async (req, res) => {
 	} catch (error) {
 		return handleError(res, 500, `Server error: ${error.message}`);
 	}
+};
+
+// @desc    Get booked slots for a specific parking spot
+// @route   GET /api/bookings/spot/:spotId
+// @access  Public (anyone viewing the spot)
+export const getBookedSlotsForSpot = async (req, res) => {
+  try {
+    const { spotId } = req.params;
+    const now = new Date();
+
+    const bookings = await Booking.find({
+      spot: spotId,
+      endTime: { $gte: now }, // only future or ongoing
+      status: { $in: ["pending", "confirmed", "active"] },
+    })
+      .sort("startTime")
+      .select("startTime endTime -_id");
+
+    // Suggest next 5 1-hour available slots (for today only)
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const allSlots = [];
+    for (let i = 0; i < 24; i++) {
+      const slotStart = new Date(startOfDay.getTime() + i * 3600000);
+      const slotEnd = new Date(slotStart.getTime() + 3600000);
+      if (slotStart >= now && slotEnd <= endOfDay) {
+        allSlots.push({ start: slotStart, end: slotEnd });
+      }
+    }
+
+    // Remove booked overlaps
+    const availableSlots = allSlots.filter((slot) =>
+      !bookings.some(
+        (b) =>
+          new Date(b.startTime) < slot.end && new Date(b.endTime) > slot.start
+      )
+    );
+
+    res.status(200).json({
+      bookedSlots: bookings,
+      suggestedSlots: availableSlots.slice(0, 5),
+    });
+  } catch (error) {
+    console.error("Error fetching booked slots:", error);
+    res.status(500).json({ message: `Server error: ${error.message}` });
+  }
 };

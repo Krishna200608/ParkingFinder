@@ -73,6 +73,10 @@ export const getParkingSpots = async (req, res) => {
       };
     }
 
+    if (req.user?._id) {
+      query.owner = { $ne: req.user._id };
+    }
+
     const spots = await ParkingSpot.find(query).populate('owner', 'username role'); // Populate owner info
     res.status(200).json(spots);
 
@@ -205,3 +209,55 @@ export const createSpotReview = async (req, res) => {
     return handleError(res, 500, `Server error: ${error.message}`);
   }
 };
+
+// @desc    Get all parking spots owned by the logged-in host
+// @route   GET /api/spots/my
+// @access  Private (Host or Admin)
+import Booking from '../models/booking.model.js'; // ✅ add this import
+export const getMyParkingSpots = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    // 1️⃣ Aggregate host’s earnings from bookings
+    const earnings = await Booking.aggregate([
+      {
+        $match: {
+          host: req.user._id,
+          paymentStatus: "paid",
+        },
+      },
+      {
+        $group: {
+          _id: "$spot",
+          totalEarnings: { $sum: "$totalCost" },
+          totalBookings: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // 2️⃣ Fetch host’s own spots
+    const spots = await ParkingSpot.find({ owner: req.user._id })
+      .populate("owner", "username role")
+      .lean();
+
+    // 3️⃣ Merge earnings data
+    const spotsWithEarnings = spots.map((spot) => {
+      const e = earnings.find(
+        (x) => x._id.toString() === spot._id.toString()
+      );
+      return {
+        ...spot,
+        totalEarnings: e ? e.totalEarnings : 0,
+        totalBookings: e ? e.totalBookings : 0,
+      };
+    });
+
+    res.status(200).json(spotsWithEarnings);
+  } catch (error) {
+    console.error("Error fetching host spots:", error);
+    res.status(500).json({ message: `Server error: ${error.message}` });
+  }
+};
+

@@ -6,24 +6,29 @@ import {
   updateParkingSpot,
   deleteParkingSpot,
   createSpotReview,
+  getMyParkingSpots, // ✅ New controller
 } from '../controllers/spots.controller.js';
 import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// --- Main Routes for Spots ---
+// --- Host Dashboard: Get logged-in host's own spots ---
+router.route('/my')
+  .get(protect, isHostOrAdmin, getMyParkingSpots); // ✅ New route
+
+// --- Public + Create routes ---
 router.route('/available')
-  .get(getParkingSpots) // Public: Anyone can search for spots
-  .post(protect, isHostOrAdmin, createParkingSpot); // Private: Only Hosts/Admins can create
+  .get(protect, getParkingSpots)
+  .post(protect, isHostOrAdmin, createParkingSpot);
 
-// --- Routes for a Single Spot ---
+// --- Single spot routes ---
 router.route('/:id')
-  .get(getParkingSpotById) // Public: Anyone can view a single spot
-  .put(protect, isHostOrAdmin, updateParkingSpot) // Private: Only the Owner/Admin can update
-  .delete(protect, isHostOrAdmin, deleteParkingSpot); // Private: Only the Owner/Admin can delete
+  .get(getParkingSpotById)
+  .put(protect, isHostOrAdmin, updateParkingSpot)
+  .delete(protect, isHostOrAdmin, deleteParkingSpot);
 
-// --- Route for Reviews ---
+// --- Reviews ---
 router.route('/:id/reviews')
-  .post(protect, createSpotReview); // Private: Any logged-in user can review (for now)
+  .post(protect, createSpotReview);
 
 export default router;
