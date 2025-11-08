@@ -15,7 +15,7 @@ router.use(protect);
 router.route('/')
   .post(createBooking); // Create a new booking
 
-router.route('/mybookings')
+router.route('/me')
   .get(getMyBookings); // Get all of the user's own bookings
 
 router.route('/:id')

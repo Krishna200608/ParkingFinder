@@ -1,46 +1,69 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState(() => {
+    const stored = localStorage.getItem("userInfo");
+    return stored ? JSON.parse(stored) : null;
+  });
 
-  // On initial load, check localStorage for user info
+  // Called after login
+  const login = (data) => {
+    if (data?.token && data?.user) {
+      localStorage.setItem("userInfo", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+      setUserInfo(data.user);
+    }
+  };
+
+  // Optional helper — used in older code, now works fine
+  const setAuthToken = (token) => {
+    if (token) {
+      localStorage.setItem("token", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    } else {
+      localStorage.removeItem("token");
+      delete axios.defaults.headers.common["Authorization"];
+    }
+  };
+
+  // Logout clears everything
+  const logout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+    } catch (err) {
+      console.warn("Logout request failed:", err.message);
+    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    delete axios.defaults.headers.common["Authorization"];
+    setUserInfo(null);
+  };
+
+  // Automatically attach token on page reload
   useEffect(() => {
-    const storedUser = localStorage.getItem('userInfo');
-    if (storedUser) {
-      setUserInfo(JSON.parse(storedUser));
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
   }, []);
 
-  // Login function: save to state and localStorage
-  const login = (userData) => {
-    // Make sure we store all user data, including the role
-    const userDataToStore = {
-      _id: userData._id,
-      name: userData.name,
-      email: userData.email,
-      role: userData.role, // <-- ENSURE ROLE IS SAVED
-      token: userData.token,
-    };
-    setUserInfo(userDataToStore);
-    localStorage.setItem('userInfo', JSON.stringify(userDataToStore));
-  };
-
-  // Logout function: clear state and localStorage
-  const logout = () => {
-    setUserInfo(null);
-    localStorage.removeItem('userInfo');
-  };
-
   return (
-    <AuthContext.Provider value={{ userInfo, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        userInfo,
+        setUserInfo,
+        login,
+        logout,
+        setAuthToken, // ✅ Fix: this now exists
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to easily access auth context
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

@@ -1,48 +1,49 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast'; // For notifications
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
-// Import Components
-import Header from './components/Header';
-import ProtectedRoute from './components/ProtectedRoute';
-import HostRoute from './components/HostRoute'; // <-- IMPORT NEW HOST ROUTE
+import Header from "./components/Header";
+import ProtectedRoute from "./components/ProtectedRoute";
+import HostRoute from "./components/HostRoute";
 
-// Import Pages
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import MapPage from './pages/MapPage';
-import HostDashboardPage from './pages/HostDashboardPage'; // <-- IMPORT NEW HOST PAGE
-import EditSpotPage from './pages/EditSpotPage'; // <-- IMPORT NEW EDIT PAGE
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import MapPage from "./pages/MapPage";
+import HostDashboardPage from "./pages/HostDashboardPage";
+import EditSpotPage from "./pages/EditSpotPage";
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Toaster position="top-center" reverseOrder={false} />
+    <div className="flex flex-col w-full min-h-screen bg-gray-50 text-gray-800 overflow-hidden">
       <Header />
-      <main className="container mx-auto p-4 flex-grow">
+      <main className="flex-grow container mx-auto px-4 py-6 w-full">
         <Routes>
-          {/* Public Routes */}
+          {/* Public */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/find" element={<MapPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/find" element={<MapPage />} />
-          
-          {/* --- Protected 'Driver' Routes --- */}
-          <Route path="" element={<ProtectedRoute />}>
+
+          {/* Driver protected */}
+          <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            {/* Add 'My Bookings' page here later */}
           </Route>
 
-          {/* --- Protected 'Host' Routes --- */}
-          <Route path="" element={<HostRoute />}>
+          {/* Host protected */}
+          <Route element={<HostRoute />}>
             <Route path="/host/dashboard" element={<HostDashboardPage />} />
             <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
           </Route>
-
         </Routes>
       </main>
+
+      <Toaster position="top-center" />
+
+      <footer className="bg-white border-t py-4 text-center text-sm text-gray-600">
+        © {new Date().getFullYear()} Parking Finder — Smart, Seamless, Sustainable.
+      </footer>
     </div>
   );
 }

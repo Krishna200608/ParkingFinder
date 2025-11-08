@@ -1,14 +1,15 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-// This component checks if a user is logged in.
-// If they are, it renders the child components (using <Outlet />).
-// If not, it redirects them to the /login page.
+/**
+ * Protects routes that require a logged-in user.
+ * If user is not logged in, redirect to /login.
+ */
 const ProtectedRoute = () => {
   const { userInfo } = useAuth();
-
-  return userInfo ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!userInfo) return <Navigate to="/login" replace />;
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

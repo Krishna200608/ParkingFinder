@@ -12,7 +12,7 @@ import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 const router = express.Router();
 
 // --- Main Routes for Spots ---
-router.route('/')
+router.route('/available')
   .get(getParkingSpots) // Public: Anyone can search for spots
   .post(protect, isHostOrAdmin, createParkingSpot); // Private: Only Hosts/Admins can create
 

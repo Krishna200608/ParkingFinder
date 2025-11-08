@@ -1,9 +1,17 @@
 import User from '../models/user.model.js';
+import jwt from 'jsonwebtoken';
 import generateToken from '../utils/generateToken.js';
 
 // --- Helper function for handling errors ---
 const handleError = (res, statusCode, message) => {
   res.status(statusCode).json({ message });
+};
+
+// --- Helper to generate a JWT (and still call generateToken to set cookie) ---
+const createToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: '7d',
+  });
 };
 
 // @desc    Register a new user
@@ -20,7 +28,6 @@ export const registerUser = async (req, res) => {
     }
 
     // 2. Create new user
-    // Password hashing is handled by the middleware in user.model.js
     const user = await User.create({
       username,
       email,
@@ -29,15 +36,19 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
-      // 3. Generate token and send cookie
+      // 3. Generate token (for both cookie and response)
       generateToken(res, user._id);
+      const token = createToken(user._id);
 
-      // 4. Send response
+      // 4. Send response with token + user info
       res.status(201).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
+        token,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        },
       });
     } else {
       return handleError(res, 400, 'Invalid user data');
@@ -57,18 +68,21 @@ export const loginUser = async (req, res) => {
     // 1. Find user by email
     const user = await User.findOne({ email });
 
-    // 2. Check if user exists and password matches
-    // We created the 'matchPassword' method in user.model.js
+    // 2. Validate password
     if (user && (await user.matchPassword(password))) {
-      // 3. Generate token and send cookie
+      // 3. Generate cookie + token
       generateToken(res, user._id);
+      const token = createToken(user._id);
 
-      // 4. Send response
+      // 4. Send full response
       res.status(200).json({
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
+        token,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        },
       });
     } else {
       return handleError(res, 401, 'Invalid email or password');
@@ -80,9 +94,8 @@ export const loginUser = async (req, res) => {
 
 // @desc    Logout user / clear cookie
 // @route   POST /api/auth/logout
-// @access  Private (must be logged in)
+// @access  Private
 export const logoutUser = (req, res) => {
-  // We clear the cookie by setting it to an empty string and expiring it
   res.cookie('jwt', '', {
     httpOnly: true,
     expires: new Date(0),
@@ -94,11 +107,7 @@ export const logoutUser = (req, res) => {
 // @route   GET /api/auth/profile
 // @access  Private
 export const getUserProfile = async (req, res) => {
-  // The 'protect' middleware (which we will add to the route)
-  // will add the user object to req.user
-  
-  // req.user is available because of the 'protect' middleware
-  const user = req.user; 
+  const user = req.user;
 
   if (user) {
     res.status(200).json({
