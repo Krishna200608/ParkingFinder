@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./screenshots/logo.png" alt="Parking Finder Logo" width="40" height="40"/>
+  <img src="./screenshots/logo.png" alt="Parking Finder Logo" width="70" height="70"/>
 </p>
 
 
