@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HostRoute from "./components/HostRoute";
 
@@ -17,6 +18,8 @@ import AddSpotPage from "./pages/AddSpotPage";
 import AboutPage from "./pages/AboutPage";
 import PricingPage from "./pages/PricingPage";
 import ContactPage from "./pages/ContactPage";
+import ProfilePage from "./pages/ProfilePage";
+
 
 function App() {
 	return (
@@ -29,7 +32,8 @@ function App() {
 					<Route path="/find" element={<MapPage />} />
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/register" element={<RegisterPage />} />
-
+          <Route path="/profile" element={<ProfilePage />} />
+          
 					{/* Driver protected */}
 					<Route element={<ProtectedRoute />}>
 						<Route path="/dashboard" element={<DashboardPage />} />
@@ -49,10 +53,7 @@ function App() {
 
 			<Toaster position="top-center" />
 
-			<footer className="bg-white border-t py-4 text-center text-sm text-gray-600">
-				© {new Date().getFullYear()} Parking Finder — Smart, Seamless,
-				Sustainable.
-			</footer>
+			<Footer />
 		</div>
 	);
 }

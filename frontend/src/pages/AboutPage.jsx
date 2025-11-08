@@ -33,7 +33,7 @@ const AboutPage = () => {
         </div>
         <div className="flex justify-center">
           <img
-            src="/src/assets/parking-about.svg"
+            src="/src/assets/logo.svg"
             alt="About ParkingFinder"
             className="w-80 h-80 object-contain drop-shadow-lg"
           />

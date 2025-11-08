@@ -67,6 +67,10 @@ const Header = () => {
               Find Parking
             </Link>
 
+            <Link to="/dashboard" className="text-sm text-slate-700 hover:text-blue-600 transition">
+              My Bookings
+            </Link>
+
             <Link to="/about" className="text-sm text-slate-700 hover:text-blue-600 transition">
               About
             </Link>
