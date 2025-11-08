@@ -13,15 +13,15 @@ const router = express.Router();
 router.use(protect);
 
 router.route('/')
-  .post(createBooking); // Create a new booking
+  .post(protect,createBooking); // Create a new booking
 
 router.route('/me')
-  .get(getMyBookings); // Get all of the user's own bookings
+  .get(protect, getMyBookings); // Get all of the user's own bookings
 
 router.route('/:id')
-  .get(getBookingById); // Get a single booking by its ID
+  .get(protect, getBookingById); // Get a single booking by its ID
 
 router.route('/:id/cancel')
-  .put(cancelBooking); // Cancel a booking
+  .put(protect, cancelBooking); // Cancel a booking
 
 export default router;
