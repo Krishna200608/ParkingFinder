@@ -38,6 +38,7 @@ const MapPage = () => {
   const mapRef = useRef();
   const markerRefs = useRef({});
 
+  // Adjust zoom based on radius
   useEffect(() => {
     const calculatedZoom = Math.max(10, Math.min(16, 16 - Math.log2(radiusKm)));
     setZoom(calculatedZoom);
@@ -54,11 +55,7 @@ const MapPage = () => {
       const radiusMeters = radiusKm * 1000;
 
       const { data } = await axios.get("/api/spots/available", {
-        params: {
-          lat: position[0],
-          lng: position[1],
-          radius: radiusMeters,
-        },
+        params: { lat: position[0], lng: position[1], radius: radiusMeters },
         withCredentials: true,
         headers: userInfo?.token
           ? { Authorization: `Bearer ${userInfo.token}` }
@@ -117,7 +114,7 @@ const MapPage = () => {
       <div className="max-w-7xl mx-auto px-6 mt-10 grid md:grid-cols-3 gap-8">
         {/* Map Column */}
         <div className="md:col-span-2 relative bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-          <div className="absolute top-4 left-4 z-40">
+          <div className="absolute top-4 left-15 z-40">
             <button
               onClick={getUserLocation}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md text-sm flex items-center gap-2"
@@ -161,7 +158,7 @@ const MapPage = () => {
               />
               <FlyToHelper mapRef={mapRef} target={position} zoom={zoom} />
 
-              {/* 🔵 Circle showing search radius */}
+              {/* Search radius circle */}
               <Circle
                 center={position}
                 radius={radiusKm * 1000}
@@ -172,6 +169,7 @@ const MapPage = () => {
                 }}
               />
 
+              {/* Markers */}
               {spots.map((spot) => {
                 const lat = spot.location.coordinates[1];
                 const lng = spot.location.coordinates[0];
@@ -185,13 +183,17 @@ const MapPage = () => {
                     {selectedSpot?._id === spot._id && (
                       <Popup autoClose={false} autoPan>
                         <div className="space-y-2">
-                          <h3 className="font-semibold text-sm">
-                            {spot.address || "Unnamed Spot"}
+                          <h3 className="font-semibold text-sm text-blue-700">
+                            📍 This parking spot is here!
                           </h3>
                           <p className="text-xs text-gray-600">
-                            {spot.description || "No description available"}
+                            {spot.address || "No address available"}
                           </p>
-                          <div className="flex items-center justify-between mt-2">
+                          <p className="text-xs text-gray-500">
+                            {spot.description ||
+                              "You’re now focused on this specific parking location."}
+                          </p>
+                          <div className="flex justify-between items-center mt-2">
                             <span className="text-sm font-semibold text-blue-600">
                               ${spot.pricePerHour}/hr
                             </span>
@@ -266,16 +268,26 @@ const MapPage = () => {
                       >
                         Book
                       </button>
+
+                      {/* Navigate Button with close zoom and popup */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           const target = [lat, lng];
                           setPosition(target);
                           setSelectedSpot(spot);
-                          if (mapRef.current)
-                            mapRef.current.flyTo(target, 16, { duration: 1.2 });
-                          const ref = markerRefs.current[spot._id];
-                          if (ref) ref.openPopup();
+
+                          if (mapRef.current) {
+                            mapRef.current.flyTo(target, 19, { duration: 1.3 });
+                          }
+
+                          // Open popup after zoom animation
+                          setTimeout(() => {
+                            const ref = markerRefs.current[spot._id];
+                            if (ref) ref.openPopup();
+                          }, 1300);
+
+                          toast.success(`Navigated to "${spot.address || 'Parking Spot'}"`);
                         }}
                         className="border border-blue-200 text-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-50 transition"
                       >

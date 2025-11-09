@@ -154,7 +154,8 @@ const Header = () => {
                       to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                     >
-                      Dashboard
+                      
+                      {userInfo.role === "host" || "admin" ? "Dashboard" : "Booking Dashboard"}
                     </Link>
 
                     {userInfo.role === "host" && (

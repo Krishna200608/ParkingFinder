@@ -219,7 +219,7 @@ const AddSpotPage = () => {
           {/* My Location Button */}
           <button
             onClick={handleMyLocation}
-            className="absolute top-6 left-6 z-40 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md text-sm flex items-center gap-2"
+            className="absolute top-25 left-15 z-40 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md text-sm flex items-center gap-2"
           >
             <MapPin size={16} /> My Location
           </button>

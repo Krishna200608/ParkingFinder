@@ -1,168 +1,292 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Calendar, Clock, MapPin, CreditCard, Car } from "lucide-react";
+import { Calendar, Clock, MapPin, CreditCard, Car, X } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+const DefaultIcon = L.icon({
+	iconUrl: markerIcon,
+	shadowUrl: markerShadow,
+	iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const DashboardPage = () => {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+	const [bookings, setBookings] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [selectedBooking, setSelectedBooking] = useState(null);
 
-  const fetchBookings = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get("/api/bookings/me");
-      setBookings(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Unable to load your bookings");
-    } finally {
-      setLoading(false);
-    }
-  };
+	const fetchBookings = async () => {
+		try {
+			setLoading(true);
+			const { data } = await axios.get("/api/bookings/me");
+			setBookings(Array.isArray(data) ? data : []);
+		} catch (err) {
+			console.error(err);
+			toast.error("Unable to load your bookings");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
+	useEffect(() => {
+		fetchBookings();
+	}, []);
 
-  const formatTime = (time) =>
-    new Date(time).toLocaleString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+	const formatTime = (time) =>
+		new Date(time).toLocaleTimeString("en-IN", {
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: true,
+		});
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Gradient Header */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-12 text-center shadow-md">
-        <h1 className="text-3xl font-bold mb-2">My Bookings</h1>
-        <p className="text-blue-100 text-sm">
-          View and manage your parking reservations easily.
-        </p>
-      </section>
+	return (
+		<div className="min-h-screen bg-gray-50 pb-20 relative">
+			{/* Gradient Header */}
+			<section className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-12 text-center shadow-md">
+				<h1 className="text-3xl font-bold mb-2">My Bookings</h1>
+				<p className="text-blue-100 text-sm">
+					View and manage your parking reservations easily.
+				</p>
+			</section>
 
-      <div className="max-w-6xl mx-auto px-6 mt-10">
-        {loading ? (
-          <div className="text-center text-gray-500 py-20 text-lg">
-            Loading your bookings...
-          </div>
-        ) : bookings.length === 0 ? (
-          <div className="bg-white p-10 rounded-2xl shadow text-center text-gray-600">
-            <Car size={40} className="mx-auto mb-3 text-blue-500" />
-            <h3 className="text-xl font-medium mb-1">No Bookings Yet</h3>
-            <p className="text-sm text-gray-500">
-              You haven’t made any bookings yet. Find parking nearby and get
-              started!
-            </p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bookings.map((b) => (
-              <div
-                key={b._id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 p-6 flex flex-col justify-between"
-              >
-                {/* Header Info */}
-                <div>
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
-                      <MapPin size={16} className="text-blue-500" />
-                      {b.spot?.address || "Unknown address"}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full ${
-                        b.status === "active"
-                          ? "bg-green-100 text-green-700"
-                          : b.status === "cancelled"
-                          ? "bg-red-100 text-red-600"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {b.status}
-                    </span>
-                  </div>
+			<div className="max-w-6xl mx-auto px-6 mt-10">
+				{loading ? (
+					<div className="text-center text-gray-500 py-20 text-lg">
+						Loading your bookings...
+					</div>
+				) : bookings.length === 0 ? (
+					<div className="bg-white p-10 rounded-2xl shadow text-center text-gray-600">
+						<Car size={40} className="mx-auto mb-3 text-blue-500" />
+						<h3 className="text-xl font-medium mb-1">No Bookings Yet</h3>
+						<p className="text-sm text-gray-500">
+							You haven’t made any bookings yet. Find parking nearby and get
+							started!
+						</p>
+					</div>
+				) : (
+					<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{bookings.map((b) => (
+							<div
+								key={b._id}
+								className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all border border-gray-100 p-6 flex flex-col justify-between"
+							>
+								{/* Header Info */}
+								<div>
+									<div className="flex justify-between items-start mb-3">
+										<h3 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+											<MapPin size={16} className="text-blue-500" />
+											{b.spot?.address || "Unknown address"}
+										</h3>
+										<span
+											className={`px-2 py-1 text-xs rounded-full ${
+												b.status === "active"
+													? "bg-green-100 text-green-700"
+													: b.status === "cancelled"
+													? "bg-red-100 text-red-600"
+													: "bg-gray-100 text-gray-600"
+											}`}
+										>
+											{b.status}
+										</span>
+									</div>
 
-                  <p className="text-sm text-gray-500 mb-3">
-                    Host: {b.host?.username || "N/A"}
-                  </p>
+									<p className="text-sm text-gray-500 mb-3">
+										Host: {b.host?.username || "N/A"}
+									</p>
 
-                  {/* Time Info */}
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p className="flex items-center gap-2">
-                      <Calendar size={14} className="text-blue-500" />
-                      <span>
-                        {new Date(b.startTime).toDateString() ===
-                        new Date(b.endTime).toDateString()
-                          ? new Date(b.startTime).toLocaleDateString("en-IN", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
-                          : `${new Date(b.startTime).toLocaleDateString(
-                              "en-IN"
-                            )} → ${new Date(b.endTime).toLocaleDateString(
-                              "en-IN"
-                            )}`}
-                      </span>
-                    </p>
+									{/* Time Info */}
+									<div className="space-y-2 text-sm text-gray-600">
+										<p className="flex items-center gap-2">
+											<Calendar size={14} className="text-blue-500" />
+											<span>
+												{new Date(b.startTime).toLocaleDateString("en-IN", {
+													day: "2-digit",
+													month: "short",
+													year: "numeric",
+												})}
+											</span>
+										</p>
 
-                    <p className="flex items-center gap-2">
-                      <Clock size={14} className="text-blue-500" />
-                      <span>
-                        {formatTime(b.startTime)} - {formatTime(b.endTime)}
-                      </span>
-                    </p>
-                  </div>
-                </div>
+										<p className="flex items-center gap-2">
+											<Clock size={14} className="text-blue-500" />
+											<span>
+												{formatTime(b.startTime)} - {formatTime(b.endTime)}
+											</span>
+										</p>
+									</div>
+								</div>
 
-                {/* Divider */}
-                <div className="border-t mt-4 mb-3"></div>
+								{/* Divider */}
+								<div className="border-t mt-4 mb-3"></div>
 
-                {/* Footer */}
-                <div className="flex justify-between items-center text-sm">
-                  <div className="text-gray-500 flex items-center gap-1">
-                    <CreditCard size={14} className="text-blue-500" />
-                    <span>
-                      {b.paymentStatus === "paid" ? (
-                        <span className="text-green-600 font-medium">
-                          Paid
-                        </span>
-                      ) : (
-                        <span className="text-yellow-600 font-medium">
-                          Pending
-                        </span>
-                      )}
-                    </span>
-                  </div>
+								{/* Footer */}
+								<div className="flex justify-between items-center text-sm">
+									<div className="text-gray-500 flex items-center gap-1">
+										<CreditCard size={14} className="text-blue-500" />
+										<span>
+											{b.paymentStatus === "paid" ? (
+												<span className="text-green-600 font-medium">Paid</span>
+											) : (
+												<span className="text-yellow-600 font-medium">
+													Pending
+												</span>
+											)}
+										</span>
+									</div>
 
-                  <div className="text-right">
-                    <p className="text-gray-600">
-                      ₹{b.spot?.pricePerHour || 0}/hr
-                    </p>
-                    <p className="font-semibold text-blue-600 text-base">
-                      ₹{b.totalCost || 0}
-                    </p>
-                  </div>
-                </div>
+									<div className="text-right">
+										<p className="text-gray-600">
+											₹{b.spot?.pricePerHour || 0}/hr
+										</p>
+										<p className="font-semibold text-blue-600 text-base">
+											₹{b.totalCost || 0}
+										</p>
+									</div>
+								</div>
 
-                {/* Actions */}
-                <div className="mt-5 flex justify-end">
-                  <button
-                    onClick={() => toast("Feature coming soon")}
-                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
+								{/* Actions */}
+								<div className="mt-5 flex justify-end">
+									<button
+										onClick={() => setSelectedBooking(b)}
+										className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+									>
+										View Details
+									</button>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+
+			{/* Booking Details Modal */}
+			{selectedBooking && (
+				<div
+					className="fixed inset-0 flex justify-center items-center z-50 p-4
+                  bg-white/10 backdrop-blur-md backdrop-saturate-150"
+				>
+					<div
+						className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 relative 
+                    overflow-y-auto max-h-[85vh] border border-gray-100"
+					>
+						{/* Close Button */}
+						<button
+							onClick={() => setSelectedBooking(null)}
+							className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition"
+						>
+							<X size={22} />
+						</button>
+
+						<h2 className="text-2xl font-semibold text-gray-800 mb-4">
+							Booking Details
+						</h2>
+
+						<div className="space-y-4">
+							<div>
+								<h3 className="font-medium text-gray-800 flex items-center gap-2">
+									<MapPin size={18} className="text-blue-600" />
+									{selectedBooking.spot?.address}
+								</h3>
+								<p className="text-sm text-gray-500 mt-1">
+									Host: {selectedBooking.host?.username}
+								</p>
+							</div>
+
+							<div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+								<p>
+									<span className="font-medium">Date:</span>{" "}
+									{new Date(selectedBooking.startTime).toLocaleDateString(
+										"en-IN",
+										{
+											day: "2-digit",
+											month: "short",
+											year: "numeric",
+										}
+									)}
+								</p>
+								<p>
+									<span className="font-medium">Status:</span>{" "}
+									<span
+										className={`${
+											selectedBooking.status === "cancelled"
+												? "text-red-600"
+												: selectedBooking.status === "active"
+												? "text-green-600"
+												: "text-gray-600"
+										} font-semibold`}
+									>
+										{selectedBooking.status}
+									</span>
+								</p>
+								<p>
+									<span className="font-medium">Start Time:</span>{" "}
+									{formatTime(selectedBooking.startTime)}
+								</p>
+								<p>
+									<span className="font-medium">End Time:</span>{" "}
+									{formatTime(selectedBooking.endTime)}
+								</p>
+								<p>
+									<span className="font-medium">Payment:</span>{" "}
+									{selectedBooking.paymentStatus === "paid" ? (
+										<span className="text-green-600 font-medium">Paid</span>
+									) : (
+										<span className="text-yellow-600 font-medium">Pending</span>
+									)}
+								</p>
+								<p>
+									<span className="font-medium">Total Cost:</span>{" "}
+									<span className="text-blue-600 font-semibold">
+										₹{selectedBooking.totalCost || 0}
+									</span>
+								</p>
+							</div>
+
+							{/* Map */}
+							{selectedBooking.spot?.location?.coordinates && (
+								<div className="mt-4">
+									<h4 className="font-medium text-gray-700 mb-2">
+										Location Map
+									</h4>
+									<div className="rounded-lg overflow-hidden shadow border border-gray-200">
+										<MapContainer
+											center={[
+												selectedBooking.spot.location.coordinates[1],
+												selectedBooking.spot.location.coordinates[0],
+											]}
+											zoom={16}
+											style={{ height: "300px", width: "100%" }}
+											scrollWheelZoom={false}
+										>
+											<TileLayer
+												attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
+												url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+											/>
+											<Marker
+												position={[
+													selectedBooking.spot.location.coordinates[1],
+													selectedBooking.spot.location.coordinates[0],
+												]}
+											>
+												<Popup>
+													<strong>{selectedBooking.spot.address}</strong>
+												</Popup>
+											</Marker>
+										</MapContainer>
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
 };
 
 export default DashboardPage;
