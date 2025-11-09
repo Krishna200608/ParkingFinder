@@ -37,6 +37,19 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 
 ---
 
+## Badges
+
+[![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)](https://reactjs.org)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=node.js)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/API-Express-lightgrey?logo=express)](https://expressjs.com)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-green?logo=mongodb)](https://www.mongodb.com)
+[![JWT](https://img.shields.io/badge/Auth-JWT-orange?logo=jsonwebtokens)](https://jwt.io)
+[![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS-38BDF8?logo=tailwindcss)](https://tailwindcss.com)
+[![Framer Motion](https://img.shields.io/badge/Animations-FramerMotion-purple?logo=framer)](https://www.framer.com/motion/)
+
+---
+
+
 ## Tech Stack
 
 | Layer                  | Technologies                                                                 |
@@ -50,17 +63,6 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 
 ---
 
-## Badges
-
-[![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)](https://reactjs.org)
-[![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=node.js)](https://nodejs.org)
-[![Express](https://img.shields.io/badge/API-Express-lightgrey?logo=express)](https://expressjs.com)
-[![MongoDB](https://img.shields.io/badge/Database-MongoDB-green?logo=mongodb)](https://www.mongodb.com)
-[![JWT](https://img.shields.io/badge/Auth-JWT-orange?logo=jsonwebtokens)](https://jwt.io)
-[![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS-38BDF8?logo=tailwindcss)](https://tailwindcss.com)
-[![Framer Motion](https://img.shields.io/badge/Animations-FramerMotion-purple?logo=framer)](https://www.framer.com/motion/)
-
----
 
 ## Project Structure
 
