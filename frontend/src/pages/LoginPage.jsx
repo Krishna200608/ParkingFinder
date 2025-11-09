@@ -3,12 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-import { LogIn, Mail, Lock } from "lucide-react";
+import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { setAuthToken, login } = useAuth();
   const navigate = useNavigate();
@@ -50,7 +51,6 @@ const LoginPage = () => {
             Log in to find and manage your parking reservations effortlessly.
           </p>
 
-          {/* ✅ Fixed Image Styling */}
           <div className="w-full flex justify-center">
             <img
               src="/src/assets/logo.svg"
@@ -76,7 +76,7 @@ const LoginPage = () => {
                 <Mail className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 <input
                   type="email"
-                  className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -90,13 +90,21 @@ const LoginPage = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 <input
-                  type="password"
-                  className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-2.5 p-1"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
-import { UserPlus, Mail, Lock, User } from "lucide-react";
+import { UserPlus, Mail, Lock, User, Eye, EyeOff, Info } from "lucide-react";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -10,6 +10,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("driver");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,14 +19,45 @@ const RegisterPage = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await axios.post("/api/auth/register", { name, email, password, role });
+      await axios.post("/api/auth/register", {
+        username: name,
+        email,
+        password,
+        role,
+      });
+
       toast.success("Registered successfully! Please login.");
       navigate("/login");
     } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || "Registration failed");
+      console.error("Registration Error:", err);
+      const serverMsg = err?.response?.data?.message || "Registration failed";
+
+      // ✅ Handle duplicate username error
+      if (serverMsg.includes("E11000") && serverMsg.includes("username")) {
+        toast.error("Username already taken — please choose a different one.");
+      }
+      // ✅ Handle duplicate email error (optional if email is unique too)
+      else if (serverMsg.includes("E11000") && serverMsg.includes("email")) {
+        toast.error("Email already registered — try logging in instead.");
+      }
+      // ✅ Handle validation errors
+      else if (serverMsg.includes("validation failed")) {
+        const cleanMsg = serverMsg
+          .replace("Server error: User validation failed:", "")
+          .replace(/username:/gi, "Username:")
+          .replace(/password:/gi, "Password:")
+          .trim();
+        toast.error(cleanMsg);
+      } else {
+        toast.error(serverMsg);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -41,7 +73,6 @@ const RegisterPage = () => {
             Register to start finding parking or hosting your own spot today.
           </p>
 
-          {/* ✅ Fixed Image Aspect Ratio */}
           <div className="w-full flex justify-center">
             <img
               src="/src/assets/logo.svg"
@@ -63,20 +94,17 @@ const RegisterPage = () => {
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
-            {/* Full Name */}
+            {/* Username */}
             <div>
               <label className="text-sm text-gray-600 mb-1 block">
-                Full Name
+                Username
               </label>
               <div className="relative">
-                <User
-                  className="absolute left-3 top-2.5 text-gray-400"
-                  size={18}
-                />
+                <User className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 <input
                   type="text"
                   className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="John Doe"
+                  placeholder="John_Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -88,10 +116,7 @@ const RegisterPage = () => {
             <div>
               <label className="text-sm text-gray-600 mb-1 block">Email</label>
               <div className="relative">
-                <Mail
-                  className="absolute left-3 top-2.5 text-gray-400"
-                  size={18}
-                />
+                <Mail className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 <input
                   type="email"
                   className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -109,18 +134,29 @@ const RegisterPage = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock
-                  className="absolute left-3 top-2.5 text-gray-400"
-                  size={18}
-                />
+                <Lock className="absolute left-3 top-2.5 text-gray-400" size={18} />
                 <input
-                  type="password"
-                  className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  type={showPassword ? "text" : "password"}
+                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3 top-2.5 p-1"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
+              {/* Password requirements */}
+              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                <Info size={14} className="text-blue-500" />
+                <span>Password must be at least 6 characters long.</span>
               </div>
             </div>
 
