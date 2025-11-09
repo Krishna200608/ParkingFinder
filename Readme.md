@@ -24,19 +24,6 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 
 ---
 
-## Overview
-
-**Parking Finder** aims to solve urban parking challenges by providing:
-
-* Real-time parking availability and booking.
-* Host-managed spot listings with earnings tracking.
-* Map-based visualization using Leaflet + OpenStreetMap.
-* Time-slot conflict prevention.
-* Role-based authentication (Driver, Host, Admin).
-* Dynamic and responsive user interface enhanced with **motion animations**.
-
----
-
 ## Badges
 
 [![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)](https://reactjs.org)
@@ -49,6 +36,20 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 
 ---
 
+
+
+## Overview
+
+**Parking Finder** aims to solve urban parking challenges by providing:
+
+* Real-time parking availability and booking.
+* Host-managed spot listings with earnings tracking.
+* Map-based visualization using Leaflet + OpenStreetMap.
+* Time-slot conflict prevention.
+* Role-based authentication (Driver, Host, Admin).
+* Dynamic and responsive user interface enhanced with **motion animations**.
+
+---
 
 ## Tech Stack
 
