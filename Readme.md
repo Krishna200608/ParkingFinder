@@ -1,13 +1,26 @@
 <p align="center">
-  <img src="./screenshots/logo.png" alt="Parking Finder Logo" width="70" height="70"/>
+  <img src="./screenshots/logo.png" alt="Parking Finder Logo" width="80" height="80"/>
 </p>
 
+<!--
+📽️ Optional Demo Preview
+You can later add a preview GIF like this:
+<p align="center">
+  <img src="./screenshots/demo.gif" alt="Parking Finder Demo Preview" width="750"/>
+</p>
+-->
+
+<p align="center">
+  <a href="https://www.framer.com/motion/">
+    <img src="https://img.shields.io/badge/Animated%20with-Framer%20Motion-purple?logo=framer&logoColor=white" alt="Framer Motion Badge"/>
+  </a>
+</p>
 
 # Parking Finder — Smart Parking Solution
 
 A full-stack MERN application that enables drivers to find and book parking spaces in real time, while allowing hosts to list, manage, and track their parking spots.
 
-Parking Finder offers real-time availability, location-based search, and role-based access, built with modern UI/UX design and scalable architecture.
+Parking Finder offers real-time availability, location-based search, and role-based access, built with modern UI/UX design, **Framer Motion animations**, and scalable architecture.
 
 ---
 
@@ -20,20 +33,20 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 * Map-based visualization using Leaflet + OpenStreetMap.
 * Time-slot conflict prevention.
 * Role-based authentication (Driver, Host, Admin).
-* Dynamic and responsive user interface.
+* Dynamic and responsive user interface enhanced with **motion animations**.
 
 ---
 
 ## Tech Stack
 
-| Layer                  | Technologies                                                   |
-| ---------------------- | -------------------------------------------------------------- |
-| **Frontend**           | React (Vite), React Router, Tailwind CSS, Axios, React-Leaflet |
-| **Backend**            | Node.js, Express.js                                            |
-| **Database**           | MongoDB Atlas                                                  |
-| **Authentication**     | JWT (Bearer + HTTP-only Cookies)                               |
-| **Map & Geo Services** | Leaflet, OpenStreetMap                                         |
-| **UI Components**      | Tailwind CSS, Lucide Icons                                     |
+| Layer                  | Technologies                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| **Frontend**           | React (Vite), React Router, Tailwind CSS, Axios, React-Leaflet, **Framer Motion** |
+| **Backend**            | Node.js, Express.js                                                          |
+| **Database**           | MongoDB Atlas                                                                |
+| **Authentication**     | JWT (Bearer + HTTP-only Cookies)                                             |
+| **Map & Geo Services** | Leaflet, OpenStreetMap                                                       |
+| **UI Components**      | Tailwind CSS, Lucide Icons, **Framer Motion Animations**                     |
 
 ---
 
@@ -44,14 +57,15 @@ Parking Finder offers real-time availability, location-based search, and role-ba
 [![Express](https://img.shields.io/badge/API-Express-lightgrey?logo=express)](https://expressjs.com)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB-green?logo=mongodb)](https://www.mongodb.com)
 [![JWT](https://img.shields.io/badge/Auth-JWT-orange?logo=jsonwebtokens)](https://jwt.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TailwindCSS](https://img.shields.io/badge/UI-TailwindCSS-38BDF8?logo=tailwindcss)](https://tailwindcss.com)
+[![Framer Motion](https://img.shields.io/badge/Animations-FramerMotion-purple?logo=framer)](https://www.framer.com/motion/)
 
 ---
 
 ## Project Structure
 
 ```
+
 parking-finder/
 │
 ├── backend/
@@ -74,31 +88,33 @@ parking-finder/
 │   └── server.js
 │
 └── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── Header.jsx
-    │   │   ├── Footer.jsx
-    │   │   ├── booking/BookingModal.jsx
-    │   │   ├── host/
-    │   │   └── form/
-    │   ├── context/AuthContext.jsx
-    │   ├── pages/
-    │   │   ├── HomePage.jsx
-    │   │   ├── LoginPage.jsx
-    │   │   ├── RegisterPage.jsx
-    │   │   ├── DashboardPage.jsx
-    │   │   ├── HostDashboardPage.jsx
-    │   │   ├── AddSpotPage.jsx
-    │   │   ├── MapPage.jsx
-    │   │   ├── ProfilePage.jsx
-    │   │   ├── PricingPage.jsx
-    │   │   ├── AboutPage.jsx
-    │   │   └── ContactPage.jsx
-    │   ├── App.jsx
-    │   └── main.jsx
-    ├── index.html
-    └── tailwind.config.js
-```
+├── src/
+│   ├── components/
+│   │   ├── Header.jsx
+│   │   ├── Footer.jsx
+│   │   ├── booking/BookingModal.jsx
+│   │   ├── host/
+│   │   └── form/
+│   ├── context/AuthContext.jsx
+│   ├── pages/
+│   │   ├── HomePage.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── RegisterPage.jsx
+│   │   ├── DashboardPage.jsx
+│   │   ├── HostDashboardPage.jsx
+│   │   ├── AddSpotPage.jsx
+│   │   ├── EditSpotPage.jsx
+│   │   ├── MapPage.jsx
+│   │   ├── ProfilePage.jsx
+│   │   ├── PricingPage.jsx
+│   │   ├── AboutPage.jsx
+│   │   └── ContactPage.jsx
+│   ├── App.jsx
+│   └── main.jsx
+├── index.html
+└── tailwind.config.js
+
+````
 
 ---
 
@@ -117,7 +133,7 @@ parking-finder/
 ```bash
 git clone https://github.com/your-username/parking-finder.git
 cd parking-finder
-```
+````
 
 ---
 
@@ -207,6 +223,35 @@ http://localhost:5173
 
 ---
 
+## ✨ UI & Motion Enhancements
+
+With **Framer Motion**, the interface now includes:
+
+* Scroll-triggered animations on every section.
+* Floating illustrations and interactive motion graphics.
+* Animated hero transitions and hover effects.
+* Seamless fade-in and scale effects for modern UI interactions.
+* Performance-optimized, GPU-accelerated motion components.
+
+Example Animation Snippet:
+
+```jsx
+import { motion } from "framer-motion";
+
+const fadeIn = (delay = 0) => ({
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.7, ease: "easeOut" },
+  },
+});
+```
+
+This makes the UI feel **alive, responsive, and premium**, enhancing user experience across all devices.
+
+---
+
 ## Role Permissions
 
 | Role       | Capabilities                                |
@@ -263,3 +308,5 @@ Contributions are welcome!
 [![Status](https://img.shields.io/badge/Status-Active-success)]()
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen)]()
 [![Build](https://img.shields.io/badge/Build-Passing-brightgreen)]()
+
+```
