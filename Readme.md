@@ -219,8 +219,6 @@ http://localhost:5173
 
 ## Screenshots (Previews)
 
-> *(Replace these with your actual screenshots later)*
-
 ### Home Page
 
 ![Home Page](./screenshots/homepage.png)
@@ -265,12 +263,3 @@ Contributions are welcome!
 [![Status](https://img.shields.io/badge/Status-Active-success)]()
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-brightgreen)]()
 [![Build](https://img.shields.io/badge/Build-Passing-brightgreen)]()
-
----
-
-Would you like me to:
-
-* Add **API documentation** (endpoints, payloads, responses)?
-* Or include a **setup diagram** (frontend ↔ backend ↔ MongoDB)?
-
-That would make your README production-grade and developer-friendly for open-source release.
