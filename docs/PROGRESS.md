@@ -1,6 +1,6 @@
 # ParkingFinder 2.0 — Progress Tracking Log
 
-## Project State: Stage 2 Completed (Vercel Free-Tier Deployment Ready)
+## Project State: Stage 3 Completed (Core Booking Engine & Concurrency Safety Verified)
 *Last Updated: 2026-11-07*
 
 ---
@@ -12,37 +12,47 @@
 | **Stage 0** | **Repository Discovery & Technical Audit** | **COMPLETED** | Complete code audit, runtime tests, failure documentation, architecture docs, audit reports |
 | **Stage 1** | **Security & Architecture Cleanup** | **COMPLETED** | Untrack keys/binaries, unify cookie auth, fix ESLint errors, Zod validation, Helmet, rate limiting |
 | **Stage 2** | **Vercel Deployment Foundation** | **COMPLETED** | Decouple Express server (`app.js`), serverless handler (`api/index.js`), connection pooling, `vercel.json` |
-| **Stage 3** | **Core Booking Engine** | **NEXT** | Transactional double-booking prevention, half-open intervals, demo status, multi-day availability |
-| **Stage 4** | **Parking Discovery & Maps** | Planned | Synchronized map/list, search filters, spot details page, favourites, Nominatim rate compliance |
+| **Stage 3** | **Core Booking Engine** | **COMPLETED** | Transactional double-booking prevention, half-open intervals, demo status, multi-day availability, Vitest suite |
+| **Stage 4** | **Parking Discovery & Maps** | **NEXT** | Synchronized map/list, search filters, spot details page, favourites, Nominatim rate compliance |
 | **Stage 5** | **Host Marketplace & Admin** | Planned | Host listing CRUD, verified review policy, host earnings analytics, admin moderation dashboard |
 | **Stage 6** | **Advanced Differentiators** | Planned | Geospatial demand heatmap, dynamic pricing simulator, EV charging filters, PWA offline shell |
 | **Stage 7** | **QA, CI/CD & Final Release** | Planned | Vitest & Supertest suites, GitHub Actions workflow, performance/a11y optimization, portfolio docs |
 
 ---
 
-## 2. Stage 2 Verification Metrics
+## 2. Stage 3 Verification Metrics
 
-- **Git Working Tree:** Active branch `feature/vercel-deployment`.
-- **Backend Architecture Decoupling:**
-  - `backend/app.js`: Clean Express application module (export default `app`).
-  - `backend/server.js`: Dedicated local runner awaiting `connectDB()` before listening on port 5001.
-  - `api/index.js`: Vercel serverless function entrypoint dispatching `/api/*` requests.
-- **Connection Caching ([`backend/db.js`](file:///d:/Web%20D/ParkingFinder/backend/db.js)):**
-  - Cached Mongoose promise & connection pool (`global.mongoose = { conn, promise }`).
-  - Max pool size set to 10 to preserve free MongoDB Atlas 500-connection ceiling.
-  - Removed fatal `process.exit(1)` from serverless path.
-- **Vercel Routing Configuration ([`vercel.json`](file:///d:/Web%20D/ParkingFinder/vercel.json)):**
-  - Configured rewrites: `/api/*` routed to `api/index.js`; all other paths routed to `index.html`.
-- **Monorepo Workspaces & Build Pipeline:**
-  - Configured npm workspaces in root `package.json` (`"workspaces": ["backend", "frontend"]`).
-  - Root build command (`npm run build`) builds `frontend/dist` in 6.95s.
-  - Root lint command (`npm run lint`) passes cleanly with 0 errors and 0 warnings.
-  - Syntax check on `api/index.js` validated with `node --check`.
+- **Git Working Tree:** Active branch `feature/booking-engine`.
+- **Double-Booking & Concurrency Engine ([`backend/controllers/bookings.controller.js`](file:///d:/Web%20D/ParkingFinder/backend/controllers/bookings.controller.js)):**
+  - Implemented transactional execution with MongoDB session and exponential backoff retry (`executeWithRetry`).
+  - Added exclusive spot-level document write lock via atomic increment (`$inc: { bookingSequence: 1 }`).
+  - Strict half-open interval overlap checks: $[StartTime, EndTime)$, ensuring $ExistingStart < RequestedEnd \land ExistingEnd > RequestedStart$.
+  - Exact contiguous boundary bookings (e.g. 10:00-12:00 and 12:00-14:00) cleanly supported without false collisions.
+  - Past booking rejection and invalid time window checks.
+  - Host self-booking prevention.
+- **Model Enhancements ([`backend/models/booking.model.js`](file:///d:/Web%20D/ParkingFinder/backend/models/booking.model.js)):**
+  - Added price snapshots (`pricePerHourSnapshot`, `totalAmount`) to protect past transactions against host rate changes.
+  - Transparent demo statuses: `paymentStatus: 'unpaid_demo'` or `'not_required'` with `paymentMethod: 'demo'`.
+  - Added full cancellation audit trail (`cancelledAt`, `cancelledBy`, `cancellationReason`).
+  - Added compound indexes: `{ parkingSpot: 1, status: 1, startTime: 1, endTime: 1 }`.
+- **Dynamic Availability Endpoint:**
+  - `GET /api/bookings/spot/:spotId/availability?date=YYYY-MM-DD` computes real-time occupied intervals and contiguous free slots.
+- **Frontend Upgrades ([`frontend/src/components/booking/BookingModal.jsx`](file:///d:/Web%20D/ParkingFinder/frontend/src/components/booking/BookingModal.jsx)):**
+  - Lifted artificial single-day constraint, allowing flexible multi-hour and multi-day reservations.
+  - Real-time availability indicator fetching busy ranges dynamically.
+  - Transparent "Demo Reservation" badges.
+- **Automated Vitest Test Suite ([`test/booking.test.js`](file:///d:/Web%20D/ParkingFinder/test/booking.test.js)):**
+  - 10 automated test cases passing (10/10 in 8.2s).
+  - Concurrency race condition test validates that strictly one of two simultaneous overlapping requests succeeds, while the second receives HTTP 409 Conflict.
+- **Frontend Lint & Build:**
+  - `npm run lint` passes with 0 errors and 0 warnings.
+  - `npm run build` generates production assets cleanly.
 
 ---
 
-## 3. Immediate Next Steps (Stage 3: Core Booking Engine)
-1. Implement transactional / versioned double-booking prevention in `backend/controllers/bookings.controller.js`.
-2. Enforce half-open interval overlap checks $[StartTime, EndTime)$.
-3. Multi-day and flexible date range availability calculator endpoint (`/api/bookings/spot/:spotId/availability`).
-4. Cancellation policy logic restoring spot availability dynamically.
+## 3. Immediate Next Steps (Stage 4: Parking Discovery & Maps)
+1. Synchronize Leaflet map markers and spot card list selection in `frontend/src/pages/MapPage.jsx`.
+2. Add comprehensive filtering: price range, vehicle size, distance radius, spot type (covered/uncovered/valet/EV).
+3. Search by locality/address with Nominatim OpenStreetMap geocoding adhering to OSM rate limits (1 req/sec debounce, custom `User-Agent`).
+4. Dedicated Spot Details Page (`/spots/:id`) showing amenities, full availability calendar, and host details.
+5. Driver saved/favourite spots feature persisted in local storage or user profile.

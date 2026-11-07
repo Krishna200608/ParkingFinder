@@ -53,7 +53,11 @@ const parkingSpotSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  // We can add more details like spot size, EV charging, etc. later
+  // Atomic sequence counter for concurrency synchronization
+  bookingSequence: {
+    type: Number,
+    default: 0,
+  },
   
   // --- Reviews (as a sub-document array) ---
   reviews: [

@@ -14,12 +14,17 @@
     "server": "npm run dev --prefix backend",
     "client": "npm start --prefix frontend",
     "build": "npm run build --prefix frontend",
-    "lint": "npm run lint --prefix frontend"
+    "lint": "npm run lint --prefix frontend",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "Krishna",
   "license": "ISC",
   "dependencies": {
     "concurrently": "^9.2.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2",
+    "vitest": "^5.1.0"
   }
 }

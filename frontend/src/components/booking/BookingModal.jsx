@@ -48,33 +48,35 @@ const BookingModal = ({ spot, onClose }) => {
 		if (!spot?._id) return;
 		const fetchSlots = async () => {
 			try {
-				const { data } = await axios.get(`/api/bookings/spot/${spot._id}`);
-				setBookedSlots(data.bookedSlots || []);
-				setSuggestedSlots(data.suggestedSlots || []);
+				const queryDate = startDate || new Date().toISOString().split("T")[0];
+				const { data } = await axios.get(
+					`/api/bookings/spot/${spot._id}/availability?date=${queryDate}`
+				);
+				setBookedSlots(data.bookedIntervals || []);
+				setSuggestedSlots(data.availableSlots?.slice(0, 6) || []);
 			} catch (err) {
-				console.error("Error fetching slots:", err);
+				console.error("Error fetching availability slots:", err);
 			}
 		};
 		fetchSlots();
-	}, [spot]);
+	}, [spot, startDate]);
 
 	useEffect(() => {
 		const start = getDateTime(startDate, startTime);
 		const end = getDateTime(endDate, endTime);
 
-		if (!start || !end || !spot?.pricePerHour) return setTotalPrice(0);
-
-		if (startDate !== endDate) {
-			toast.error("Booking must be on the same day");
-			return setTotalPrice(0);
+		if (!start || !end || !spot?.pricePerHour) {
+			setTotalPrice(0);
+			return;
 		}
+
 		if (end <= start) {
-			toast.error("End time must be after start time");
-			return setTotalPrice(0);
+			setTotalPrice(0);
+			return;
 		}
 
 		const diffHours = (end - start) / (1000 * 60 * 60);
-		setTotalPrice(diffHours * spot.pricePerHour);
+		setTotalPrice(Math.round(diffHours * spot.pricePerHour * 100) / 100);
 	}, [startDate, startTime, endDate, endTime, spot]);
 
 	const isFormValid = () => {
@@ -84,7 +86,6 @@ const BookingModal = ({ spot, onClose }) => {
 			!!userInfo &&
 			start &&
 			end &&
-			startDate === endDate &&
 			end > start &&
 			totalPrice > 0
 		);
