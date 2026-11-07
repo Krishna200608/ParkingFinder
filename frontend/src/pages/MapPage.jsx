@@ -374,7 +374,7 @@ export default function MapPage() {
       {/* ── 1. COMPACT TOOLBAR ─────────────────────────────────── */}
       <div className="bg-white border-b border-[#DDE3EA] px-4 py-2.5 shrink-0 z-30">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
-          {/* Location & Keyword Search */}
+          {/* Location Search Bar */}
           <div className="flex items-center gap-2 flex-1 min-w-[280px] max-w-xl relative">
             <div className="relative flex-1">
               <Search
@@ -386,16 +386,31 @@ export default function MapPage() {
                 value={locationSearch}
                 onChange={handleLocationSearchChange}
                 placeholder="Search area, landmark or metro hub..."
-                className="w-full pl-9 pr-20 py-1.5 text-xs rounded-lg border border-[#DDE3EA] bg-white text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-blue-100"
+                className="w-full pl-9 pr-24 py-1.5 text-xs rounded-lg border border-[#DDE3EA] bg-white text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-blue-100"
               />
-              <button
-                type="button"
-                onClick={getUserLocation}
-                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-0.5 text-[11px] font-medium text-[#2563EB] hover:bg-blue-50 rounded transition flex items-center gap-1 cursor-pointer"
-                title="Use current GPS location"
-              >
-                <MapPin size={12} /> Near Me
-              </button>
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {locationSearch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocationSearch("");
+                      setLocationResults([]);
+                    }}
+                    className="p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                    title="Clear location search"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={getUserLocation}
+                  className="px-2 py-0.5 text-[11px] font-medium text-[#2563EB] hover:bg-blue-50 rounded transition flex items-center gap-1 cursor-pointer"
+                  title="Use current GPS location"
+                >
+                  <MapPin size={12} /> Near Me
+                </button>
+              </div>
 
               {/* Nominatim Autocomplete Menu */}
               {locationResults.length > 0 && (
@@ -414,25 +429,6 @@ export default function MapPage() {
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
-
-            {/* Keyword Search Input */}
-            <div className="relative hidden md:block w-48">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Filter by title..."
-                className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#DDE3EA] bg-white text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
-                >
-                  <X size={12} />
-                </button>
               )}
             </div>
           </div>
@@ -555,7 +551,7 @@ export default function MapPage() {
 
         {/* ── EXPANDABLE FILTER DRAWER ────────────────────────── */}
         {showFilterDrawer && (
-          <div className="mt-2.5 pt-2.5 border-t border-[#DDE3EA] grid sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+          <div className="mt-2.5 pt-2.5 border-t border-[#DDE3EA] grid sm:grid-cols-2 md:grid-cols-5 gap-3.5 text-xs">
             {/* Radius */}
             <div>
               <div className="flex justify-between font-medium text-[#17243A] mb-1">
@@ -599,7 +595,7 @@ export default function MapPage() {
               <select
                 value={vehicleSize}
                 onChange={(e) => setVehicleSize(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-md px-2 py-1 bg-white text-xs text-[#475569]"
+                className="w-full border border-[#DDE3EA] rounded-md px-2 py-1.5 bg-white text-xs text-[#475569] focus:outline-none focus:border-[#2563EB]"
               >
                 <option value="any">Any Size</option>
                 <option value="compact">Compact / Hatchback</option>
@@ -608,19 +604,10 @@ export default function MapPage() {
               </select>
             </div>
 
-            {/* Spot Type & Reset */}
+            {/* Spot Type */}
             <div>
               <div className="flex justify-between items-center mb-1">
                 <span className="font-medium text-[#17243A]">Listing Type</span>
-                {activeFilterCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={resetFilters}
-                    className="text-[#DC4545] hover:underline flex items-center gap-0.5 text-[11px] cursor-pointer"
-                  >
-                    <RotateCcw size={10} /> Reset all
-                  </button>
-                )}
               </div>
               <div className="grid grid-cols-3 gap-1">
                 {[
@@ -632,7 +619,7 @@ export default function MapPage() {
                     key={t.key}
                     type="button"
                     onClick={() => setSpotType(t.key)}
-                    className={`py-1 rounded text-center transition cursor-pointer ${
+                    className={`py-1 rounded text-center transition cursor-pointer text-[11px] ${
                       spotType === t.key
                         ? "bg-[#2563EB] text-white font-medium"
                         : "bg-[#F4F6F8] border border-[#DDE3EA] text-[#475569] hover:bg-[#E2E8F0]"
@@ -641,6 +628,40 @@ export default function MapPage() {
                     {t.label}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Keyword / Title Filter */}
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium text-[#17243A]">Keyword / Title</span>
+                {activeFilterCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={resetFilters}
+                    className="text-[#DC4545] hover:underline flex items-center gap-0.5 text-[10px] cursor-pointer"
+                  >
+                    <RotateCcw size={9} /> Reset
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="e.g. Garage, Gate 2..."
+                  className="w-full border border-[#DDE3EA] rounded-md pl-2 pr-6 py-1 bg-white text-xs text-[#475569] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
               </div>
             </div>
           </div>

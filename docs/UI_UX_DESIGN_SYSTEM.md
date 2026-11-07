@@ -84,3 +84,4 @@
   * Mobile: Fluid segmented control toggle between "List" and "Map" views with automatic Leaflet `map.invalidateSize()`.
 * **Standard Editorial Shell (All other routes)**:
   * Minimum 100vh canvas (`min-h-screen bg-[#F4F6F8]`), standardized centered containers, and full corporate footer.
+

@@ -15,6 +15,7 @@ import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import PageHeader from "../components/ui/PageHeader";
+import { useAuth } from "../context/AuthContext";
 
 const TIME_WINDOWS = [
   { key: "night", label: "Late Night (00:00 - 06:00)", surgeFactor: -0.25 },
@@ -25,6 +26,8 @@ const TIME_WINDOWS = [
 ];
 
 export default function PricingPage() {
+  const { userInfo } = useAuth();
+
   const plans = [
     {
       name: "Basic Driver",
@@ -51,8 +54,8 @@ export default function PricingPage() {
         "Saved favorite spaces & one-tap routing",
         "Digital transaction receipts & exports",
       ],
-      cta: "Start Free Trial",
-      href: "/register",
+      cta: userInfo ? "Access Features in App" : "Start Free Trial",
+      href: userInfo ? "/find" : "/register",
       highlight: true,
     },
     {
@@ -66,8 +69,8 @@ export default function PricingPage() {
         "Dynamic pricing algorithmic rate simulator",
         "Verified post-stay driver ratings & reviews",
       ],
-      cta: "Become a Host",
-      href: "/host/add-spot",
+      cta: userInfo ? (userInfo.role === "host" ? "Go to Host Dashboard" : "List Your Space") : "Become a Host",
+      href: userInfo ? (userInfo.role === "host" ? "/host/dashboard" : "/host/add-spot") : "/register",
       highlight: false,
     },
   ];

@@ -10,6 +10,24 @@ export default function Footer() {
     return null;
   }
 
+  // Render minimal single-line footer on authentication pages
+  if (location.pathname === "/login" || location.pathname === "/register") {
+    return (
+      <footer className="bg-white border-t border-[#DDE3EA] py-4 text-xs text-[#94A3B8] mt-auto">
+        <div className="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px]">
+          <p>© {new Date().getFullYear()} ParkingFinder. Urban mobility marketplace.</p>
+          <div className="flex items-center gap-4 text-[#64748B]">
+            <Link to="/about" className="hover:text-[#17243A]">About</Link>
+            <span>•</span>
+            <Link to="/pricing" className="hover:text-[#17243A]">Pricing</Link>
+            <span>•</span>
+            <Link to="/contact" className="hover:text-[#17243A]">Support</Link>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   return (
     <footer className="bg-white border-t border-[#DDE3EA] text-[#64748B] text-xs mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">

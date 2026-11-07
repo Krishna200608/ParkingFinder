@@ -489,9 +489,16 @@ export const seedDemoSpots = async (req, res) => {
       });
     }
 
-    // Find or create demo host user
-    let demoHost = await User.findOne({ role: 'host' });
-    if (!demoHost) {
+    // Find or create demo host user safely without unique email conflicts
+    let demoHost = await User.findOne({
+      $or: [{ role: 'host' }, { email: 'host@parkingfinder.demo' }],
+    });
+    if (demoHost) {
+      if (demoHost.role !== 'host') {
+        demoHost.role = 'host';
+        await demoHost.save();
+      }
+    } else {
       demoHost = await User.create({
         username: 'MetroHost',
         email: 'host@parkingfinder.demo',

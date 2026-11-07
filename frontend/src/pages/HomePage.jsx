@@ -17,8 +17,10 @@ import {
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
+import { useAuth } from "../context/AuthContext";
 
 export default function HomePage() {
+  const { userInfo } = useAuth();
   const navigate = useNavigate();
   const [quickQuery, setQuickQuery] = useState("");
   const [activePersona, setActivePersona] = useState("driver"); // 'driver' | 'host'
@@ -338,7 +340,7 @@ export default function HomePage() {
 
       {/* ── 4. HOST MONETIZATION HIGHLIGHT ─────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-        <Card className="bg-[#17243A] text-white border-slate-700" padding="lg">
+        <Card variant="dark" className="bg-[#17243A] text-white border-slate-700" padding="lg">
           <div className="max-w-2xl">
             <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-300 border-slate-700 mb-3">
               For Property & Driveway Owners
@@ -354,7 +356,7 @@ export default function HomePage() {
               <Button
                 variant="primary"
                 size="md"
-                href="/host/add-spot"
+                href={userInfo ? "/host/add-spot" : "/register"}
                 className="bg-[#2563EB] hover:bg-blue-600 text-white"
               >
                 List Your Space
@@ -374,7 +376,7 @@ export default function HomePage() {
 
       {/* ── 5. FINAL ACTION BANNER ─────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 w-full text-center">
-        <div className="border border-[#DDE3EA] rounded-xl bg-white p-8 sm:p-12">
+        <div className="border border-[#DDE3EA] rounded-xl bg-white p-8 sm:p-12 shadow-2xs">
           <h2 className="text-2xl sm:text-3xl font-bold text-[#17243A] tracking-tight mb-3">
             Find guaranteed parking near your destination
           </h2>
@@ -390,13 +392,23 @@ export default function HomePage() {
               <Search size={16} />
               <span>Explore Interactive Map</span>
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              href="/register"
-            >
-              Create Account
-            </Button>
+            {userInfo ? (
+              <Button
+                variant="secondary"
+                size="lg"
+                href={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
+              >
+                Go to My Dashboard
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                size="lg"
+                href="/register"
+              >
+                Create Account
+              </Button>
+            )}
           </div>
         </div>
       </section>

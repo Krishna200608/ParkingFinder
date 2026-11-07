@@ -61,12 +61,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6">
+    <div className="flex-1 flex flex-col justify-center items-center py-12 px-4 sm:px-6">
       <div className="w-full max-w-sm">
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm">
+          <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
+            <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm shadow-2xs group-hover:bg-blue-700 transition-colors">
               P
             </div>
             <span className="font-bold text-lg text-[#17243A] tracking-tight">
@@ -82,17 +82,17 @@ export default function RegisterPage() {
         </div>
 
         {/* Card Container */}
-        <Card padding="lg" className="shadow-xs">
+        <Card padding="lg" className="shadow-xs bg-white">
           <form onSubmit={handleRegister} className="space-y-4 text-xs">
             <div>
-              <label className="block text-[#475569] font-medium mb-1">
+              <label className="block text-[#475569] font-medium mb-1.5">
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
                 <input
                   type="text"
-                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="alex_driver"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -102,14 +102,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1">
+              <label className="block text-[#475569] font-medium mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
                 <input
                   type="email"
-                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -119,14 +119,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1">
+              <label className="block text-[#475569] font-medium mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -135,10 +135,10 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <p className="text-[11px] text-[#94A3B8] mt-1">
@@ -147,7 +147,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1">
+              <label className="block text-[#475569] font-medium mb-1.5">
                 Account Purpose
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 variant="primary"
                 size="md"
                 disabled={isLoading}
-                className="w-full justify-center"
+                className="w-full justify-center py-2.5"
               >
                 {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
