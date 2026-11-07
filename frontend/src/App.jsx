@@ -20,6 +20,8 @@ import PricingPage from "./pages/PricingPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
 import SpotDetailsPage from "./pages/SpotDetailsPage";
+import CheckoutSimulatorPage from "./pages/CheckoutSimulatorPage";
+import BookingSuccessPage from "./pages/BookingSuccessPage";
 
 
 function App() {
@@ -39,6 +41,8 @@ function App() {
 					{/* Driver protected */}
 					<Route element={<ProtectedRoute />}>
 						<Route path="/dashboard" element={<DashboardPage />} />
+						<Route path="/checkout-simulator" element={<CheckoutSimulatorPage />} />
+						<Route path="/booking-success" element={<BookingSuccessPage />} />
 					</Route>
 
 					{/* Host protected */}

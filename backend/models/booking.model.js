@@ -64,12 +64,32 @@ const bookingSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Payment Status Lifecycle (honest demo-first representation)
+    // Payment Status Lifecycle (honest demo-first representation + Stripe test mode)
     paymentStatus: {
       type: String,
-      enum: ['not_required', 'unpaid_demo', 'paid', 'pending', 'failed'],
+      enum: ['not_required', 'unpaid_demo', 'pending', 'paid', 'refunded', 'failed'],
       default: 'unpaid_demo',
       index: true,
+    },
+
+    // Stripe Test Mode / Sandbox Integration
+    stripeSessionId: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    stripePaymentIntentId: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    paidAt: {
+      type: Date,
+      default: null,
+    },
+    refundedAt: {
+      type: Date,
+      default: null,
     },
 
     notes: {

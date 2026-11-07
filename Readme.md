@@ -1,7 +1,7 @@
 # ParkingFinder 2.0 — Smart Urban Parking Marketplace
 
 [![CI/CD Pipeline](https://github.com/Krishna200608/ParkingFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Krishna200608/ParkingFinder/actions)
-[![Tests Passing](https://img.shields.io/badge/Vitest-25%2F25%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
+[![Tests Passing](https://img.shields.io/badge/Vitest-34%2F34%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Infrastructure: Zero-Cost](https://img.shields.io/badge/Infrastructure-%240%20Free%20Tier-success)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20Shell-orange?logo=pwa&logoColor=white)](./frontend/public/manifest.json)
@@ -151,6 +151,15 @@ The project includes 25 automated unit and integration tests across 3 comprehens
 | `GET` | `/api/bookings/spot/:spotId/availability` | Public | Computes occupied intervals and free contiguous slots for a given date. |
 | `GET` | `/api/bookings/:id` | Private (Participant) | Returns single booking details with audit trail. |
 | `PUT` | `/api/bookings/:id/cancel` | Private (Driver/Admin) | Cancels booking with audit trail (`cancelledAt`, `cancelledBy`, `reason`). |
+
+### Payments & Checkout (`/api/payments`)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/payments/create-checkout-session` | Private (Driver) | Creates Stripe Checkout Session or returns Sandbox Simulator link. |
+| `GET` | `/api/payments/verify-session` | Private (Driver) | Verifies session status with Stripe / Simulator and updates booking. |
+| `POST` | `/api/payments/simulate-success` | Private (Driver) | Authorizes simulated test card payment in Sandbox mode. |
+| `POST` | `/api/payments/webhook` | Public | Stripe webhook listener with cryptographic HMAC signature verification. |
+| `GET` | `/api/payments/my-transactions` | Private (Driver) | Retrieves driver's verified payment ledger and receipts. |
 
 ---
 

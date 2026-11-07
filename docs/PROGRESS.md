@@ -17,6 +17,7 @@
 | **Stage 5** | **Host Marketplace & Management** | **COMPLETED** | Host listing CRUD, instant availability toggle, incoming reservations table, verified review policy |
 | **Stage 6** | **Advanced Differentiators** | **COMPLETED** | Geospatial demand heatmap, dynamic pricing simulator, EV charging filters, PWA offline shell |
 | **Stage 7** | **QA, CI/CD & Final Release** | **COMPLETED** | GitHub Actions CI/CD (`ci.yml`), 25 Vitest tests, production README, zero-cost deploy runbook |
+| **Stage 8** | **Stripe Test Mode & Sandbox Payments** | **COMPLETED** | Stripe Checkout API, HMAC webhook verification, sandbox simulation mode, immutable transaction ledger, 34 Vitest tests passing |
 
 ---
 

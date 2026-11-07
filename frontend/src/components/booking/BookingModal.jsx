@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { CreditCard, BookmarkCheck } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -91,21 +92,32 @@ const BookingModal = ({ spot, onClose }) => {
 		);
 	};
 
-	const handleBook = async () => {
+	const handleBook = async (payImmediately = false) => {
 		if (!isFormValid()) return toast.error("Please fill all required details");
 		try {
 			setIsLoading(true);
 			const start = getDateTime(startDate, startTime);
 			const end = getDateTime(endDate, endTime);
 
-			await axios.post("/api/bookings", {
+			const { data: booking } = await axios.post("/api/bookings", {
 				spotId: spot._id,
 				startTime: start.toISOString(),
 				endTime: end.toISOString(),
 				notes,
 			});
 
-			toast.success("Booked successfully!");
+			if (payImmediately && booking?._id) {
+				toast.success("Reserved! Opening Stripe checkout...");
+				const { data: checkout } = await axios.post("/api/payments/create-checkout-session", {
+					bookingId: booking._id,
+				});
+				if (checkout.url) {
+					window.location.href = checkout.url;
+					return;
+				}
+			}
+
+			toast.success("Reservation confirmed!");
 			onClose(true);
 		} catch (err) {
 			console.error(err);
@@ -330,24 +342,35 @@ const BookingModal = ({ spot, onClose }) => {
 					</div>
 
 					{/* Footer (pinned at bottom) */}
-					<div className="flex justify-end gap-3 p-6 border-t bg-white sticky bottom-0 z-10 rounded-b-2xl">
+					<div className="flex flex-wrap justify-end gap-2.5 p-6 border-t bg-white sticky bottom-0 z-10 rounded-b-2xl">
 						<button
 							onClick={() => onClose(false)}
-							className="px-4 py-2 rounded border hover:bg-gray-50"
+							className="px-3.5 py-2 rounded-lg border text-gray-600 hover:bg-gray-50 text-sm font-medium transition"
 							disabled={isLoading}
 						>
 							Cancel
 						</button>
 						<button
-							onClick={handleBook}
+							onClick={() => handleBook(false)}
 							disabled={isLoading || !isFormValid()}
-							className={`px-5 py-2 rounded text-white font-semibold ${
+							className={`px-4 py-2 rounded-lg text-sm font-medium border border-blue-600 text-blue-600 hover:bg-blue-50 transition flex items-center gap-1.5 ${
+								!isFormValid() ? "opacity-50 cursor-not-allowed" : ""
+							}`}
+						>
+							<BookmarkCheck size={16} />
+							Reserve Demo
+						</button>
+						<button
+							onClick={() => handleBook(true)}
+							disabled={isLoading || !isFormValid()}
+							className={`px-4 py-2 rounded-lg text-sm text-white font-semibold flex items-center gap-1.5 shadow transition ${
 								isFormValid()
 									? "bg-blue-600 hover:bg-blue-700"
 									: "bg-gray-400 cursor-not-allowed"
 							}`}
 						>
-							{isLoading ? "Booking..." : `Book $${totalPrice.toFixed(2)}`}
+							<CreditCard size={16} />
+							{isLoading ? "Processing..." : `Pay with Stripe $${totalPrice.toFixed(2)}`}
 						</button>
 					</div>
 				</div>

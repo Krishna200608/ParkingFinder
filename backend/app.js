@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.routes.js';
 import spotRoutes from './routes/spots.routes.js';
 import bookingRoutes from './routes/bookings.routes.js';
+import paymentRoutes from './routes/payments.routes.js';
 
 // Resolve environment variables from backend/.env or root .env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -43,8 +44,15 @@ app.use(
   })
 );
 
-// 3. Body & Cookie parsers
-app.use(express.json({ limit: '1mb' }));
+// 3. Body & Cookie parsers (captures rawBody buffer for Stripe HMAC webhook signatures)
+app.use(
+  express.json({
+    limit: '1mb',
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 app.use(cookieParser());
 
@@ -93,6 +101,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/spots', spotRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {

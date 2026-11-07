@@ -106,6 +106,17 @@ flowchart LR
   - Polished documentation and GitHub README with live badges, architecture diagrams, screenshots, and API docs.
 - **Exit Criteria:** 100% CI pass rate, verified live deployment, and production-ready portfolio presentation.
 
+### Stage 8: Stripe Test Mode & Sandbox Payments
+- **Objective:** Implement full-lifecycle payment workflows with Stripe Checkout, cryptographic webhook signatures, and resilient sandbox simulation.
+- **Key Deliverables:**
+  - Stripe Checkout Session creation (`POST /api/payments/create-checkout-session`).
+  - Webhook listener with HMAC SHA-256 signature verification (`POST /api/payments/webhook`).
+  - Instant sandbox simulator (`/checkout-simulator`) for zero-cost review without live credit cards.
+  - Return & verification page (`/booking-success`).
+  - Immutable financial transactions ledger (`Payment` model) and driver transactions view (`GET /api/payments/my-transactions`).
+  - Vitest integration test suite (9 tests passing).
+- **Exit Criteria:** Automated test suite 34/34 passing; 0 ESLint warnings; payment status transitions verified.
+
 ---
 
 ## 3. Prioritized Feature Matrix
