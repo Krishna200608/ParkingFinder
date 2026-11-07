@@ -42,7 +42,7 @@ export default function BookingSuccessPage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Verifying payment confirmation...</p>
+        <p className="text-sm text-[#334155]">Verifying payment confirmation...</p>
       </div>
     );
   }
@@ -63,10 +63,10 @@ export default function BookingSuccessPage() {
           <ShieldCheck size={12} className="mr-1" /> Payment Verified
         </Badge>
 
-        <h1 className="text-2xl font-bold text-[#17243A] mb-2">
+        <h1 className="text-2xl font-bold text-[#0F172A] mb-2">
           Reservation Confirmed
         </h1>
-        <p className="text-xs sm:text-sm text-[#64748B] max-w-sm mx-auto mb-6">
+        <p className="text-xs sm:text-sm text-[#334155] max-w-sm mx-auto mb-6">
           Your parking bay is locked and guaranteed. Details and transaction references are summarized below.
         </p>
 
@@ -81,15 +81,15 @@ export default function BookingSuccessPage() {
         <div className="bg-[#F8FAFC] rounded-lg p-4 sm:p-5 text-left border border-[#DDE3EA] mb-6 space-y-3.5 text-xs">
           <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
             <div>
-              <span className="text-[11px] text-[#94A3B8] font-medium uppercase tracking-wider block">
+              <span className="text-[11px] text-[#475569] font-medium uppercase tracking-wider block">
                 Transaction Reference
               </span>
-              <span className="font-mono text-xs font-semibold text-[#17243A] mt-0.5 block">
+              <span className="font-mono text-xs font-semibold text-[#0F172A] mt-0.5 block">
                 {payment?.stripePaymentIntentId || payment?.stripeSessionId || sessionId || `txn_${bookingId.slice(-6)}`}
               </span>
             </div>
             <div className="text-right">
-              <span className="text-[11px] text-[#94A3B8] font-medium uppercase tracking-wider block">
+              <span className="text-[11px] text-[#475569] font-medium uppercase tracking-wider block">
                 Amount Paid
               </span>
               <span className="text-lg font-bold text-[#16845B]">
@@ -98,15 +98,15 @@ export default function BookingSuccessPage() {
             </div>
           </div>
 
-          <div className="space-y-2 text-xs text-[#475569]">
+          <div className="space-y-2 text-xs text-[#334155]">
             <div className="flex items-start gap-2">
               <MapPin size={14} className="text-[#2563EB] shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold text-[#17243A] block">
+                <span className="font-semibold text-[#0F172A] block">
                   {booking?.spot?.title || booking?.spot?.address || "Reserved Bay"}
                 </span>
                 {booking?.spot?.address && (
-                  <span className="text-[#64748B] text-[11px]">{booking.spot.address}</span>
+                  <span className="text-[#475569] text-[11px]">{booking.spot.address}</span>
                 )}
               </div>
             </div>

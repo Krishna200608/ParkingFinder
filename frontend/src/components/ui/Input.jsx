@@ -16,7 +16,7 @@ export function Input({
   return (
     <div className="relative w-full">
       {Icon && (
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#64748B]">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#475569]">
           <Icon size={16} aria-hidden="true" />
         </div>
       )}
@@ -28,7 +28,7 @@ export function Input({
         placeholder={placeholder}
         disabled={disabled}
         required={required}
-        className={`w-full rounded-lg border bg-white text-[#17243A] placeholder-[#94A3B8] text-sm h-10 px-3 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 disabled:bg-[#F4F6F8] disabled:text-[#94A3B8] disabled:cursor-not-allowed ${
+        className={`w-full rounded-lg border bg-white text-[#0F172A] placeholder-[#64748B] text-sm h-10 px-3 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 disabled:bg-[#F4F6F8] disabled:text-[#475569] disabled:cursor-not-allowed ${
           Icon ? "pl-9" : ""
         } ${
           error ? "border-[#DC4545] focus:ring-red-500/20 focus:border-[#DC4545]" : "border-[#DDE3EA]"
@@ -52,10 +52,10 @@ export function FormField({
     <div className={`space-y-1.5 ${className}`}>
       {label && (
         <div className="flex justify-between items-center">
-          <label htmlFor={id} className="block text-xs font-semibold text-[#17243A]">
+          <label htmlFor={id} className="block text-xs font-semibold text-[#0F172A]">
             {label} {required && <span className="text-[#DC4545]">*</span>}
           </label>
-          {hint && <span className="text-[11px] text-[#64748B]">{hint}</span>}
+          {hint && <span className="text-[11px] text-[#475569]">{hint}</span>}
         </div>
       )}
       {children}

@@ -129,7 +129,7 @@ export default function HostDashboardPage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Loading your host dashboard...</p>
+        <p className="text-sm text-[#334155]">Loading your host dashboard...</p>
       </div>
     );
   }
@@ -170,37 +170,37 @@ export default function HostDashboardPage() {
       {/* ── 4-STAT METRICS GRID ────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         <Card padding="default">
-          <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-[#475569] uppercase tracking-wider block">
             Gross Earnings
           </span>
-          <p className="text-xl sm:text-2xl font-bold text-[#17243A] mt-1">
+          <p className="text-xl sm:text-2xl font-bold text-[#0F172A] mt-1">
             ${totalEarnings.toFixed(2)}
           </p>
         </Card>
 
         <Card padding="default">
-          <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-[#475569] uppercase tracking-wider block">
             Total Reservations
           </span>
-          <p className="text-xl sm:text-2xl font-bold text-[#17243A] mt-1">
+          <p className="text-xl sm:text-2xl font-bold text-[#0F172A] mt-1">
             {totalBookingsCount}
           </p>
         </Card>
 
         <Card padding="default">
-          <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-[#475569] uppercase tracking-wider block">
             Active Spaces
           </span>
-          <p className="text-xl sm:text-2xl font-bold text-[#17243A] mt-1">
-            {activeSpacesCount} <span className="text-xs text-[#94A3B8] font-normal">/ {spots.length}</span>
+          <p className="text-xl sm:text-2xl font-bold text-[#0F172A] mt-1">
+            {activeSpacesCount} <span className="text-xs text-[#475569] font-medium">/ {spots.length}</span>
           </p>
         </Card>
 
         <Card padding="default">
-          <span className="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider block">
+          <span className="text-[11px] font-semibold text-[#475569] uppercase tracking-wider block">
             Average Rating
           </span>
-          <p className="text-xl sm:text-2xl font-bold text-[#17243A] mt-1 flex items-center gap-1">
+          <p className="text-xl sm:text-2xl font-bold text-[#0F172A] mt-1 flex items-center gap-1">
             <Star size={18} className="fill-amber-400 text-amber-400" />
             <span>{avgRating ? avgRating.toFixed(1) : "New"}</span>
           </p>
@@ -255,10 +255,10 @@ export default function HostDashboardPage() {
                       </div>
                     </div>
 
-                    <h3 className="font-semibold text-sm text-[#17243A] truncate">
+                    <h3 className="font-semibold text-sm text-[#0F172A] truncate">
                       {spot.title || spot.address}
                     </h3>
-                    <p className="text-xs text-[#64748B] truncate flex items-start gap-1">
+                    <p className="text-xs text-[#334155] truncate flex items-start gap-1 font-normal">
                       <MapPin size={13} className="text-[#2563EB] shrink-0 mt-0.5" />
                       <span>{spot.address}</span>
                     </p>
@@ -287,15 +287,15 @@ export default function HostDashboardPage() {
                     {/* Performance Metrics Box */}
                     <div className="bg-[#F8FAFC] rounded-lg p-2.5 border border-[#E2E8F0] grid grid-cols-3 gap-2 text-center text-xs mt-3 mb-3">
                       <div>
-                        <span className="text-[#94A3B8] text-[10px] block">Rate</span>
-                        <span className="font-semibold text-[#17243A]">${spot.pricePerHour}/hr</span>
+                        <span className="text-[#475569] text-[10px] font-medium block">Rate</span>
+                        <span className="font-semibold text-[#0F172A]">${spot.pricePerHour}/hr</span>
                       </div>
                       <div>
-                        <span className="text-[#94A3B8] text-[10px] block">Bookings</span>
-                        <span className="font-semibold text-[#17243A]">{spot.totalBookings || 0}</span>
+                        <span className="text-[#475569] text-[10px] font-medium block">Bookings</span>
+                        <span className="font-semibold text-[#0F172A]">{spot.totalBookings || 0}</span>
                       </div>
                       <div>
-                        <span className="text-[#94A3B8] text-[10px] block">Earnings</span>
+                        <span className="text-[#475569] text-[10px] font-medium block">Earnings</span>
                         <span className="font-semibold text-[#16845B]">
                           ${spot.totalEarnings?.toFixed(2) || "0.00"}
                         </span>
@@ -312,7 +312,7 @@ export default function HostDashboardPage() {
                         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition cursor-pointer ${
                           spot.isAvailable
                             ? "bg-[#ECFDF5] text-[#16845B] hover:bg-emerald-100 border border-[#A7F3D0]"
-                            : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] border border-[#CBD5E1]"
+                            : "bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0] border border-[#CBD5E1]"
                         }`}
                         title={spot.isAvailable ? "Click to pause listing" : "Click to activate listing"}
                       >
@@ -329,14 +329,14 @@ export default function HostDashboardPage() {
                       <div className="flex items-center gap-1">
                         <Link
                           to={`/spots/${spot._id}`}
-                          className="p-1.5 text-[#94A3B8] hover:text-[#2563EB] transition rounded hover:bg-[#F1F5F9]"
+                          className="p-1.5 text-[#475569] hover:text-[#2563EB] transition rounded hover:bg-[#F1F5F9]"
                           title="View public listing page"
                         >
                           <ExternalLink size={14} />
                         </Link>
                         <Link
                           to={`/host/edit-spot/${spot._id}`}
-                          className="p-1.5 text-[#94A3B8] hover:text-[#2563EB] transition rounded hover:bg-[#F1F5F9]"
+                          className="p-1.5 text-[#475569] hover:text-[#2563EB] transition rounded hover:bg-[#F1F5F9]"
                           title="Edit listing details"
                         >
                           <Edit3 size={14} />
@@ -345,7 +345,7 @@ export default function HostDashboardPage() {
                           type="button"
                           onClick={() => handleDeleteSpot(spot._id)}
                           disabled={deletingSpotId === spot._id}
-                          className="p-1.5 text-[#94A3B8] hover:text-[#DC4545] transition rounded hover:bg-rose-50 cursor-pointer"
+                          className="p-1.5 text-[#475569] hover:text-[#DC4545] transition rounded hover:bg-rose-50 cursor-pointer"
                           title="Delete listing"
                         >
                           <Trash2 size={14} />
@@ -364,17 +364,17 @@ export default function HostDashboardPage() {
       {activeTab === "bookings" && (
         <Card padding="none" className="overflow-hidden">
           {bookings.length === 0 ? (
-            <div className="py-16 text-center text-xs text-[#64748B]">
+            <div className="py-16 text-center text-xs text-[#334155]">
               <Users size={32} className="mx-auto text-[#CBD5E1] mb-2" />
-              <p className="font-semibold text-sm text-[#17243A]">No Driver Reservations Yet</p>
-              <p className="text-[#94A3B8] mt-0.5">
+              <p className="font-semibold text-sm text-[#0F172A]">No Driver Reservations Yet</p>
+              <p className="text-[#475569] mt-0.5">
                 When drivers book your parking spaces, their bookings and schedules will appear here in real time.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#475569]">
-                <thead className="bg-[#F8FAFC] border-b border-[#DDE3EA] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider">
+              <table className="w-full text-left text-xs text-[#334155]">
+                <thead className="bg-[#F8FAFC] border-b border-[#DDE3EA] text-[11px] font-semibold text-[#475569] uppercase tracking-wider">
                   <tr>
                     <th className="px-4 py-3">Parking Bay</th>
                     <th className="px-4 py-3">Driver</th>
@@ -388,23 +388,23 @@ export default function HostDashboardPage() {
                   {bookings.map((b) => (
                     <tr key={b._id} className="hover:bg-[#F8FAFC]/60 transition">
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-[#17243A]">
+                        <div className="font-semibold text-[#0F172A]">
                           {b.spot?.title || b.spot?.address || "Parking Bay"}
                         </div>
-                        <div className="text-[11px] text-[#94A3B8] truncate max-w-xs">
+                        <div className="text-[11px] text-[#475569] truncate max-w-xs">
                           {b.spot?.address}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-[#17243A]">
+                        <div className="font-medium text-[#0F172A]">
                           {b.user?.username || "Driver"}
                         </div>
-                        <div className="text-[11px] text-[#94A3B8]">
+                        <div className="text-[11px] text-[#475569]">
                           {b.user?.email}
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 font-medium text-[#17243A]">
+                        <div className="flex items-center gap-1.5 font-medium text-[#0F172A]">
                           <Clock size={12} className="text-[#2563EB]" />
                           <span>
                             {new Date(b.startTime).toLocaleDateString([], {
@@ -417,7 +417,7 @@ export default function HostDashboardPage() {
                             })}
                           </span>
                         </div>
-                        <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                        <div className="text-[11px] text-[#475569] mt-0.5">
                           until{" "}
                           {new Date(b.endTime).toLocaleTimeString([], {
                             hour: "2-digit",

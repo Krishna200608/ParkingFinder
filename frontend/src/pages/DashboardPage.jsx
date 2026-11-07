@@ -148,7 +148,7 @@ export default function DashboardPage() {
       {activeTab === "bookings" && (
         <>
           {loading ? (
-            <div className="py-20 text-center text-sm text-[#64748B]">
+            <div className="py-20 text-center text-sm text-[#334155]">
               <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
               Loading your parking reservations...
             </div>
@@ -176,10 +176,10 @@ export default function DashboardPage() {
                       {/* Status Row */}
                       <div className="flex items-start justify-between gap-2 mb-3">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm text-[#17243A] truncate">
+                          <h3 className="font-semibold text-sm text-[#0F172A] truncate">
                             {b.spot?.title || b.spot?.address || "Parking Bay"}
                           </h3>
-                          <p className="text-xs text-[#64748B] truncate mt-0.5">
+                          <p className="text-xs text-[#334155] truncate mt-0.5">
                             {b.spot?.address}
                           </p>
                         </div>
@@ -187,7 +187,7 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Time Details Box */}
-                      <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#475569] mb-4">
+                      <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#334155] mb-4">
                         <div className="flex items-center gap-2">
                           <Calendar size={13} className="text-[#2563EB] shrink-0" />
                           <span>
@@ -226,10 +226,10 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <div className="text-right">
-                          <span className="text-[11px] text-[#94A3B8] block">
+                          <span className="text-[11px] text-[#475569] font-medium block">
                             ${b.spot?.pricePerHour || b.pricePerHourSnapshot || 0}/hr
                           </span>
-                          <span className="text-base font-bold text-[#17243A]">
+                          <span className="text-base font-bold text-[#0F172A]">
                             ${(b.totalAmount || b.totalCost || 0).toFixed(2)}
                           </span>
                         </div>
@@ -283,27 +283,27 @@ export default function DashboardPage() {
       {activeTab === "receipts" && (
         <Card padding="none" className="overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-[#DDE3EA]">
-            <h2 className="text-base font-bold text-[#17243A] flex items-center gap-2">
+            <h2 className="text-base font-bold text-[#0F172A] flex items-center gap-2">
               <Receipt className="text-[#2563EB]" size={18} />
               <span>Payment Receipts</span>
             </h2>
-            <p className="text-xs text-[#64748B] mt-0.5">
+            <p className="text-xs text-[#334155] mt-0.5">
               Verified financial transactions executed through Stripe Sandbox & Checkout Simulator.
             </p>
           </div>
 
           {transactions.length === 0 ? (
-            <div className="py-16 text-center text-xs text-[#64748B]">
+            <div className="py-16 text-center text-xs text-[#334155]">
               <Receipt size={32} className="mx-auto text-[#CBD5E1] mb-2" />
-              <p className="font-medium text-[#17243A]">No payment transactions recorded</p>
-              <p className="text-[#94A3B8] mt-0.5">
+              <p className="font-semibold text-[#0F172A]">No payment transactions recorded</p>
+              <p className="text-[#475569] mt-0.5">
                 Complete payment on any reserved booking to view receipts here.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#475569]">
-                <thead className="bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider border-b border-[#DDE3EA]">
+              <table className="w-full text-left text-xs text-[#334155]">
+                <thead className="bg-[#F8FAFC] text-[11px] font-semibold text-[#475569] uppercase tracking-wider border-b border-[#DDE3EA]">
                   <tr>
                     <th className="py-2.5 px-4">Transaction Reference</th>
                     <th className="py-2.5 px-4">Parking Bay</th>
@@ -316,21 +316,21 @@ export default function DashboardPage() {
                 <tbody className="divide-y divide-[#F1F5F9]">
                   {transactions.map((txn) => (
                     <tr key={txn._id} className="hover:bg-[#F8FAFC]/60 transition">
-                      <td className="py-3 px-4 font-mono text-[11px] text-[#17243A]">
+                      <td className="py-3 px-4 font-mono text-[11px] text-[#0F172A]">
                         {txn.stripePaymentIntentId || txn.stripeSessionId || txn._id}
                       </td>
-                      <td className="py-3 px-4 font-medium text-[#17243A]">
+                      <td className="py-3 px-4 font-medium text-[#0F172A]">
                         {txn.booking?.spot?.title || txn.booking?.spot?.address || "Dedicated Bay"}
                       </td>
                       <td className="py-3 px-4 font-semibold text-[#16845B]">
                         ${Number(txn.amount || 0).toFixed(2)}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]">
+                        <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#334155] border border-[#E2E8F0]">
                           {txn.mode}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-[#64748B]">
+                      <td className="py-3 px-4 text-[#334155]">
                         {new Date(txn.createdAt).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4">
@@ -348,19 +348,19 @@ export default function DashboardPage() {
       {/* ── RESERVATION DETAILS DIALOG ────────────────────────── */}
       {selectedBooking && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-[#17243A]/40 backdrop-blur-xs"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-[#0F172A]/40 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
         >
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg border border-[#DDE3EA] overflow-hidden flex flex-col max-h-[85vh]">
             <div className="flex justify-between items-center px-5 py-4 border-b border-[#DDE3EA]">
-              <h3 className="font-bold text-sm text-[#17243A]">
+              <h3 className="font-bold text-sm text-[#0F172A]">
                 Reservation Details
               </h3>
               <button
                 type="button"
                 onClick={() => setSelectedBooking(null)}
-                className="text-[#94A3B8] hover:text-[#17243A] p-1 cursor-pointer"
+                className="text-[#475569] hover:text-[#0F172A] p-1 cursor-pointer"
               >
                 <X size={16} />
               </button>
@@ -368,36 +368,36 @@ export default function DashboardPage() {
 
             <div className="p-5 space-y-4 overflow-y-auto text-xs">
               <div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8] block mb-1">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#475569] block mb-1">
                   Location
                 </span>
-                <p className="font-semibold text-sm text-[#17243A]">
+                <p className="font-semibold text-sm text-[#0F172A]">
                   {selectedBooking.spot?.address}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0]">
                 <div>
-                  <span className="text-[11px] text-[#64748B] block">Duration</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[11px] text-[#475569] block">Duration</span>
+                  <span className="font-semibold text-[#0F172A]">
                     {selectedBooking.durationHours} hours
                   </span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-[#64748B] block">Hourly Rate</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[11px] text-[#475569] block">Hourly Rate</span>
+                  <span className="font-semibold text-[#0F172A]">
                     ${selectedBooking.pricePerHourSnapshot || selectedBooking.spot?.pricePerHour}/hr
                   </span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-[#64748B] block">Start</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[11px] text-[#475569] block">Start</span>
+                  <span className="font-semibold text-[#0F172A]">
                     {formatTime(selectedBooking.startTime)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[11px] text-[#64748B] block">End</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[11px] text-[#475569] block">End</span>
+                  <span className="font-semibold text-[#0F172A]">
                     {formatTime(selectedBooking.endTime)}
                   </span>
                 </div>
@@ -405,7 +405,7 @@ export default function DashboardPage() {
 
               <div className="flex items-center justify-between pt-1">
                 <div>
-                  <span className="text-[11px] text-[#64748B] block">Payment Status</span>
+                  <span className="text-[11px] text-[#475569] block">Payment Status</span>
                   <div className="mt-0.5">
                     {selectedBooking.paymentStatus === "paid" ? (
                       <span className="text-[#16845B] font-bold flex items-center gap-1">
@@ -445,7 +445,7 @@ export default function DashboardPage() {
               {/* Location Map */}
               {selectedBooking.spot?.location?.coordinates && (
                 <div>
-                  <span className="text-[11px] font-semibold text-[#64748B] block mb-1">
+                  <span className="text-[11px] font-semibold text-[#475569] block mb-1">
                     Map Overview
                   </span>
                   <div className="h-36 rounded-lg overflow-hidden border border-[#DDE3EA]">

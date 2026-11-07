@@ -18,29 +18,29 @@ export function PageHeader({
     >
       <div className="space-y-1">
         {Array.isArray(breadcrumbs) && breadcrumbs.length > 0 && (
-          <nav className="flex items-center gap-1.5 text-xs text-[#64748B] mb-1.5" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-1.5 text-xs text-[#475569] mb-1.5" aria-label="Breadcrumb">
             {breadcrumbs.map((crumb, idx) => (
               <React.Fragment key={idx}>
-                {idx > 0 && <ChevronRight size={12} className="text-[#94A3B8]" />}
+                {idx > 0 && <ChevronRight size={12} className="text-[#64748B]" />}
                 {crumb.href ? (
                   <Link
                     to={crumb.href}
-                    className="hover:text-[#17243A] transition hover:underline"
+                    className="hover:text-[#0F172A] transition hover:underline"
                   >
                     {crumb.label}
                   </Link>
                 ) : (
-                  <span className="text-[#17243A] font-medium">{crumb.label}</span>
+                  <span className="text-[#0F172A] font-medium">{crumb.label}</span>
                 )}
               </React.Fragment>
             ))}
           </nav>
         )}
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#17243A]">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#0F172A]">
           {title}
         </h1>
         {description && (
-          <p className="text-xs sm:text-sm text-[#64748B] max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#334155] max-w-2xl leading-relaxed">
             {description}
           </p>
         )}

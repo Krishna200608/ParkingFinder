@@ -31,8 +31,8 @@ export default function App() {
     <div
       className={
         isMapRoute
-          ? "h-screen w-full flex flex-col overflow-hidden bg-white text-[#17243A]"
-          : "min-h-screen w-full flex flex-col bg-[#F4F6F8] text-[#17243A]"
+          ? "h-screen w-full flex flex-col overflow-hidden bg-white text-[#0F172A]"
+          : "min-h-screen w-full flex flex-col bg-[#F4F6F8] text-[#0F172A]"
       }
     >
       <Header />
@@ -71,10 +71,10 @@ export default function App() {
         toastOptions={{
           style: {
             background: "#FFFFFF",
-            color: "#17243A",
+            color: "#0F172A",
             border: "1px solid #DDE3EA",
             fontSize: "13px",
-            boxShadow: "0 10px 15px -3px rgba(23, 36, 58, 0.08)",
+            boxShadow: "0 10px 15px -3px rgba(15, 23, 42, 0.08)",
             borderRadius: "10px",
           },
         }}

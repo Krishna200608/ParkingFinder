@@ -21,7 +21,7 @@ export default function Card({
 
   let baseSurface = "";
   if (variant === "dark") {
-    baseSurface = `${hasCustomBg ? "" : "bg-[#17243A]"} text-white ${hasCustomBorder ? "" : "border border-slate-800"} shadow-sm`;
+    baseSurface = `${hasCustomBg ? "" : "bg-[#0F172A]"} text-white ${hasCustomBorder ? "" : "border border-slate-800"} shadow-sm`;
   } else if (variant === "muted") {
     baseSurface = `${hasCustomBg ? "" : "bg-[#F8FAFC]"} ${hasCustomBorder ? "" : "border border-[#DDE3EA]"} shadow-2xs`;
   } else if (variant === "plain") {

@@ -185,7 +185,7 @@ export default function SpotDetailsPage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-3">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Loading parking space details...</p>
+        <p className="text-sm text-[#334155]">Loading parking space details...</p>
       </div>
     );
   }
@@ -193,10 +193,10 @@ export default function SpotDetailsPage() {
   if (!spot) {
     return (
       <div className="max-w-xl mx-auto my-16 text-center bg-white p-8 rounded-xl border border-[#DDE3EA]">
-        <h2 className="text-xl font-bold text-[#17243A] mb-2">
+        <h2 className="text-xl font-bold text-[#0F172A] mb-2">
           Parking Space Not Found
         </h2>
-        <p className="text-sm text-[#64748B] mb-6">
+        <p className="text-sm text-[#334155] mb-6">
           This parking listing may have been deactivated or removed by the host.
         </p>
         <Button variant="primary" size="md" href="/find">
@@ -217,7 +217,7 @@ export default function SpotDetailsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/find"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#64748B] hover:text-[#17243A] transition"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] transition"
         >
           <ArrowLeft size={14} /> Back to Search Map
         </Link>
@@ -275,11 +275,11 @@ export default function SpotDetailsPage() {
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-bold text-[#17243A] mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] mb-2">
               {spot.title || spot.address}
             </h1>
 
-            <div className="flex items-center gap-1.5 text-xs text-[#64748B] mb-4">
+            <div className="flex items-center gap-1.5 text-xs text-[#334155] mb-4 font-normal">
               <MapPin size={14} className="text-[#2563EB] shrink-0" />
               <span>{spot.address}</span>
             </div>
@@ -288,15 +288,15 @@ export default function SpotDetailsPage() {
               <div className="flex items-center gap-1 text-amber-600 font-semibold">
                 <Star size={14} className="fill-amber-400" />
                 <span>{spot.rating ? spot.rating.toFixed(1) : "New"}</span>
-                <span className="text-[#94A3B8] font-normal">
+                <span className="text-[#475569] font-medium">
                   ({spot.reviews?.length || 0} reviews)
                 </span>
               </div>
               <span className="text-[#CBD5E1]">|</span>
-              <div className="text-[#64748B] flex items-center gap-1">
+              <div className="text-[#475569] flex items-center gap-1">
                 <User size={13} />
                 <span>Host:</span>
-                <span className="font-medium text-[#17243A]">
+                <span className="font-semibold text-[#0F172A]">
                   {spot.owner?.username || "Verified Host"}
                 </span>
               </div>
@@ -305,10 +305,10 @@ export default function SpotDetailsPage() {
 
           {/* Description */}
           <Card padding="default">
-            <h2 className="text-sm font-semibold text-[#17243A] mb-2">
+            <h2 className="text-sm font-semibold text-[#0F172A] mb-2">
               Space Overview
             </h2>
-            <p className="text-xs sm:text-sm text-[#475569] leading-relaxed whitespace-pre-line">
+            <p className="text-xs sm:text-sm text-[#334155] leading-relaxed whitespace-pre-line">
               {spot.description ||
                 "Dedicated parking bay situated in a convenient urban location with reliable ground access."}
             </p>
@@ -330,7 +330,7 @@ export default function SpotDetailsPage() {
 
           {/* Amenities */}
           <Card padding="default">
-            <h2 className="text-sm font-semibold text-[#17243A] mb-3">
+            <h2 className="text-sm font-semibold text-[#0F172A] mb-3">
               Included Amenities & Features
             </h2>
             {spot.amenities && spot.amenities.length > 0 ? (
@@ -344,7 +344,7 @@ export default function SpotDetailsPage() {
                   return (
                     <div
                       key={amenityKey}
-                      className="flex items-center gap-2 p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#17243A] text-xs font-medium"
+                      className="flex items-center gap-2 p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[#0F172A] text-xs font-medium"
                     >
                       <IconComp size={15} className="text-[#2563EB] shrink-0" />
                       <span>{meta.label}</span>
@@ -353,7 +353,7 @@ export default function SpotDetailsPage() {
                 })}
               </div>
             ) : (
-              <p className="text-xs text-[#64748B]">
+              <p className="text-xs text-[#475569]">
                 Standard open parking bay with street access.
               </p>
             )}
@@ -362,7 +362,7 @@ export default function SpotDetailsPage() {
           {/* Mini Leaflet Map */}
           <Card padding="default">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-[#17243A]">
+              <h2 className="text-sm font-semibold text-[#0F172A]">
                 Location Map
               </h2>
               <a
@@ -400,7 +400,7 @@ export default function SpotDetailsPage() {
           {/* Reviews Section */}
           <Card padding="default">
             <div className="flex items-center justify-between pb-3 border-b border-[#F1F5F9] mb-4">
-              <h2 className="text-sm font-semibold text-[#17243A]">
+              <h2 className="text-sm font-semibold text-[#0F172A]">
                 Driver Feedback ({spot.reviews?.length || 0})
               </h2>
               <div className="flex items-center gap-1 text-amber-600 font-bold text-xs">
@@ -414,10 +414,10 @@ export default function SpotDetailsPage() {
                 {spot.reviews.map((rev, index) => (
                   <div key={index} className="pt-3 first:pt-0 space-y-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[#17243A]">
+                      <span className="text-xs font-semibold text-[#0F172A]">
                         {rev.user?.username || "Verified Driver"}
                       </span>
-                      <span className="text-[11px] text-[#94A3B8]">
+                      <span className="text-[11px] text-[#475569] font-medium">
                         {new Date(rev.createdAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -434,12 +434,12 @@ export default function SpotDetailsPage() {
                         />
                       ))}
                     </div>
-                    <p className="text-xs text-[#475569]">{rev.comment}</p>
+                    <p className="text-xs text-[#334155]">{rev.comment}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#94A3B8] py-2">
+              <p className="text-xs text-[#475569] py-2 font-medium">
                 No reviews yet for this space.
               </p>
             )}
@@ -450,11 +450,11 @@ export default function SpotDetailsPage() {
                 onSubmit={handleReviewSubmit}
                 className="mt-6 pt-4 border-t border-[#F1F5F9] space-y-3"
               >
-                <h3 className="text-xs font-semibold text-[#17243A] flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
                   <MessageSquare size={14} className="text-[#2563EB]" /> Write a Review
                 </h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#64748B]">Rating:</span>
+                  <span className="text-xs text-[#334155]">Rating:</span>
                   <div className="flex items-center gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -480,7 +480,7 @@ export default function SpotDetailsPage() {
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
                   placeholder="Share details regarding spot accessibility, space width, and overall experience..."
-                  className="w-full text-xs border border-[#DDE3EA] rounded-lg p-2.5 focus:outline-none focus:border-[#2563EB]"
+                  className="w-full text-xs text-[#0F172A] border border-[#DDE3EA] rounded-lg p-2.5 focus:outline-none focus:border-[#2563EB]"
                   required
                 />
                 <Button
@@ -501,10 +501,10 @@ export default function SpotDetailsPage() {
           <Card padding="default">
             <div className="flex items-baseline justify-between border-b border-[#F1F5F9] pb-3 mb-4">
               <div>
-                <span className="text-2xl font-bold text-[#17243A]">
+                <span className="text-2xl font-bold text-[#0F172A]">
                   ${spot.pricePerHour}
                 </span>
-                <span className="text-xs text-[#64748B] font-normal"> / hour</span>
+                <span className="text-xs text-[#475569] font-normal"> / hour</span>
               </div>
               <Badge variant="brand" size="sm">
                 Instant Reserve
@@ -515,7 +515,7 @@ export default function SpotDetailsPage() {
             <div className="space-y-2 mb-4">
               <label
                 htmlFor="availabilityDate"
-                className="block text-xs font-medium text-[#17243A] flex items-center gap-1.5"
+                className="block text-xs font-semibold text-[#0F172A] flex items-center gap-1.5"
               >
                 <Calendar size={13} className="text-[#2563EB]" /> Check Date Availability:
               </label>
@@ -525,11 +525,11 @@ export default function SpotDetailsPage() {
                 value={selectedDate}
                 min={new Date().toISOString().split("T")[0]}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               />
 
               {loadingAvailability ? (
-                <p className="text-[11px] text-[#94A3B8] py-0.5">Checking slot occupancy...</p>
+                <p className="text-[11px] text-[#475569] py-0.5">Checking slot occupancy...</p>
               ) : availability?.occupiedIntervals?.length > 0 ? (
                 <div className="text-xs bg-[#FEF2F2] p-2.5 rounded-lg border border-[#FECACA] space-y-1">
                   <span className="font-semibold text-[#DC4545] block text-[11px]">
@@ -564,7 +564,7 @@ export default function SpotDetailsPage() {
 
             {/* Reservation Trigger */}
             {isOwner ? (
-              <div className="p-3 bg-[#F1F5F9] rounded-lg text-center text-xs text-[#64748B]">
+              <div className="p-3 bg-[#F1F5F9] rounded-lg text-center text-xs text-[#334155] font-medium">
                 You are the host of this listing.
               </div>
             ) : (
@@ -579,7 +579,7 @@ export default function SpotDetailsPage() {
               </Button>
             )}
 
-            <div className="text-center text-[11px] text-[#94A3B8] space-y-1 pt-3 border-t border-[#F1F5F9] mt-4">
+            <div className="text-center text-[11px] text-[#475569] font-medium space-y-1 pt-3 border-t border-[#F1F5F9] mt-4">
               <p>• Cancellation permitted before scheduled arrival</p>
               <p>• Atomic write-lock concurrency protection</p>
             </div>

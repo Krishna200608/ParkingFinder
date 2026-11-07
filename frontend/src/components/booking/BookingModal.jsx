@@ -148,7 +148,7 @@ export default function BookingModal({ spot, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#17243A]/40 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F172A]/50 backdrop-blur-xs overflow-y-auto"
       role="dialog"
       aria-modal="true"
     >
@@ -156,17 +156,17 @@ export default function BookingModal({ spot, onClose }) {
         {/* Header */}
         <div className="flex justify-between items-start px-5 py-4 border-b border-[#DDE3EA] bg-white shrink-0">
           <div>
-            <h3 className="text-base font-bold text-[#17243A]">
+            <h3 className="text-base font-bold text-[#0F172A]">
               Reserve Parking Bay
             </h3>
-            <p className="text-xs text-[#64748B] truncate max-w-sm mt-0.5">
+            <p className="text-xs text-[#334155] truncate max-w-sm mt-0.5">
               {spot.title || spot.address}
             </p>
           </div>
           <button
             type="button"
             onClick={() => onClose(false)}
-            className="p-1 rounded text-[#94A3B8] hover:text-[#17243A] transition cursor-pointer"
+            className="p-1 rounded text-[#475569] hover:text-[#0F172A] transition cursor-pointer"
             aria-label="Close dialog"
           >
             <X size={18} />
@@ -283,7 +283,7 @@ export default function BookingModal({ spot, onClose }) {
                 value={startDate}
                 min={new Date().toISOString().split("T")[0]}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div>
@@ -295,7 +295,7 @@ export default function BookingModal({ spot, onClose }) {
                 value={endDate}
                 min={startDate || new Date().toISOString().split("T")[0]}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function BookingModal({ spot, onClose }) {
                 type="time"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               />
             </div>
             <div>
@@ -320,7 +320,7 @@ export default function BookingModal({ spot, onClose }) {
                 type="time"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-1.5 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               />
             </div>
           </div>
@@ -328,13 +328,13 @@ export default function BookingModal({ spot, onClose }) {
           {/* Rate Summary & Notes */}
           <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between">
             <div>
-              <span className="text-[11px] text-[#64748B] block">Hourly Rate</span>
-              <span className="text-xs font-semibold text-[#17243A]">
+              <span className="text-[11px] text-[#475569] block">Hourly Rate</span>
+              <span className="text-xs font-semibold text-[#0F172A]">
                 ${spot.pricePerHour}/hr
               </span>
             </div>
             <div className="text-right">
-              <span className="text-[11px] text-[#64748B] block">Total Estimated</span>
+              <span className="text-[11px] text-[#475569] block">Total Estimated</span>
               <span className="text-base font-bold text-[#2563EB]">
                 ${totalPrice ? totalPrice.toFixed(2) : "0.00"}
               </span>
@@ -350,7 +350,7 @@ export default function BookingModal({ spot, onClose }) {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Arriving in silver sedan, license plate ABC-1234"
-              className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+              className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
             />
           </div>
         </div>

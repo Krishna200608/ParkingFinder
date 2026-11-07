@@ -92,7 +92,7 @@ export default function CheckoutSimulatorPage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Preparing sandbox checkout session...</p>
+        <p className="text-sm text-[#334155]">Preparing sandbox checkout session...</p>
       </div>
     );
   }
@@ -106,8 +106,8 @@ export default function CheckoutSimulatorPage() {
         <div className="flex items-start gap-2.5">
           <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5 text-[#D97706]" />
           <div>
-            <p className="font-semibold text-[#17243A]">Stripe Sandbox / Test Mode Simulator</p>
-            <p className="text-[#64748B] mt-0.5">
+            <p className="font-semibold text-[#0F172A]">Stripe Sandbox / Test Mode Simulator</p>
+            <p className="text-[#334155] mt-0.5">
               This checkout operates in test mode. No real payment method is charged.
             </p>
           </div>
@@ -128,48 +128,48 @@ export default function CheckoutSimulatorPage() {
           <div>
             <Link
               to="/dashboard"
-              className="inline-flex items-center text-xs text-[#64748B] hover:text-[#17243A] mb-5 font-medium gap-1"
+              className="inline-flex items-center text-xs text-[#475569] hover:text-[#0F172A] mb-5 font-medium gap-1"
             >
               <ArrowLeft size={13} /> Back to My Bookings
             </Link>
 
-            <h2 className="text-base font-bold text-[#17243A] mb-1">
+            <h2 className="text-base font-bold text-[#0F172A] mb-1">
               Reservation Summary
             </h2>
-            <p className="text-xs font-mono text-[#94A3B8] mb-5">
+            <p className="text-xs font-mono text-[#475569] font-medium mb-5">
               Ref: {bookingId.slice(-8)}
             </p>
 
             <div className="space-y-3.5 text-xs">
               <div className="pb-3 border-b border-[#E2E8F0]">
-                <span className="text-[#64748B] block mb-0.5">Parking Bay</span>
-                <p className="font-semibold text-sm text-[#17243A]">
+                <span className="text-[#475569] block mb-0.5">Parking Bay</span>
+                <p className="font-semibold text-sm text-[#0F172A]">
                   {booking?.spot?.title || booking?.spot?.address || "Dedicated Space"}
                 </p>
-                <p className="text-[11px] text-[#64748B] mt-0.5">
+                <p className="text-[11px] text-[#334155] mt-0.5">
                   {booking?.spot?.address}
                 </p>
               </div>
 
               <div className="pb-3 border-b border-[#E2E8F0] grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-[#64748B] block">Duration</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[#475569] block">Duration</span>
+                  <span className="font-semibold text-[#0F172A]">
                     {booking?.durationHours} hours
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#64748B] block">Hourly Rate</span>
-                  <span className="font-semibold text-[#17243A]">
+                  <span className="text-[#475569] block">Hourly Rate</span>
+                  <span className="font-semibold text-[#0F172A]">
                     ${booking?.pricePerHourSnapshot || booking?.spot?.pricePerHour}/hr
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-1 text-xs text-[#64748B]">
+              <div className="space-y-1.5 pt-1 text-xs text-[#475569]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium text-[#17243A]">
+                  <span className="font-semibold text-[#0F172A]">
                     ${totalAmount.toFixed(2)}
                   </span>
                 </div>
@@ -183,7 +183,7 @@ export default function CheckoutSimulatorPage() {
 
           <div className="pt-4 border-t border-[#E2E8F0] mt-6">
             <div className="flex justify-between items-baseline">
-              <span className="text-xs font-semibold text-[#64748B]">Total Amount</span>
+              <span className="text-xs font-semibold text-[#475569]">Total Amount</span>
               <span className="text-2xl font-bold text-[#2563EB]">
                 ${totalAmount.toFixed(2)}
               </span>
@@ -195,7 +195,7 @@ export default function CheckoutSimulatorPage() {
         <div className="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between pb-4 border-b border-[#F1F5F9] mb-5">
-              <h3 className="text-sm font-bold text-[#17243A] flex items-center gap-2">
+              <h3 className="text-sm font-bold text-[#0F172A] flex items-center gap-2">
                 <CreditCard className="text-[#2563EB]" size={16} />
                 <span>Simulated Card Authorization</span>
               </h3>
@@ -206,12 +206,12 @@ export default function CheckoutSimulatorPage() {
 
             <form onSubmit={handleSimulatePayment} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-[#475569] mb-1">
+                <label className="block text-xs font-semibold text-[#1E293B] mb-1">
                   Card Information
                 </label>
                 <div className="border border-[#DDE3EA] rounded-lg overflow-hidden focus-within:border-[#2563EB]">
                   <div className="px-3 py-2 bg-white flex items-center border-b border-[#DDE3EA]">
-                    <CreditCard className="text-[#94A3B8] mr-2 shrink-0" size={16} />
+                    <CreditCard className="text-[#475569] mr-2 shrink-0" size={16} />
                     <input
                       type="text"
                       value={cardNumber}
@@ -220,7 +220,7 @@ export default function CheckoutSimulatorPage() {
                         setRawCardNumber(e.target.value.replace(/\D/g, ""));
                       }}
                       placeholder="4242 4242 4242 4242"
-                      className="w-full text-xs font-mono text-[#17243A] focus:outline-none"
+                      className="w-full text-xs font-mono text-[#0F172A] focus:outline-none"
                       required
                     />
                     <Badge variant="brand" size="sm" className="ml-2">
@@ -233,7 +233,7 @@ export default function CheckoutSimulatorPage() {
                       value={cardExpiry}
                       onChange={(e) => setCardExpiry(e.target.value)}
                       placeholder="MM / YY"
-                      className="px-3 py-2 text-xs font-mono text-[#17243A] focus:outline-none bg-white"
+                      className="px-3 py-2 text-xs font-mono text-[#0F172A] focus:outline-none bg-white"
                       required
                     />
                     <input
@@ -242,7 +242,7 @@ export default function CheckoutSimulatorPage() {
                       onChange={(e) => setCardCvc(e.target.value)}
                       placeholder="CVC"
                       maxLength={4}
-                      className="px-3 py-2 text-xs font-mono text-[#17243A] focus:outline-none bg-white"
+                      className="px-3 py-2 text-xs font-mono text-[#0F172A] focus:outline-none bg-white"
                       required
                     />
                   </div>
@@ -250,7 +250,7 @@ export default function CheckoutSimulatorPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-[#475569] mb-1">
+                <label className="block text-xs font-semibold text-[#1E293B] mb-1">
                   Cardholder Name
                 </label>
                 <input
@@ -258,7 +258,7 @@ export default function CheckoutSimulatorPage() {
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value)}
                   placeholder="Demo Driver"
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
@@ -280,7 +280,7 @@ export default function CheckoutSimulatorPage() {
                 </Button>
               </div>
 
-              <p className="text-[11px] text-[#94A3B8] text-center flex items-center justify-center gap-1 pt-1">
+              <p className="text-[11px] text-[#475569] font-medium text-center flex items-center justify-center gap-1 pt-1">
                 <CheckCircle2 size={12} className="text-[#16845B]" />
                 Simulated checkout writes verified booking record to backend.
               </p>

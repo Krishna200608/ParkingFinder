@@ -214,12 +214,12 @@ export default function AddSpotPage() {
         <div className="lg:col-span-7 space-y-5">
           {/* Section 1: Basic Information */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               1. Basic Space Information
             </h2>
             <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Space Title (e.g., Secure Gated Driveway near Metro)
                 </label>
                 <input
@@ -228,35 +228,35 @@ export default function AddSpotPage() {
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g., Covered Driveway near Connaught Place"
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[#475569] font-medium mb-1">
+                  <label className="block text-[#1E293B] font-semibold mb-1">
                     Space Classification
                   </label>
                   <select
                     name="spotType"
                     value={formData.spotType}
                     onChange={handleChange}
-                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                   >
                     <option value="p2p">Peer-to-Peer (Driveway/Residential)</option>
                     <option value="operator">Commercial Hub / Structured Lot</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[#475569] font-medium mb-1">
+                  <label className="block text-[#1E293B] font-semibold mb-1">
                     Max Vehicle Compatibility
                   </label>
                   <select
                     name="vehicleSize"
                     value={formData.vehicleSize}
                     onChange={handleChange}
-                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                   >
                     <option value="any">Any Vehicle Size</option>
                     <option value="compact">Compact / Hatchback</option>
@@ -267,7 +267,7 @@ export default function AddSpotPage() {
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Full Street Address
                 </label>
                 <input
@@ -276,16 +276,16 @@ export default function AddSpotPage() {
                   value={formData.address}
                   onChange={handleChange}
                   placeholder="Street address or select from the map"
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
-                <p className="text-[11px] text-[#94A3B8] mt-1">
+                <p className="text-[11px] text-[#475569] mt-1">
                   Pinpoint your entrance on the map to auto-fill exact address.
                 </p>
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Space Description
                 </label>
                 <textarea
@@ -294,7 +294,7 @@ export default function AddSpotPage() {
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Describe clearance, ease of access, lighting, or specific bay numbers..."
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             </div>
@@ -302,16 +302,16 @@ export default function AddSpotPage() {
 
           {/* Section 2: Pricing & Instructions */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               2. Hourly Pricing & Access Rules
             </h2>
             <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Base Hourly Rate ($ USD)
                 </label>
                 <div className="relative max-w-xs">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] font-semibold">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569] font-semibold">
                     $
                   </span>
                   <input
@@ -322,17 +322,17 @@ export default function AddSpotPage() {
                     value={formData.pricePerHour}
                     onChange={handleChange}
                     placeholder="10.00"
-                    className="w-full pl-7 pr-3 py-2 border border-[#DDE3EA] rounded-lg text-xs font-semibold text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full pl-7 pr-3 py-2 border border-[#DDE3EA] rounded-lg text-xs font-semibold text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                     required
                   />
                 </div>
-                <p className="text-[11px] text-[#94A3B8] mt-1">
+                <p className="text-[11px] text-[#475569] mt-1">
                   Tip: Most urban residential spaces charge between $5 to $20/hr.
                 </p>
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Driver Entry & Gate Instructions
                 </label>
                 <textarea
@@ -341,7 +341,7 @@ export default function AddSpotPage() {
                   value={formData.accessInstructions}
                   onChange={handleChange}
                   placeholder="e.g. Ring doorbell #4, enter gate code 1234, or park in bay labeled P-2."
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function AddSpotPage() {
 
           {/* Section 3: Amenities */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               3. Available Amenities & Security
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -364,10 +364,10 @@ export default function AddSpotPage() {
                     className={`p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2 transition cursor-pointer text-left ${
                       isSelected
                         ? "bg-blue-50 border-blue-200 text-[#2563EB]"
-                        : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
+                        : "bg-white border-[#DDE3EA] text-[#334155] hover:bg-[#F8FAFC]"
                     }`}
                   >
-                    <Icon size={14} className={isSelected ? "text-[#2563EB]" : "text-[#94A3B8]"} />
+                    <Icon size={14} className={isSelected ? "text-[#2563EB]" : "text-[#64748B]"} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -400,10 +400,10 @@ export default function AddSpotPage() {
           <Card padding="default">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-xs font-bold text-[#17243A]">
+                <h3 className="text-xs font-bold text-[#0F172A]">
                   Pinpoint Location on Map
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#334155]">
                   Click the map to place the marker.
                 </p>
               </div>
@@ -458,7 +458,7 @@ export default function AddSpotPage() {
                 <span className="text-[11px] font-semibold text-[#16845B] flex items-center gap-1">
                   <CheckCircle2 size={12} /> Location Pinned
                 </span>
-                <p className="text-[#64748B] text-[11px] truncate font-mono">
+                <p className="text-[#475569] text-[11px] truncate font-mono">
                   {coordinates[0].toFixed(5)}, {coordinates[1].toFixed(5)}
                 </p>
               </div>

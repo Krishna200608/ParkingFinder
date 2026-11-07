@@ -237,6 +237,7 @@ describe('Stage 3: Core Booking Engine & Concurrency Suite', () => {
   it('calculates available and booked intervals for any chosen date', async () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(12, 0, 0, 0);
     const dateStr = tomorrow.toISOString().split('T')[0];
 
     const res = await request(app).get(`/api/bookings/spot/${testSpot._id}/availability?date=${dateStr}&duration=1`);

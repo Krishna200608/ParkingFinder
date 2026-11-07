@@ -69,14 +69,14 @@ export default function RegisterPage() {
             <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm shadow-2xs group-hover:bg-blue-700 transition-colors">
               P
             </div>
-            <span className="font-bold text-lg text-[#17243A] tracking-tight">
+            <span className="font-bold text-lg text-[#0F172A] tracking-tight">
               ParkingFinder
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-[#17243A] tracking-tight">
+          <h1 className="text-2xl font-bold text-[#0F172A] tracking-tight">
             Create an account
           </h1>
-          <p className="text-xs text-[#64748B] mt-1">
+          <p className="text-xs text-[#334155] mt-1 font-normal">
             Join thousands of urban commuters and space hosts.
           </p>
         </div>
@@ -85,14 +85,14 @@ export default function RegisterPage() {
         <Card padding="lg" className="shadow-xs bg-white">
           <form onSubmit={handleRegister} className="space-y-4 text-xs">
             <div>
-              <label className="block text-[#475569] font-medium mb-1.5">
+              <label className="block text-[#1E293B] font-semibold mb-1.5">
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569]" size={16} />
                 <input
                   type="text"
-                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="alex_driver"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -102,14 +102,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1.5">
+              <label className="block text-[#1E293B] font-semibold mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569]" size={16} />
                 <input
                   type="email"
-                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2.5 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -119,14 +119,14 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1.5">
+              <label className="block text-[#1E293B] font-semibold mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={16} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569]" size={16} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2.5 text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
+                  className="w-full bg-white border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2.5 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-blue-100 transition-all"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -135,19 +135,19 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#475569] hover:text-[#0F172A] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              <p className="text-[11px] text-[#94A3B8] mt-1">
+              <p className="text-[11px] text-[#475569] mt-1 font-medium">
                 Must be at least 6 characters long.
               </p>
             </div>
 
             <div>
-              <label className="block text-[#475569] font-medium mb-1.5">
+              <label className="block text-[#1E293B] font-semibold mb-1.5">
                 Account Purpose
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -189,7 +189,7 @@ export default function RegisterPage() {
             </div>
           </form>
 
-          <div className="mt-5 pt-4 border-t border-[#F1F5F9] text-center text-xs text-[#64748B]">
+          <div className="mt-5 pt-4 border-t border-[#F1F5F9] text-center text-xs text-[#334155]">
             Already have an account?{" "}
             <Link to="/login" className="text-[#2563EB] font-semibold hover:underline">
               Sign in

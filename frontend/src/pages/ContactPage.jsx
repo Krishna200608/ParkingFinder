@@ -43,10 +43,10 @@ export default function ContactPage() {
         {/* LEFT COLUMN: CONTACT CHANNELS (5 COLS) */}
         <div className="md:col-span-5 space-y-5">
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3">
               Developer & Community Channels
             </h2>
-            <p className="text-xs text-[#64748B] leading-relaxed mb-4">
+            <p className="text-xs text-[#334155] leading-relaxed mb-4">
               ParkingFinder is an open-source urban parking platform. We welcome feature requests, bug reports, and community contributions.
             </p>
 
@@ -57,14 +57,14 @@ export default function ContactPage() {
                 rel="noreferrer"
                 className="flex items-center gap-3 p-3 rounded-lg border border-[#DDE3EA] hover:border-[#2563EB] hover:bg-blue-50/20 transition group"
               >
-                <Github size={18} className="text-[#17243A] group-hover:text-[#2563EB]" />
+                <Github size={18} className="text-[#0F172A] group-hover:text-[#2563EB]" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[#17243A]">GitHub Repository</p>
-                  <p className="text-[11px] text-[#64748B] truncate">
+                  <p className="font-semibold text-[#0F172A]">GitHub Repository</p>
+                  <p className="text-[11px] text-[#475569] truncate">
                     Krishna200608/ParkingFinder
                   </p>
                 </div>
-                <ExternalLink size={13} className="text-[#94A3B8]" />
+                <ExternalLink size={13} className="text-[#475569]" />
               </a>
 
               <a
@@ -73,25 +73,25 @@ export default function ContactPage() {
                 rel="noreferrer"
                 className="flex items-center gap-3 p-3 rounded-lg border border-[#DDE3EA] hover:border-[#2563EB] hover:bg-blue-50/20 transition group"
               >
-                <MessageSquare size={18} className="text-[#17243A] group-hover:text-[#2563EB]" />
+                <MessageSquare size={18} className="text-[#0F172A] group-hover:text-[#2563EB]" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-[#17243A]">Issues & Bug Reports</p>
-                  <p className="text-[11px] text-[#64748B]">
+                  <p className="font-semibold text-[#0F172A]">Issues & Bug Reports</p>
+                  <p className="text-[11px] text-[#475569]">
                     Submit bug tickets or pull requests
                   </p>
                 </div>
-                <ExternalLink size={13} className="text-[#94A3B8]" />
+                <ExternalLink size={13} className="text-[#475569]" />
               </a>
             </div>
           </Card>
 
           {/* Honest Backend Disclaimer */}
-          <div className="bg-[#F8FAFC] border border-[#DDE3EA] rounded-xl p-4 text-xs text-[#64748B] space-y-1.5">
-            <div className="font-semibold text-[#17243A] flex items-center gap-1.5">
+          <div className="bg-[#F8FAFC] border border-[#DDE3EA] rounded-xl p-4 text-xs text-[#334155] space-y-1.5">
+            <div className="font-semibold text-[#0F172A] flex items-center gap-1.5">
               <Info size={14} className="text-[#2563EB]" />
               <span>Integration Notice</span>
             </div>
-            <p className="text-[11px] leading-relaxed">
+            <p className="text-[11px] leading-relaxed text-[#475569]">
               The backend REST API does not currently expose an automated contact ingestion endpoint. Submitting the form uses your system's default email client as a reliable communication channel.
             </p>
           </div>
@@ -100,16 +100,16 @@ export default function ContactPage() {
         {/* RIGHT COLUMN: CONTACT FORM (7 COLS) */}
         <div className="md:col-span-7">
           <Card padding="lg">
-            <h3 className="text-sm font-bold text-[#17243A] mb-1">
+            <h3 className="text-sm font-bold text-[#0F172A] mb-1">
               Send a Direct Message
             </h3>
-            <p className="text-xs text-[#64748B] mb-5">
+            <p className="text-xs text-[#334155] mb-5">
               Fill in your inquiry details below to compose an email to the team.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Your Full Name
                 </label>
                 <input
@@ -117,13 +117,13 @@ export default function ContactPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="e.g. Sarah Jenkins"
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Email Address
                 </label>
                 <input
@@ -131,13 +131,13 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   placeholder="name@example.com"
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Message
                 </label>
                 <textarea
@@ -145,7 +145,7 @@ export default function ContactPage() {
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   placeholder="Describe your inquiry, question, or bug description..."
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>

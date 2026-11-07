@@ -73,7 +73,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Loading account profile...</p>
+        <p className="text-sm text-[#334155]">Loading account profile...</p>
       </div>
     );
   }
@@ -100,24 +100,24 @@ export default function ProfilePage() {
           <div className="flex-1 text-center sm:text-left space-y-3">
             <div>
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h2 className="text-lg font-bold text-[#17243A]">
+                <h2 className="text-lg font-bold text-[#0F172A]">
                   {profile?.username || "Authenticated User"}
                 </h2>
                 <Badge variant={profile?.role === "host" ? "purple" : "brand"} size="sm">
                   {profile?.role === "host" ? "Space Host" : "Driver"}
                 </Badge>
               </div>
-              <p className="text-xs text-[#64748B] mt-0.5">{profile?.email}</p>
+              <p className="text-xs text-[#334155] mt-0.5">{profile?.email}</p>
             </div>
 
-            <div className="pt-3 border-t border-[#F1F5F9] grid sm:grid-cols-2 gap-3 text-xs text-[#475569]">
+            <div className="pt-3 border-t border-[#F1F5F9] grid sm:grid-cols-2 gap-3 text-xs text-[#334155]">
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-[#2563EB] shrink-0" />
                 <span>Email: {profile?.email}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Shield size={14} className="text-[#2563EB] shrink-0" />
-                <span>Account Role: <strong className="capitalize">{profile?.role}</strong></span>
+                <span>Account Role: <strong className="capitalize text-[#0F172A]">{profile?.role}</strong></span>
               </div>
             </div>
           </div>

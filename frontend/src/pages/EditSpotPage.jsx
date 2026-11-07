@@ -213,7 +213,7 @@ export default function EditSpotPage() {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
         <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#64748B]">Loading spot listing for editing...</p>
+        <p className="text-sm text-[#334155]">Loading spot listing for editing...</p>
       </div>
     );
   }
@@ -234,12 +234,12 @@ export default function EditSpotPage() {
         <div className="lg:col-span-7 space-y-5">
           {/* Section 1: Basic Information */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               1. Basic Space Information
             </h2>
             <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Space Title
                 </label>
                 <input
@@ -247,35 +247,35 @@ export default function EditSpotPage() {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[#475569] font-medium mb-1">
+                  <label className="block text-[#1E293B] font-semibold mb-1">
                     Space Classification
                   </label>
                   <select
                     name="spotType"
                     value={formData.spotType}
                     onChange={handleChange}
-                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                   >
                     <option value="p2p">Peer-to-Peer (Driveway/Residential)</option>
                     <option value="operator">Commercial Hub / Structured Lot</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[#475569] font-medium mb-1">
+                  <label className="block text-[#1E293B] font-semibold mb-1">
                     Vehicle Compatibility
                   </label>
                   <select
                     name="vehicleSize"
                     value={formData.vehicleSize}
                     onChange={handleChange}
-                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
                   >
                     <option value="any">Any Vehicle Size</option>
                     <option value="compact">Compact / Hatchback</option>
@@ -286,7 +286,7 @@ export default function EditSpotPage() {
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Street Address
                 </label>
                 <input
@@ -294,13 +294,13 @@ export default function EditSpotPage() {
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Description
                 </label>
                 <textarea
@@ -308,7 +308,7 @@ export default function EditSpotPage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             </div>
@@ -316,16 +316,16 @@ export default function EditSpotPage() {
 
           {/* Section 2: Pricing & Instructions */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               2. Hourly Pricing & Access Rules
             </h2>
             <div className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Base Hourly Rate ($ USD)
                 </label>
                 <div className="relative max-w-xs">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] font-semibold">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569] font-semibold">
                     $
                   </span>
                   <input
@@ -335,14 +335,14 @@ export default function EditSpotPage() {
                     name="pricePerHour"
                     value={formData.pricePerHour}
                     onChange={handleChange}
-                    className="w-full pl-7 pr-3 py-2 border border-[#DDE3EA] rounded-lg text-xs font-semibold text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full pl-7 pr-3 py-2 border border-[#DDE3EA] rounded-lg text-xs font-semibold text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[#475569] font-medium mb-1">
+                <label className="block text-[#1E293B] font-semibold mb-1">
                   Driver Access Instructions
                 </label>
                 <textarea
@@ -350,7 +350,7 @@ export default function EditSpotPage() {
                   name="accessInstructions"
                   value={formData.accessInstructions}
                   onChange={handleChange}
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                 />
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function EditSpotPage() {
 
           {/* Section 3: Amenities */}
           <Card padding="default">
-            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
               3. Available Amenities & Security
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -373,10 +373,10 @@ export default function EditSpotPage() {
                     className={`p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2 transition cursor-pointer text-left ${
                       isSelected
                         ? "bg-blue-50 border-blue-200 text-[#2563EB]"
-                        : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
+                        : "bg-white border-[#DDE3EA] text-[#334155] hover:bg-[#F8FAFC]"
                     }`}
                   >
-                    <Icon size={14} className={isSelected ? "text-[#2563EB]" : "text-[#94A3B8]"} />
+                    <Icon size={14} className={isSelected ? "text-[#2563EB]" : "text-[#64748B]"} />
                     <span className="truncate">{item.label}</span>
                   </button>
                 );
@@ -409,10 +409,10 @@ export default function EditSpotPage() {
           <Card padding="default">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-xs font-bold text-[#17243A]">
+                <h3 className="text-xs font-bold text-[#0F172A]">
                   Adjust Location Marker
                 </h3>
-                <p className="text-[11px] text-[#64748B]">
+                <p className="text-[11px] text-[#334155]">
                   Drag the marker or click on the map.
                 </p>
               </div>
@@ -451,7 +451,7 @@ export default function EditSpotPage() {
               <span className="text-[11px] font-semibold text-[#16845B] flex items-center gap-1">
                 <CheckCircle2 size={12} /> Coordinates Selected
               </span>
-              <p className="text-[#64748B] text-[11px] truncate font-mono">
+              <p className="text-[#475569] text-[11px] truncate font-mono">
                 {position[0].toFixed(5)}, {position[1].toFixed(5)}
               </p>
             </div>

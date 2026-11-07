@@ -36,8 +36,8 @@ export default function MySpotsList({ spots = [], onDeleted = () => {} }) {
           className="border border-[#DDE3EA] rounded-xl p-4 bg-white flex justify-between items-start text-xs"
         >
           <div>
-            <h4 className="font-semibold text-sm text-[#17243A]">{s.title || s.address}</h4>
-            <p className="text-[#64748B] mt-0.5">{s.description || s.address}</p>
+            <h4 className="font-semibold text-sm text-[#0F172A]">{s.title || s.address}</h4>
+            <p className="text-[#334155] mt-0.5">{s.description || s.address}</p>
             <div className="text-xs font-bold text-[#2563EB] mt-2">
               ${s.pricePerHour}/hr
             </div>

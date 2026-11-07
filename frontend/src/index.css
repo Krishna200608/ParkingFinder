@@ -4,9 +4,11 @@
   --color-brand-primary: #2563EB;
   --color-brand-hover: #1D4ED8;
   --color-brand-surface: #EFF6FF;
-  --color-text-main: #17243A;
-  --color-text-muted: #64748B;
-  --color-text-light: #94A3B8;
+  --color-text-main: #0F172A;
+  --color-text-body: #334155;
+  --color-text-muted: #475569;
+  --color-text-caption: #64748B;
+  --color-text-light: #64748B;
   --color-bg-base: #F4F6F8;
   --color-bg-surface: #FFFFFF;
   --color-border-subtle: #DDE3EA;

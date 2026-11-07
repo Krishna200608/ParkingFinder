@@ -68,11 +68,11 @@ export default function Header() {
             className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-md"
             aria-label="ParkingFinder Home"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#17243A] text-white flex items-center justify-center transition-colors group-hover:bg-blue-600">
+            <div className="w-8 h-8 rounded-lg bg-[#0F172A] text-white flex items-center justify-center transition-colors group-hover:bg-blue-600">
               <Car size={18} strokeWidth={2.2} />
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-bold tracking-tight text-[#17243A]">
+              <span className="text-base font-bold tracking-tight text-[#0F172A]">
                 Parking<span className="text-blue-600">Finder</span>
               </span>
             </div>
@@ -87,7 +87,7 @@ export default function Header() {
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   isActive(item.path)
                     ? "bg-[#F4F6F8] text-blue-600 font-semibold"
-                    : "text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8]"
+                    : "text-[#334155] hover:text-[#0F172A] hover:bg-[#F4F6F8]"
                 }`}
               >
                 {item.label}
@@ -102,7 +102,7 @@ export default function Header() {
           {!isMapPage && (
             <Link
               to="/find"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8] transition-colors border border-[#DDE3EA]"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#334155] hover:text-[#0F172A] hover:bg-[#F4F6F8] transition-colors border border-[#CBD5E1]"
             >
               <Search size={13} aria-hidden="true" />
               <span>Explore Map</span>
@@ -114,7 +114,7 @@ export default function Header() {
             userInfo.role === "host" || userInfo.role === "admin" ? (
               <Link
                 to="/host/add-spot"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#DDE3EA] text-[#17243A] hover:bg-[#F4F6F8] transition-colors shadow-2xs"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#CBD5E1] text-[#0F172A] hover:bg-[#F4F6F8] transition-colors shadow-2xs"
               >
                 <Plus size={14} className="text-blue-600" />
                 <span>List Space</span>
@@ -122,7 +122,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/dashboard"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#17243A] hover:bg-[#F4F6F8] border border-[#DDE3EA] transition-colors shadow-2xs"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0F172A] hover:bg-[#F4F6F8] border border-[#CBD5E1] transition-colors shadow-2xs"
               >
                 <Calendar size={13} className="text-blue-600" />
                 <span>My Bookings</span>
@@ -131,7 +131,7 @@ export default function Header() {
           ) : (
             <Link
               to="/register"
-              className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#64748B] hover:text-[#17243A] px-3 py-1.5"
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#334155] hover:text-[#0F172A] px-3 py-1.5"
             >
               Become a Host
             </Link>
@@ -142,7 +142,7 @@ export default function Header() {
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="text-xs font-semibold text-[#17243A] px-3 py-1.5 hover:text-blue-600 transition-colors"
+                className="text-xs font-semibold text-[#0F172A] px-3 py-1.5 hover:text-blue-600 transition-colors"
               >
                 Sign In
               </Link>
@@ -163,34 +163,34 @@ export default function Header() {
                 aria-haspopup="true"
                 aria-label="User Account Menu"
               >
-                <div className="w-7 h-7 rounded-md bg-[#17243A] text-white flex items-center justify-center text-xs font-semibold">
+                <div className="w-7 h-7 rounded-md bg-[#0F172A] text-white flex items-center justify-center text-xs font-semibold">
                   {userInfo.username?.[0]?.toUpperCase() || "U"}
                 </div>
                 <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-semibold text-[#17243A] leading-tight max-w-[110px] truncate">
+                  <span className="text-xs font-semibold text-[#0F172A] leading-tight max-w-[110px] truncate">
                     {userInfo.username || "Account"}
                   </span>
-                  <span className="text-[10px] text-[#64748B] font-medium capitalize">
+                  <span className="text-[10px] text-[#475569] font-semibold capitalize">
                     {userInfo.role || "Driver"}
                   </span>
                 </div>
-                <ChevronDown size={14} className="text-[#64748B]" />
+                <ChevronDown size={14} className="text-[#475569]" />
               </button>
 
               {/* Dropdown Menu */}
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-[#DDE3EA] rounded-xl shadow-lg py-1.5 z-50 text-xs">
                   <div className="px-3 py-2 border-b border-[#DDE3EA] bg-[#F8FAFC]">
-                    <p className="font-semibold text-[#17243A] truncate">{userInfo.username}</p>
-                    <p className="text-[11px] text-[#64748B] truncate">{userInfo.email}</p>
+                    <p className="font-semibold text-[#0F172A] truncate">{userInfo.username}</p>
+                    <p className="text-[11px] text-[#475569] truncate">{userInfo.email}</p>
                   </div>
 
                   <Link
                     to={userInfo.role === "host" || userInfo.role === "admin" ? "/host/dashboard" : "/dashboard"}
                     onClick={() => setUserDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 text-[#0F172A] hover:bg-[#F4F6F8] transition-colors"
                   >
-                    <LayoutDashboard size={14} className="text-[#64748B]" />
+                    <LayoutDashboard size={14} className="text-[#475569]" />
                     <span>{userInfo.role === "host" || userInfo.role === "admin" ? "Host Dashboard" : "Reservations"}</span>
                   </Link>
 
@@ -198,9 +198,9 @@ export default function Header() {
                     <Link
                       to="/host/add-spot"
                       onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2 text-[#0F172A] hover:bg-[#F4F6F8] transition-colors"
                     >
-                      <Plus size={14} className="text-[#64748B]" />
+                      <Plus size={14} className="text-[#475569]" />
                       <span>List New Space</span>
                     </Link>
                   )}
@@ -219,9 +219,9 @@ export default function Header() {
                   <Link
                     to="/profile"
                     onClick={() => setUserDropdownOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2 text-[#0F172A] hover:bg-[#F4F6F8] transition-colors"
                   >
-                    <User size={14} className="text-[#64748B]" />
+                    <User size={14} className="text-[#475569]" />
                     <span>Account Settings</span>
                   </Link>
 
@@ -247,7 +247,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 rounded-lg text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8]"
+            className="md:hidden p-1.5 rounded-lg text-[#334155] hover:text-[#0F172A] hover:bg-[#F4F6F8]"
             aria-label="Toggle navigation drawer"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -267,7 +267,7 @@ export default function Header() {
                 className={`block px-3 py-2 rounded-lg text-sm font-medium ${
                   isActive(item.path)
                     ? "bg-[#F4F6F8] text-blue-600 font-semibold"
-                    : "text-[#17243A] hover:bg-[#F4F6F8]"
+                    : "text-[#0F172A] hover:bg-[#F4F6F8]"
                 }`}
               >
                 {item.label}
@@ -281,7 +281,7 @@ export default function Header() {
                 <Link
                   to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-sm font-medium text-[#17243A] hover:bg-[#F4F6F8] rounded-lg"
+                  className="block px-3 py-2 text-sm font-medium text-[#0F172A] hover:bg-[#F4F6F8] rounded-lg"
                 >
                   {userInfo.role === "host" ? "Host Dashboard" : "My Bookings"}
                 </Link>
@@ -289,7 +289,7 @@ export default function Header() {
                   <Link
                     to="/host/add-spot"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-2 text-sm font-medium text-[#17243A] hover:bg-[#F4F6F8] rounded-lg"
+                    className="block px-3 py-2 text-sm font-medium text-[#0F172A] hover:bg-[#F4F6F8] rounded-lg"
                   >
                     + Add New Space
                   </Link>
@@ -310,7 +310,7 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center py-2 rounded-lg border border-[#DDE3EA] text-xs font-semibold text-[#17243A]"
+                  className="text-center py-2 rounded-lg border border-[#DDE3EA] text-xs font-semibold text-[#0F172A]"
                 >
                   Sign In
                 </Link>

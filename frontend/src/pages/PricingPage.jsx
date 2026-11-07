@@ -154,10 +154,10 @@ export default function PricingPage() {
         <Badge variant="brand" size="sm" className="mb-2">
           Transparent Marketplace Pricing
         </Badge>
-        <h1 className="text-3xl font-bold text-[#17243A] tracking-tight">
+        <h1 className="text-3xl font-bold text-[#0F172A] tracking-tight">
           Simple plans and intelligent dynamic pricing
         </h1>
-        <p className="text-sm text-[#64748B] mt-2">
+        <p className="text-sm text-[#334155] mt-2 font-normal">
           Discover guaranteed spaces without hidden valet fees, or monetize unused parking with automated demand-based yield modeling.
         </p>
       </div>
@@ -176,7 +176,7 @@ export default function PricingPage() {
           >
             <div>
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-base font-bold text-[#17243A]">
+                <h2 className="text-base font-bold text-[#0F172A]">
                   {plan.name}
                 </h2>
                 {plan.highlight && (
@@ -185,14 +185,14 @@ export default function PricingPage() {
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-[#64748B] mb-4 min-h-[32px]">
+              <p className="text-xs text-[#334155] mb-4 min-h-[32px] leading-relaxed">
                 {plan.desc}
               </p>
-              <div className="text-2xl sm:text-3xl font-bold text-[#17243A] mb-5">
+              <div className="text-2xl sm:text-3xl font-bold text-[#0F172A] mb-5">
                 {plan.price}
               </div>
 
-              <ul className="text-xs text-[#475569] space-y-2.5 mb-6">
+              <ul className="text-xs text-[#1E293B] space-y-2.5 mb-6">
                 {plan.features.map((f, j) => (
                   <li key={j} className="flex items-start gap-2">
                     <Check className="text-[#16845B] shrink-0 mt-0.5" size={14} />
@@ -217,23 +217,23 @@ export default function PricingPage() {
       {/* ── DYNAMIC PRICING SIMULATOR ──────────────────────────── */}
       <Card padding="none" className="overflow-hidden">
         {/* Simulator Header */}
-        <div className="bg-[#17243A] text-white p-6 sm:p-7">
+        <div className="bg-[#0F172A] text-white p-6 sm:p-7">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-300 border-slate-700 mb-2">
+              <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-200 border-slate-700 mb-2">
                 Algorithmic Engine
               </Badge>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
                 Dynamic Pricing & Revenue Simulator
               </h2>
-              <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+              <p className="text-slate-200 text-xs sm:text-sm mt-1 max-w-xl">
                 Simulates real-time rate adjustments based on occupancy density (D), time-of-day surge (T), and demand sensitivity (α).
               </p>
             </div>
 
             {/* Presets */}
             <div className="flex flex-wrap items-center gap-1.5 shrink-0">
-              <span className="text-xs text-slate-400 mr-1">Presets:</span>
+              <span className="text-xs text-slate-300 mr-1">Presets:</span>
               <button
                 type="button"
                 onClick={() => applyPreset("downtown_peak")}
@@ -265,7 +265,7 @@ export default function PricingPage() {
           <div className="lg:col-span-7 space-y-5 text-xs">
             {/* Control 1: Base Rate */}
             <div>
-              <div className="flex justify-between items-center font-semibold text-[#17243A] mb-1.5">
+              <div className="flex justify-between items-center font-semibold text-[#0F172A] mb-1.5">
                 <span className="flex items-center gap-1.5">
                   <DollarSign size={14} className="text-[#2563EB]" /> Base Hourly Rate (P_base)
                 </span>
@@ -282,7 +282,7 @@ export default function PricingPage() {
                 onChange={(e) => setBasePrice(Number(e.target.value))}
                 className="w-full accent-[#2563EB] cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-[#94A3B8] mt-1">
+              <div className="flex justify-between text-[11px] text-[#475569] mt-1 font-medium">
                 <span>$5/hr (Residential)</span>
                 <span>$25/hr (Urban Center)</span>
                 <span>$50/hr (Prime Commercial)</span>
@@ -291,7 +291,7 @@ export default function PricingPage() {
 
             {/* Control 2: Occupancy Rate */}
             <div>
-              <div className="flex justify-between items-center font-semibold text-[#17243A] mb-1.5">
+              <div className="flex justify-between items-center font-semibold text-[#0F172A] mb-1.5">
                 <span className="flex items-center gap-1.5">
                   <TrendingUp size={14} className="text-[#2563EB]" /> Zone Occupancy Density (D)
                 </span>
@@ -316,7 +316,7 @@ export default function PricingPage() {
                 onChange={(e) => setOccupancyRate(Number(e.target.value))}
                 className="w-full accent-[#2563EB] cursor-pointer"
               />
-              <div className="flex justify-between text-[11px] text-[#94A3B8] mt-1">
+              <div className="flex justify-between text-[11px] text-[#475569] mt-1 font-medium">
                 <span>0% (Empty)</span>
                 <span>50% (Normal Demand)</span>
                 <span>100% (High Congestion)</span>
@@ -327,7 +327,7 @@ export default function PricingPage() {
             <div>
               <label
                 htmlFor="timeWindow"
-                className="block font-semibold text-[#17243A] mb-1.5 flex items-center gap-1.5"
+                className="block font-semibold text-[#0F172A] mb-1.5 flex items-center gap-1.5"
               >
                 <Clock size={14} className="text-[#2563EB]" /> Time Window (T_surge)
               </label>
@@ -335,7 +335,7 @@ export default function PricingPage() {
                 id="timeWindow"
                 value={timeWindowKey}
                 onChange={(e) => setTimeWindowKey(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#17243A] bg-white focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#0F172A] bg-white focus:outline-none focus:border-[#2563EB]"
               >
                 {TIME_WINDOWS.map((w) => (
                   <option key={w.key} value={w.key}>
@@ -354,7 +354,7 @@ export default function PricingPage() {
               <div>
                 <label
                   htmlFor="elasticitySelect"
-                  className="block font-semibold text-[#17243A] mb-1.5"
+                  className="block font-semibold text-[#0F172A] mb-1.5"
                 >
                   Demand Elasticity (α)
                 </label>
@@ -362,7 +362,7 @@ export default function PricingPage() {
                   id="elasticitySelect"
                   value={elasticity}
                   onChange={(e) => setElasticity(Number(e.target.value))}
-                  className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#17243A] bg-white focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#0F172A] bg-white focus:outline-none focus:border-[#2563EB]"
                 >
                   <option value={0.2}>Low Elasticity (α = 0.2)</option>
                   <option value={0.5}>Balanced Standard (α = 0.5)</option>
@@ -371,7 +371,7 @@ export default function PricingPage() {
               </div>
 
               <div>
-                <span className="block font-semibold text-[#17243A] mb-1.5">
+                <span className="block font-semibold text-[#0F172A] mb-1.5">
                   Facility Premiums
                 </span>
                 <div className="flex items-center gap-2">
@@ -381,7 +381,7 @@ export default function PricingPage() {
                     className={`flex-1 py-1.5 px-2 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer ${
                       hasEV
                         ? "bg-emerald-50 border-emerald-200 text-[#16845B]"
-                        : "bg-white border-[#DDE3EA] text-[#64748B] hover:bg-[#F8FAFC]"
+                        : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
                     }`}
                   >
                     <Zap size={12} /> EV (+15%)
@@ -392,7 +392,7 @@ export default function PricingPage() {
                     className={`flex-1 py-1.5 px-2 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1 transition cursor-pointer ${
                       isCovered
                         ? "bg-blue-50 border-blue-200 text-[#2563EB]"
-                        : "bg-white border-[#DDE3EA] text-[#64748B] hover:bg-[#F8FAFC]"
+                        : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
                     }`}
                   >
                     <ShieldCheck size={12} /> Covered (+10%)
@@ -405,13 +405,13 @@ export default function PricingPage() {
           {/* Right Output Area (5 Cols) */}
           <div className="lg:col-span-5 bg-[#F8FAFC] rounded-xl p-5 border border-[#DDE3EA] space-y-4">
             <div>
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8] block mb-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#475569] block mb-1">
                 Simulated Rate Output
               </span>
               <div className="flex items-baseline justify-between">
                 <div className="text-3xl font-bold text-[#2563EB]">
                   ${calculatedPrice}
-                  <span className="text-xs text-[#64748B] font-normal"> / hour</span>
+                  <span className="text-xs text-[#475569] font-normal"> / hour</span>
                 </div>
                 <Badge
                   variant={priceDeltaPct >= 0 ? "success" : "neutral"}
@@ -425,13 +425,13 @@ export default function PricingPage() {
             {/* Projections */}
             <div className="grid grid-cols-2 gap-3 text-xs bg-white p-3 rounded-lg border border-[#DDE3EA]">
               <div>
-                <span className="text-[#94A3B8] text-[11px] block">Daily Projection</span>
-                <p className="font-bold text-[#17243A] text-sm mt-0.5">
+                <span className="text-[#475569] text-[11px] font-medium block">Daily Projection</span>
+                <p className="font-bold text-[#0F172A] text-sm mt-0.5">
                   ${estimatedDailyRevenue}
                 </p>
               </div>
               <div>
-                <span className="text-[#94A3B8] text-[11px] block">Monthly Yield</span>
+                <span className="text-[#475569] text-[11px] font-medium block">Monthly Yield</span>
                 <p className="font-bold text-[#16845B] text-sm mt-0.5">
                   ${Math.round(estimatedDailyRevenue * 30)}
                 </p>
@@ -441,10 +441,10 @@ export default function PricingPage() {
             {/* 24-Hour Projected Price Profile Bar Chart */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#17243A] flex items-center gap-1">
+                <span className="font-semibold text-[#0F172A] flex items-center gap-1">
                   <BarChart3 size={13} className="text-[#2563EB]" /> 24-Hour Yield Profile
                 </span>
-                <span className="text-[10px] text-[#94A3B8]">00:00 → 23:00</span>
+                <span className="text-[10px] text-[#475569] font-medium">00:00 → 23:00</span>
               </div>
 
               <div className="h-24 bg-white rounded-lg p-2.5 border border-[#DDE3EA] flex items-end justify-between gap-1">
@@ -466,14 +466,14 @@ export default function PricingPage() {
                             : "bg-[#CBD5E1] group-hover:bg-slate-400"
                         }`}
                       />
-                      <div className="hidden group-hover:block absolute bottom-full mb-1 z-20 bg-[#17243A] text-white text-[9px] px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap">
+                      <div className="hidden group-hover:block absolute bottom-full mb-1 z-20 bg-[#0F172A] text-white text-[9px] px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap">
                         {hp.hour}:00: ${hp.price}
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="flex justify-between text-[10px] text-[#94A3B8] px-1">
+              <div className="flex justify-between text-[10px] text-[#475569] px-1 font-medium">
                 <span>12 AM</span>
                 <span>8 AM (Peak)</span>
                 <span>1 PM</span>
@@ -482,11 +482,11 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <div className="text-xs text-[#64748B] bg-white p-2.5 rounded-lg border border-[#DDE3EA] space-y-0.5">
-              <span className="font-semibold text-[#17243A] flex items-center gap-1 text-[11px]">
+            <div className="text-xs text-[#334155] bg-white p-2.5 rounded-lg border border-[#DDE3EA] space-y-0.5">
+              <span className="font-semibold text-[#0F172A] flex items-center gap-1 text-[11px]">
                 <RefreshCw size={11} className="text-[#2563EB]" /> Algorithm Guardrails Active
               </span>
-              <p className="text-[11px]">
+              <p className="text-[11px] text-[#475569]">
                 Calculated rates are bounded between minimum floor ($1.00/hr) and 3× base price to prevent price gouging.
               </p>
             </div>

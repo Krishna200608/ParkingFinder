@@ -100,12 +100,12 @@ export default function HomePage() {
             <span>Urban Parking Marketplace</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#17243A] tracking-tight leading-[1.12] mb-5">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#0F172A] tracking-tight leading-[1.12] mb-5">
             Reliable urban parking, <br className="hidden sm:inline" />
             <span className="text-[#2563EB]">reserved before you arrive.</span>
           </h1>
 
-          <p className="text-[#64748B] text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+          <p className="text-[#334155] text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
             Connect directly with verified parking space hosts. Reserve guaranteed bays
             with strict concurrency protection or monetize your idle driveway.
           </p>
@@ -123,7 +123,7 @@ export default function HomePage() {
                   value={quickQuery}
                   onChange={(e) => setQuickQuery(e.target.value)}
                   placeholder="Enter destination, landmark, or district..."
-                  className="w-full text-sm text-[#17243A] placeholder-[#94A3B8] focus:outline-none bg-transparent py-1.5"
+                  className="w-full text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none bg-transparent py-1.5"
                 />
               </div>
 
@@ -139,14 +139,14 @@ export default function HomePage() {
             </form>
 
             {/* Quick Metro Presets */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3 text-xs text-[#64748B]">
-              <span className="font-medium text-[#94A3B8] mr-1">Popular hubs:</span>
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3 text-xs text-[#475569]">
+              <span className="font-semibold text-[#475569] mr-1">Popular hubs:</span>
               {METRO_PRESETS.map((preset) => (
                 <button
                   key={preset.label}
                   type="button"
                   onClick={() => navigate(`/find?search=${encodeURIComponent(preset.query)}`)}
-                  className="px-2.5 py-1 rounded-md bg-[#F4F6F8] hover:bg-blue-50 hover:text-[#2563EB] border border-transparent hover:border-blue-200 text-[#475569] transition text-xs font-medium cursor-pointer"
+                  className="px-2.5 py-1 rounded-md bg-[#F4F6F8] hover:bg-blue-50 hover:text-[#2563EB] border border-transparent hover:border-blue-200 text-[#334155] transition text-xs font-medium cursor-pointer"
                 >
                   {preset.label}
                 </button>
@@ -160,10 +160,10 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[#DDE3EA] gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#17243A] tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
               Designed for drivers and space hosts
             </h2>
-            <p className="text-sm text-[#64748B] mt-1">
+            <p className="text-sm text-[#334155] mt-1">
               Select your role to explore the streamlined journey from search to payout.
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function HomePage() {
               className={`px-4 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
                 activePersona === "driver"
                   ? "bg-white text-[#2563EB] shadow-2xs font-semibold"
-                  : "text-[#64748B] hover:text-[#17243A]"
+                  : "text-[#475569] hover:text-[#0F172A]"
               }`}
             >
               <Car size={14} /> For Drivers
@@ -185,7 +185,7 @@ export default function HomePage() {
               className={`px-4 py-1.5 rounded-md text-xs font-medium transition flex items-center gap-1.5 cursor-pointer ${
                 activePersona === "host"
                   ? "bg-white text-[#2563EB] shadow-2xs font-semibold"
-                  : "text-[#64748B] hover:text-[#17243A]"
+                  : "text-[#475569] hover:text-[#0F172A]"
               }`}
             >
               <DollarSign size={14} /> For Hosts
@@ -227,17 +227,17 @@ export default function HomePage() {
                 <Card key={i} className="flex flex-col justify-between" padding="default">
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-xs font-mono font-bold text-[#94A3B8]">
+                      <span className="text-xs font-mono font-bold text-[#475569]">
                         {item.step}
                       </span>
                       <div className="w-8 h-8 rounded-lg bg-[#F4F6F8] border border-[#DDE3EA] text-[#2563EB] flex items-center justify-center">
                         <Icon size={16} />
                       </div>
                     </div>
-                    <h3 className="font-semibold text-sm text-[#17243A] mb-1.5">
+                    <h3 className="font-semibold text-sm text-[#0F172A] mb-1.5">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#64748B] leading-relaxed">
+                    <p className="text-xs text-[#334155] leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -278,17 +278,17 @@ export default function HomePage() {
                 <Card key={i} className="flex flex-col justify-between" padding="default">
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-xs font-mono font-bold text-[#94A3B8]">
+                      <span className="text-xs font-mono font-bold text-[#475569]">
                         {item.step}
                       </span>
                       <div className="w-8 h-8 rounded-lg bg-[#F4F6F8] border border-[#DDE3EA] text-[#2563EB] flex items-center justify-center">
                         <Icon size={16} />
                       </div>
                     </div>
-                    <h3 className="font-semibold text-sm text-[#17243A] mb-1.5">
+                    <h3 className="font-semibold text-sm text-[#0F172A] mb-1.5">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-[#64748B] leading-relaxed">
+                    <p className="text-xs text-[#334155] leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -305,10 +305,10 @@ export default function HomePage() {
           <Badge variant="brand" size="sm" className="mb-2">
             Platform Capabilities
           </Badge>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#17243A] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
             Engineered for high reliability and market efficiency
           </h2>
-          <p className="text-sm text-[#64748B] mt-1">
+          <p className="text-sm text-[#334155] mt-1">
             Built on mathematically verified booking intervals, geospatial queries, and transparent algorithmic pricing.
           </p>
         </div>
@@ -320,10 +320,10 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center mb-4">
                 <Lock size={18} />
               </div>
-              <h3 className="text-base font-semibold text-[#17243A] mb-2">
+              <h3 className="text-base font-semibold text-[#0F172A] mb-2">
                 Concurrency Protection
               </h3>
-              <p className="text-xs text-[#64748B] leading-relaxed mb-4">
+              <p className="text-xs text-[#334155] leading-relaxed mb-4">
                 Concurrent booking requests evaluate against half-open temporal intervals to prevent duplicate occupancy:
               </p>
               <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-xs text-[#2563EB]">
@@ -341,10 +341,10 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 text-[#D97706] flex items-center justify-center mb-4">
                 <TrendingUp size={18} />
               </div>
-              <h3 className="text-base font-semibold text-[#17243A] mb-2">
+              <h3 className="text-base font-semibold text-[#0F172A] mb-2">
                 Dynamic Pricing Engine
               </h3>
-              <p className="text-xs text-[#64748B] leading-relaxed mb-4">
+              <p className="text-xs text-[#334155] leading-relaxed mb-4">
                 Simulates real-time rate adjustments based on base price, local occupancy density, and peak hours:
               </p>
               <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-xs text-[#D97706]">
@@ -365,10 +365,10 @@ export default function HomePage() {
               <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mb-4">
                 <Layers size={18} />
               </div>
-              <h3 className="text-base font-semibold text-[#17243A] mb-2">
+              <h3 className="text-base font-semibold text-[#0F172A] mb-2">
                 Geospatial Demand Heatmap
               </h3>
-              <p className="text-xs text-[#64748B] leading-relaxed mb-4">
+              <p className="text-xs text-[#334155] leading-relaxed mb-4">
                 Visualizes high-occupancy hotspots directly on OpenStreetMap, enabling drivers to plan ahead:
               </p>
               <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] font-mono text-xs text-indigo-700">
@@ -387,15 +387,15 @@ export default function HomePage() {
 
       {/* ── 4. HOST MONETIZATION HIGHLIGHT ─────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-        <Card variant="dark" className="bg-[#17243A] text-white border-slate-700" padding="lg">
+        <Card variant="dark" className="bg-[#0F172A] text-white border-slate-700" padding="lg">
           <div className="max-w-2xl">
-            <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-300 border-slate-700 mb-3">
+            <Badge variant="neutral" size="sm" className="bg-slate-800 text-slate-200 border-slate-700 mb-3">
               For Property & Driveway Owners
             </Badge>
             <h2 className="text-xl sm:text-3xl font-bold tracking-tight mb-3 text-white">
               Turn your unused parking space into predictable monthly income
             </h2>
-            <p className="text-slate-300 text-sm leading-relaxed mb-6">
+            <p className="text-slate-200 text-sm leading-relaxed mb-6 font-normal">
               Listing takes less than two minutes. Set your own rules, accept reservations
               automatically, and manage availability through our dedicated host portal.
             </p>
@@ -409,10 +409,9 @@ export default function HomePage() {
                 List Your Space
               </Button>
               <Button
-                variant="secondary"
+                variant="dark"
                 size="md"
                 to="/pricing"
-                className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
               >
                 Calculate Potential Yield
               </Button>
@@ -424,10 +423,10 @@ export default function HomePage() {
       {/* ── 5. FINAL ACTION BANNER ─────────────────────────────── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 w-full text-center">
         <div className="border border-[#DDE3EA] rounded-xl bg-white p-8 sm:p-12 shadow-2xs">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#17243A] tracking-tight mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight mb-3">
             Find guaranteed parking near your destination
           </h2>
-          <p className="text-sm text-[#64748B] max-w-lg mx-auto mb-6">
+          <p className="text-sm sm:text-base text-[#334155] max-w-lg mx-auto mb-6 font-normal">
             Search hundreds of verified parking bays across active metro hubs with transparent hourly pricing.
           </p>
           <div className="flex flex-wrap justify-center items-center gap-3">
@@ -471,25 +470,25 @@ export default function HomePage() {
               <button
                 type="button"
                 onClick={() => setShowHostUpgradeModal(false)}
-                className="p-1 rounded-lg text-[#94A3B8] hover:text-[#17243A] hover:bg-[#F4F6F8] cursor-pointer"
+                className="p-1 rounded-lg text-[#475569] hover:text-[#0F172A] hover:bg-[#F4F6F8] cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-[#17243A] tracking-tight">
+              <h3 className="text-lg font-bold text-[#0F172A] tracking-tight">
                 Activate Space Host Mode
               </h3>
-              <p className="text-xs text-[#64748B] mt-1">
-                You are currently signed in as a Driver (<strong>{userInfo?.username}</strong>).
+              <p className="text-xs text-[#334155] mt-1">
+                You are currently signed in as a Driver (<strong className="text-[#0F172A]">{userInfo?.username}</strong>).
               </p>
-              <p className="text-xs text-[#475569] mt-3 leading-relaxed">
+              <p className="text-xs text-[#334155] mt-3 leading-relaxed">
                 To list a parking space, garage, or driveway, activate Host mode on your account. It takes one click, and gives you instant access to listing tools and rental payouts.
               </p>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#475569]">
+            <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#1E293B]">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={13} className="text-[#16845B] shrink-0" />
                 <span>Monetize unused residential driveways or garages</span>

@@ -64,55 +64,57 @@ export default function CreateSpotForm({ initialData = null, onSaved = () => {} 
   return (
     <form onSubmit={handleSubmit} className="space-y-3.5 bg-white p-5 rounded-xl border border-[#DDE3EA] text-xs">
       <div>
-        <label className="block text-[#475569] font-medium mb-1">Street Address</label>
+        <label className="block text-[#1E293B] font-semibold mb-1">Street Address</label>
         <input
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+          placeholder="e.g. 123 Main St"
+          className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
           required
         />
       </div>
 
       <div>
-        <label className="block text-[#475569] font-medium mb-1">Description</label>
+        <label className="block text-[#1E293B] font-semibold mb-1">Description</label>
         <textarea
           rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+          placeholder="Space details..."
+          className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
         />
       </div>
 
       <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="block text-[#475569] font-medium mb-1">Rate ($/hr)</label>
+          <label className="block text-[#1E293B] font-semibold mb-1">Rate ($/hr)</label>
           <input
             type="number"
             step="0.5"
             value={pricePerHour}
             onChange={(e) => setPricePerHour(Number(e.target.value))}
-            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs font-semibold text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs font-semibold text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
             required
           />
         </div>
         <div>
-          <label className="block text-[#475569] font-medium mb-1">Latitude</label>
+          <label className="block text-[#1E293B] font-semibold mb-1">Latitude</label>
           <input
             type="text"
             value={lat}
             onChange={(e) => setLat(e.target.value)}
-            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
             required
           />
         </div>
         <div>
-          <label className="block text-[#475569] font-medium mb-1">Longitude</label>
+          <label className="block text-[#1E293B] font-semibold mb-1">Longitude</label>
           <input
             type="text"
             value={lng}
             onChange={(e) => setLng(e.target.value)}
-            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
             required
           />
         </div>

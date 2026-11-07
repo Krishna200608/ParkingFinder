@@ -27,17 +27,21 @@ export default function Button({
 
   const variantClasses = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-xs border border-blue-600",
+      "bg-blue-600 text-white font-semibold hover:bg-blue-700 active:bg-blue-800 shadow-xs border border-blue-600",
     secondary:
-      "bg-[#F4F6F8] text-[#17243A] hover:bg-[#E2E8F0] active:bg-[#CBD5E1] border border-[#DDE3EA]",
+      "bg-white text-[#0F172A] font-semibold hover:bg-[#F8FAFC] active:bg-[#F1F5F9] border border-[#CBD5E1] shadow-2xs",
     outline:
-      "bg-white text-[#17243A] hover:bg-[#F4F6F8] active:bg-[#E2E8F0] border border-[#DDE3EA] shadow-2xs",
+      "bg-white text-[#0F172A] font-semibold hover:bg-[#F8FAFC] active:bg-[#F1F5F9] border border-[#CBD5E1] shadow-2xs",
     ghost:
-      "bg-transparent text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8]",
+      "bg-transparent text-[#334155] font-medium hover:text-[#0F172A] hover:bg-[#F1F5F9]",
+    dark:
+      "bg-slate-800 text-white font-semibold hover:bg-slate-700 active:bg-slate-900 border border-slate-700 shadow-xs",
+    darkOutline:
+      "bg-transparent text-white font-semibold hover:bg-white/10 active:bg-white/20 border border-white/20",
     danger:
-      "bg-[#DC4545] text-white hover:bg-[#B91C1C] active:bg-[#991B1B] shadow-xs border border-[#DC4545]",
+      "bg-[#DC4545] text-white font-semibold hover:bg-[#B91C1C] active:bg-[#991B1B] shadow-xs border border-[#DC4545]",
     dangerOutline:
-      "bg-white text-[#DC4545] border border-red-200 hover:bg-red-50 active:bg-red-100",
+      "bg-white text-[#DC4545] font-semibold border border-red-300 hover:bg-red-50 active:bg-red-100",
   };
 
   const destination = to || href;

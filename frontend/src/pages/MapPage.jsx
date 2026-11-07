@@ -379,14 +379,14 @@ export default function MapPage() {
             <div className="relative flex-1">
               <Search
                 size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#475569] pointer-events-none"
               />
               <input
                 type="text"
                 value={locationSearch}
                 onChange={handleLocationSearchChange}
                 placeholder="Search area, landmark or metro hub..."
-                className="w-full pl-9 pr-24 py-1.5 text-xs rounded-lg border border-[#DDE3EA] bg-white text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-blue-100"
+                className="w-full pl-9 pr-24 py-1.5 text-xs rounded-lg border border-[#DDE3EA] bg-white text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-blue-100"
               />
               <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 {locationSearch && (
@@ -396,7 +396,7 @@ export default function MapPage() {
                       setLocationSearch("");
                       setLocationResults([]);
                     }}
-                    className="p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                    className="p-1 text-[#475569] hover:text-[#0F172A] cursor-pointer"
                     title="Clear location search"
                   >
                     <X size={12} />
@@ -405,7 +405,7 @@ export default function MapPage() {
                 <button
                   type="button"
                   onClick={getUserLocation}
-                  className="px-2 py-0.5 text-[11px] font-medium text-[#2563EB] hover:bg-blue-50 rounded transition flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-0.5 text-[11px] font-semibold text-[#2563EB] hover:bg-blue-50 rounded transition flex items-center gap-1 cursor-pointer"
                   title="Use current GPS location"
                 >
                   <MapPin size={12} /> Near Me
@@ -423,7 +423,7 @@ export default function MapPage() {
                       className="w-full px-3 py-2 text-left text-xs hover:bg-blue-50/50 transition flex items-center gap-2 cursor-pointer"
                     >
                       <MapPin size={13} className="text-[#2563EB] shrink-0" />
-                      <span className="truncate text-[#17243A]">
+                      <span className="truncate text-[#0F172A] font-medium">
                         {item.display_name}
                       </span>
                     </button>
@@ -503,7 +503,7 @@ export default function MapPage() {
               }`}
               title="Demand Heatmap overlay"
             >
-              <Flame size={13} className={showHeatmap ? "text-[#D97706]" : "text-[#94A3B8]"} />
+              <Flame size={13} className={showHeatmap ? "text-[#D97706]" : "text-[#475569]"} />
               <span className="hidden sm:inline">Heatmap</span>
             </button>
 
@@ -511,7 +511,7 @@ export default function MapPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="border border-[#DDE3EA] rounded-lg px-2 py-1.5 bg-white text-xs text-[#475569] focus:outline-none focus:border-[#2563EB] cursor-pointer"
+              className="border border-[#DDE3EA] rounded-lg px-2 py-1.5 bg-white text-xs text-[#0F172A] font-medium focus:outline-none focus:border-[#2563EB] cursor-pointer"
             >
               <option value="distance">Nearest Distance</option>
               <option value="price_asc">Price: Low to High</option>
@@ -526,8 +526,8 @@ export default function MapPage() {
                 onClick={() => setMobileView("list")}
                 className={`p-1 rounded text-xs transition cursor-pointer ${
                   mobileView === "list"
-                    ? "bg-white text-[#2563EB] shadow-2xs"
-                    : "text-[#64748B]"
+                    ? "bg-white text-[#2563EB] shadow-2xs font-semibold"
+                    : "text-[#475569]"
                 }`}
                 title="List View"
               >
@@ -538,8 +538,8 @@ export default function MapPage() {
                 onClick={() => setMobileView("map")}
                 className={`p-1 rounded text-xs transition cursor-pointer ${
                   mobileView === "map"
-                    ? "bg-white text-[#2563EB] shadow-2xs"
-                    : "text-[#64748B]"
+                    ? "bg-white text-[#2563EB] shadow-2xs font-semibold"
+                    : "text-[#475569]"
                 }`}
                 title="Map View"
               >
@@ -554,7 +554,7 @@ export default function MapPage() {
           <div className="mt-2.5 pt-2.5 border-t border-[#DDE3EA] grid sm:grid-cols-2 md:grid-cols-5 gap-3.5 text-xs">
             {/* Radius */}
             <div>
-              <div className="flex justify-between font-medium text-[#17243A] mb-1">
+              <div className="flex justify-between font-medium text-[#0F172A] mb-1">
                 <span>Search Radius</span>
                 <span className="text-[#2563EB] font-semibold">{radiusKm} km</span>
               </div>
@@ -570,7 +570,7 @@ export default function MapPage() {
 
             {/* Price */}
             <div>
-              <div className="flex justify-between font-medium text-[#17243A] mb-1">
+              <div className="flex justify-between font-medium text-[#0F172A] mb-1">
                 <span>Maximum Rate</span>
                 <span className="text-[#2563EB] font-semibold">
                   {maxPrice >= 50 ? "Any ($50+)" : `$${maxPrice}/hr`}
@@ -589,13 +589,13 @@ export default function MapPage() {
 
             {/* Vehicle Size */}
             <div>
-              <span className="font-medium text-[#17243A] block mb-1">
+              <span className="font-medium text-[#0F172A] block mb-1">
                 Vehicle Compatibility
               </span>
               <select
                 value={vehicleSize}
                 onChange={(e) => setVehicleSize(e.target.value)}
-                className="w-full border border-[#DDE3EA] rounded-md px-2 py-1.5 bg-white text-xs text-[#475569] focus:outline-none focus:border-[#2563EB]"
+                className="w-full border border-[#DDE3EA] rounded-md px-2 py-1.5 bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#2563EB]"
               >
                 <option value="any">Any Size</option>
                 <option value="compact">Compact / Hatchback</option>
@@ -607,7 +607,7 @@ export default function MapPage() {
             {/* Spot Type */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="font-medium text-[#17243A]">Listing Type</span>
+                <span className="font-medium text-[#0F172A]">Listing Type</span>
               </div>
               <div className="grid grid-cols-3 gap-1">
                 {[
@@ -634,7 +634,7 @@ export default function MapPage() {
             {/* Keyword / Title Filter */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="font-medium text-[#17243A]">Keyword / Title</span>
+                <span className="font-medium text-[#0F172A]">Keyword / Title</span>
                 {activeFilterCount > 0 && (
                   <button
                     type="button"
@@ -651,13 +651,13 @@ export default function MapPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="e.g. Garage, Gate 2..."
-                  className="w-full border border-[#DDE3EA] rounded-md pl-2 pr-6 py-1 bg-white text-xs text-[#475569] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full border border-[#DDE3EA] rounded-md pl-2 pr-6 py-1 bg-white text-xs text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:border-[#2563EB]"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#475569] hover:text-[#0F172A] cursor-pointer"
                   >
                     <X size={12} />
                   </button>
@@ -679,17 +679,17 @@ export default function MapPage() {
           {/* List Header */}
           <div className="px-4 py-3 border-b border-[#DDE3EA] flex items-center justify-between bg-[#F8FAFC]">
             <div>
-              <span className="text-xs font-semibold text-[#17243A]">
+              <span className="text-xs font-semibold text-[#0F172A]">
                 {spots.length} spaces available
               </span>
-              <span className="text-[11px] text-[#64748B] ml-1.5">
+              <span className="text-[11px] text-[#475569] font-medium ml-1.5">
                 within {radiusKm} km
               </span>
             </div>
             <button
               type="button"
               onClick={fetchSpots}
-              className="p-1 text-[#64748B] hover:text-[#2563EB] transition rounded hover:bg-white cursor-pointer"
+              className="p-1 text-[#475569] hover:text-[#2563EB] transition rounded hover:bg-white cursor-pointer"
               title="Refresh spots"
             >
               <RefreshCw size={13} className={isLoading ? "animate-spin" : ""} />
@@ -699,7 +699,7 @@ export default function MapPage() {
           {/* Cards Scroll Container */}
           <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
             {isLoading && spots.length === 0 ? (
-              <div className="py-12 text-center text-xs text-[#64748B]">
+              <div className="py-12 text-center text-xs text-[#334155]">
                 <div className="w-5 h-5 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                 Scanning active parking bays...
               </div>
@@ -765,25 +765,25 @@ export default function MapPage() {
                           )}
                           {spot.distanceKm !== null &&
                             spot.distanceKm !== undefined && (
-                              <span className="text-[11px] text-[#64748B]">
+                              <span className="text-[11px] text-[#475569] font-medium">
                                 • {spot.distanceKm} km away
                               </span>
                             )}
                         </div>
 
-                        <h4 className="font-semibold text-xs sm:text-sm text-[#17243A] truncate">
+                        <h4 className="font-semibold text-xs sm:text-sm text-[#0F172A] truncate">
                           {spot.title || spot.address}
                         </h4>
-                        <p className="text-[11px] text-[#64748B] truncate mt-0.5">
+                        <p className="text-[11px] text-[#334155] truncate mt-0.5 font-normal">
                           {spot.address}
                         </p>
                       </div>
 
                       {/* Price & Favorite */}
                       <div className="text-right shrink-0">
-                        <div className="text-sm sm:text-base font-bold text-[#17243A]">
+                        <div className="text-sm sm:text-base font-bold text-[#0F172A]">
                           ${spot.pricePerHour}
-                          <span className="text-[10px] text-[#64748B] font-normal">
+                          <span className="text-[10px] text-[#475569] font-normal">
                             /hr
                           </span>
                         </div>
@@ -793,7 +793,7 @@ export default function MapPage() {
                             e.stopPropagation();
                             toggleFavorite(spot._id);
                           }}
-                          className="mt-1 p-0.5 text-[#94A3B8] hover:text-rose-500 transition cursor-pointer"
+                          className="mt-1 p-0.5 text-[#475569] hover:text-rose-500 transition cursor-pointer"
                           title={isFav ? "Saved" : "Save spot"}
                         >
                           <Heart
@@ -949,11 +949,11 @@ export default function MapPage() {
                 >
                   <Popup>
                     <div className="text-xs space-y-1">
-                      <p className="font-bold text-[#17243A] flex items-center gap-1">
+                      <p className="font-bold text-[#0F172A] flex items-center gap-1">
                         <Flame size={12} className="text-[#DC4545]" />
                         Demand: {Math.round(hp.intensity * 100)}%
                       </p>
-                      <p className="text-[#64748B] line-clamp-1">{hp.title}</p>
+                      <p className="text-[#334155] line-clamp-1">{hp.title}</p>
                       <p className="font-semibold text-[#2563EB]">
                         Base: ${hp.pricePerHour}/hr
                       </p>
@@ -987,7 +987,7 @@ export default function MapPage() {
                   <Popup autoClose={false} autoPan>
                     <div className="p-1 space-y-2 text-xs min-w-[200px]">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-[#17243A] text-sm">
+                        <span className="font-bold text-[#0F172A] text-sm">
                           ${spot.pricePerHour}/hr
                         </span>
                         <span
@@ -1000,10 +1000,10 @@ export default function MapPage() {
                           {spot.spotType === "operator" ? "Hub" : "P2P"}
                         </span>
                       </div>
-                      <h4 className="font-semibold text-[#17243A] line-clamp-1">
+                      <h4 className="font-semibold text-[#0F172A] line-clamp-1">
                         {spot.title || spot.address}
                       </h4>
-                      <p className="text-[#64748B] line-clamp-2 text-[11px]">
+                      <p className="text-[#334155] line-clamp-2 text-[11px]">
                         {spot.address}
                       </p>
                       <div className="flex items-center justify-between pt-1.5 border-t border-[#DDE3EA]">

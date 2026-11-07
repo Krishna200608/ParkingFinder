@@ -30,10 +30,10 @@ export default function AboutPage() {
 
       {/* ── CORE PRODUCT STORY ─────────────────────────────────── */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold text-[#17243A] tracking-tight">
+        <h2 className="text-xl font-bold text-[#0F172A] tracking-tight">
           Solving urban parking friction through transparent marketplace mechanics
         </h2>
-        <div className="grid md:grid-cols-2 gap-6 text-xs text-[#475569] leading-relaxed">
+        <div className="grid md:grid-cols-2 gap-6 text-xs text-[#334155] leading-relaxed">
           <p>
             Finding parking in high-density urban corridors costs drivers time, generates unnecessary fuel burn, and creates road congestion. Meanwhile, thousands of private residential driveways, parking garages, and commercial bays sit unoccupied throughout the workday.
           </p>
@@ -49,10 +49,10 @@ export default function AboutPage() {
           <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center mb-4">
             <Car size={18} />
           </div>
-          <h3 className="text-base font-bold text-[#17243A] mb-2">
+          <h3 className="text-base font-bold text-[#0F172A] mb-2">
             For Urban Drivers
           </h3>
-          <ul className="space-y-2 text-xs text-[#64748B] mb-5">
+          <ul className="space-y-2 text-xs text-[#334155] mb-5">
             <li className="flex items-start gap-2">
               <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
               <span>Real-time geospatial search via OpenStreetMap & GPS.</span>
@@ -79,10 +79,10 @@ export default function AboutPage() {
           <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 text-[#16845B] flex items-center justify-center mb-4">
             <TrendingUp size={18} />
           </div>
-          <h3 className="text-base font-bold text-[#17243A] mb-2">
+          <h3 className="text-base font-bold text-[#0F172A] mb-2">
             For Space Hosts
           </h3>
-          <ul className="space-y-2 text-xs text-[#64748B] mb-5">
+          <ul className="space-y-2 text-xs text-[#334155] mb-5">
             <li className="flex items-start gap-2">
               <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
               <span>Monetize driveways, commercial garages, or assigned tenant spaces.</span>
@@ -108,33 +108,33 @@ export default function AboutPage() {
 
       {/* ── ARCHITECTURAL INTEGRITY ────────────────────────────── */}
       <section className="space-y-4">
-        <h2 className="text-base font-bold text-[#17243A]">
+        <h2 className="text-base font-bold text-[#0F172A]">
           Technical Foundations
         </h2>
         <div className="grid sm:grid-cols-3 gap-4 text-xs">
           <Card padding="default">
-            <h4 className="font-semibold text-[#17243A] mb-1">
+            <h4 className="font-semibold text-[#0F172A] mb-1">
               Geospatial Indexing
             </h4>
-            <p className="text-[#64748B] leading-relaxed">
+            <p className="text-[#334155] leading-relaxed">
               MongoDB 2dsphere spherical indexes calculate distances in real-time, querying radial bounds up to 50 km.
             </p>
           </Card>
 
           <Card padding="default">
-            <h4 className="font-semibold text-[#17243A] mb-1">
+            <h4 className="font-semibold text-[#0F172A] mb-1">
               Temporal Write Locks
             </h4>
-            <p className="text-[#64748B] leading-relaxed">
+            <p className="text-[#334155] leading-relaxed">
               Half-open interval overlap detection [start, end) prevents race conditions when multiple drivers reserve simultaneously.
             </p>
           </Card>
 
           <Card padding="default">
-            <h4 className="font-semibold text-[#17243A] mb-1">
+            <h4 className="font-semibold text-[#0F172A] mb-1">
               Free-Tier Sustainable
             </h4>
-            <p className="text-[#64748B] leading-relaxed">
+            <p className="text-[#334155] leading-relaxed">
               Engineered cleanly to run within zero-cost development tiers (Vercel, Render, and MongoDB Atlas).
             </p>
           </Card>
@@ -143,10 +143,10 @@ export default function AboutPage() {
 
       {/* ── CALL TO ACTION ─────────────────────────────────────── */}
       <Card padding="lg" className="text-center bg-[#F8FAFC]">
-        <h3 className="text-lg font-bold text-[#17243A] mb-2">
+        <h3 className="text-lg font-bold text-[#0F172A] mb-2">
           Experience ParkingFinder Today
         </h3>
-        <p className="text-xs text-[#64748B] max-w-md mx-auto mb-5">
+        <p className="text-xs sm:text-sm text-[#334155] max-w-md mx-auto mb-5 font-normal">
           Find an active parking space near your destination or list your driveway to earn passive revenue.
         </p>
         <div className="flex flex-wrap justify-center items-center gap-2.5">
