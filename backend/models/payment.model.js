@@ -69,3 +69,4 @@ paymentSchema.index({ user: 1, createdAt: -1 });
 
 const Payment = mongoose.model('Payment', paymentSchema);
 export default Payment;
+

@@ -26,6 +26,8 @@ app.use(helmet());
 // 2. CORS configuration with credentials support
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+  'https://parkingfinder-three.vercel.app',
   'http://localhost:3000',
   'http://localhost:5173',
 ].filter(Boolean);
@@ -34,11 +36,18 @@ app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or same-origin Vercel requests)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      if (!origin) return callback(null, true);
+
+      // Allow explicitly listed origins
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      // Allow all Vercel production and preview deployments
+      if (/^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
       }
+
+      console.warn(`[CORS Blocked] Origin: ${origin}`);
+      return callback(null, false);
     },
     credentials: true,
   })

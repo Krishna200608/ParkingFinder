@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
 	MapContainer,
 	TileLayer,
@@ -48,6 +48,7 @@ function FlyToHelper({ target, zoom }) {
 }
 
 const MapPage = () => {
+	const navigate = useNavigate();
 	const { userInfo } = useAuth();
 	const [spots, setSpots] = useState([]);
 	const [selectedSpot, setSelectedSpot] = useState(null);
@@ -153,10 +154,7 @@ const MapPage = () => {
 				withCredentials: true,
 			});
 
-			const currentUserId = userInfo?._id || userInfo?.user?._id;
-			let filtered = Array.isArray(data)
-				? data.filter((s) => s.owner?._id !== currentUserId)
-				: [];
+			let filtered = Array.isArray(data) ? data : [];
 
 			if (showFavoritesOnly) {
 				filtered = filtered.filter((s) => savedFavorites.includes(s._id));
@@ -180,7 +178,6 @@ const MapPage = () => {
 		sortBy,
 		showFavoritesOnly,
 		savedFavorites,
-		userInfo,
 	]);
 
 	// Auto-trigger fetch on filter change
@@ -282,10 +279,10 @@ const MapPage = () => {
 				{ withCredentials: true }
 			);
 			toast.success(data.message || "Demo spots seeded successfully!");
-			fetchSpots();
+			await fetchSpots();
 		} catch (err) {
 			console.error("Failed to seed spots:", err);
-			toast.error("Unable to seed demo spots");
+			toast.error(err.response?.data?.message || "Unable to seed demo spots");
 		} finally {
 			setIsLoading(false);
 		}
@@ -293,6 +290,12 @@ const MapPage = () => {
 
 	// Modal handling
 	const handleOpenModal = (spot) => {
+		const currentUserId = userInfo?._id || userInfo?.user?._id;
+		if (currentUserId && spot.owner?._id === currentUserId) {
+			toast.error("You are the host of this spot! Hosts manage their listings from the Host Dashboard.");
+			navigate(`/host/edit-spot/${spot._id}`);
+			return;
+		}
 		setBookingSpot(spot);
 		setIsModalOpen(true);
 	};
@@ -714,12 +717,21 @@ const MapPage = () => {
 												>
 													Details <ArrowUpRight size={12} />
 												</Link>
-												<button
-													onClick={() => handleOpenModal(spot)}
-													className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded-md text-[11px]"
-												>
-													Book Now
-												</button>
+												{spot.owner?._id === (userInfo?._id || userInfo?.user?._id) ? (
+													<button
+														onClick={() => navigate(`/host/edit-spot/${spot._id}`)}
+														className="bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 font-semibold px-2.5 py-1 rounded-md text-[11px]"
+													>
+														Manage
+													</button>
+												) : (
+													<button
+														onClick={() => handleOpenModal(spot)}
+														className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 rounded-md text-[11px]"
+													>
+														Book Now
+													</button>
+												)}
 											</div>
 										</div>
 									</Popup>
@@ -804,6 +816,11 @@ const MapPage = () => {
 													>
 														{spot.spotType === "operator" ? "Hub" : "P2P"}
 													</span>
+													{spot.owner?._id === (userInfo?._id || userInfo?.user?._id) && (
+														<span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">
+															Your Space
+														</span>
+													)}
 													{spot.distanceKm !== null &&
 														spot.distanceKm !== undefined && (
 															<span className="text-[11px] text-gray-500 font-medium">
@@ -898,16 +915,29 @@ const MapPage = () => {
 												>
 													Map Pin
 												</button>
-												<button
-													type="button"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleOpenModal(spot);
-													}}
-													className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-xs transition"
-												>
-													Book
-												</button>
+												{spot.owner?._id === (userInfo?._id || userInfo?.user?._id) ? (
+													<button
+														type="button"
+														onClick={(e) => {
+															e.stopPropagation();
+															navigate(`/host/edit-spot/${spot._id}`);
+														}}
+														className="px-3 py-1 text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 font-semibold rounded-lg shadow-xs transition"
+													>
+														Manage
+													</button>
+												) : (
+													<button
+														type="button"
+														onClick={(e) => {
+															e.stopPropagation();
+															handleOpenModal(spot);
+														}}
+														className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-xs transition"
+													>
+														Book
+													</button>
+												)}
 											</div>
 										</div>
 									</div>

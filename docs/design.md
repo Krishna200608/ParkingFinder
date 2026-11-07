@@ -97,3 +97,4 @@ ParkingFinder bridges urban drivers with private space hosts and commercial gara
 - ARIA landmarks on Header (`<header>`), Navigation (`<nav>`), Main (`<main>`), and Footer (`<footer>`).
 - Contrast ratios meeting WCAG 2.1 AA (minimum 4.5:1 for body copy).
 - Smooth Framer Motion transitions (`easeOut`, 0.3s - 0.5s duration).
+
