@@ -13,6 +13,7 @@ import {
 	Star,
 	Briefcase,
 } from "lucide-react";
+import logoPng from "../assets/logo.png";
 
 const fadeIn = (delay = 0) => ({
 	hidden: { opacity: 0, y: 30 },
@@ -64,7 +65,7 @@ const HomePage = () => {
 						className="relative flex justify-center"
 					>
 						<motion.img
-							src="/src/assets/logo.png"
+							src={logoPng}
 							alt="Parking Finder Illustration"
 							className="w-96 drop-shadow-2xl"
 							animate={{ y: [0, -10, 0] }}

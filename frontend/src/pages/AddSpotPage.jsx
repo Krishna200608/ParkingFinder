@@ -212,7 +212,7 @@ const AddSpotPage = () => {
 			setTimeout(() => mapRef.current.invalidateSize(), 400);
 			if (coordinates) mapRef.current.flyTo(coordinates, 14, { duration: 0.8 });
 		}
-	}, [showPreview]);
+	}, [showPreview, coordinates]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 pb-20">

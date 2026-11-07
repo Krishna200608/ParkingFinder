@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
 	MapContainer,
 	TileLayer,
@@ -24,7 +24,7 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function FlyToHelper({ mapRef, target, zoom }) {
+function FlyToHelper({ target, zoom }) {
 	const map = useMap();
 	useEffect(() => {
 		if (target && map) map.flyTo(target, zoom, { duration: 1.2 });
@@ -45,17 +45,7 @@ const MapPage = () => {
 	const mapRef = useRef();
 	const markerRefs = useRef({});
 
-	// Adjust zoom based on radius
-	useEffect(() => {
-		const calculatedZoom = Math.max(10, Math.min(16, 16 - Math.log2(radiusKm)));
-		setZoom(calculatedZoom);
-		fetchSpots();
-		if (mapRef.current) {
-			mapRef.current.flyTo(position, calculatedZoom, { duration: 1.2 });
-		}
-	}, [radiusKm, position]);
-
-	const fetchSpots = async () => {
+	const fetchSpots = useCallback(async () => {
 		try {
 			if (!position) return;
 			setIsLoading(true);
@@ -64,13 +54,11 @@ const MapPage = () => {
 			const { data } = await axios.get("/api/spots/available", {
 				params: { lat: position[0], lng: position[1], radius: radiusMeters },
 				withCredentials: true,
-				headers: userInfo?.token
-					? { Authorization: `Bearer ${userInfo.token}` }
-					: {},
 			});
 
+			const currentUserId = userInfo?._id || userInfo?.user?._id;
 			const filtered = Array.isArray(data)
-				? data.filter((s) => s.owner?._id !== userInfo?.user?._id)
+				? data.filter((s) => s.owner?._id !== currentUserId)
 				: [];
 			setSpots(filtered);
 		} catch (err) {
@@ -79,7 +67,17 @@ const MapPage = () => {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [position, radiusKm, userInfo]);
+
+	// Adjust zoom based on radius
+	useEffect(() => {
+		const calculatedZoom = Math.max(10, Math.min(16, 16 - Math.log2(radiusKm)));
+		setZoom(calculatedZoom);
+		fetchSpots();
+		if (mapRef.current) {
+			mapRef.current.flyTo(position, calculatedZoom, { duration: 1.2 });
+		}
+	}, [radiusKm, position, fetchSpots]);
 
 	const handleOpenModal = (spot) => {
 		setBookingSpot(spot);
@@ -133,7 +131,7 @@ const MapPage = () => {
 				},
 				{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
 			);
-		} catch (err) {
+		} catch {
 			toast.error("Could not verify location permissions");
 		}
 	};

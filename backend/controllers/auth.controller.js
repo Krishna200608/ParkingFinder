@@ -1,18 +1,5 @@
 import User from '../models/user.model.js';
-import jwt from 'jsonwebtoken';
 import generateToken from '../utils/generateToken.js';
-
-// --- Helper function for handling errors ---
-const handleError = (res, statusCode, message) => {
-  res.status(statusCode).json({ message });
-};
-
-// --- Helper to generate a JWT (and still call generateToken to set cookie) ---
-const createToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
-  });
-};
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -21,28 +8,35 @@ export const registerUser = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
 
-    // 1. Check if user already exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
-      return handleError(res, 400, 'User already exists, use different email');
+    // 1. Check if user already exists by email or username
+    const existingUser = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { username }],
+    });
+
+    if (existingUser) {
+      const field = existingUser.email === email.toLowerCase() ? 'Email' : 'Username';
+      return res.status(400).json({ message: `${field} is already in use` });
     }
 
-    // 2. Create new user
+    // 2. Enforce strict role whitelisting (prevent unauthorized admin escalation)
+    const allowedRoles = ['driver', 'host'];
+    const assignedRole = allowedRoles.includes(role) ? role : 'driver';
+
+    // 3. Create new user
     const user = await User.create({
       username,
-      email,
+      email: email.toLowerCase(),
       password,
-      role, // 'driver' or 'host'
+      role: assignedRole,
     });
 
     if (user) {
-      // 3. Generate token (for both cookie and response)
+      // 4. Set secure HTTP-only session cookie
       generateToken(res, user._id);
-      const token = createToken(user._id);
 
-      // 4. Send response with token + user info
-      res.status(201).json({
-        token,
+      // 5. Send clean response
+      return res.status(201).json({
+        message: 'Account created successfully',
         user: {
           _id: user._id,
           username: user.username,
@@ -50,15 +44,16 @@ export const registerUser = async (req, res) => {
           role: user.role,
         },
       });
-    } else {
-      return handleError(res, 400, 'Invalid user data');
     }
+
+    return res.status(400).json({ message: 'Invalid user registration data' });
   } catch (error) {
-    return handleError(res, 500, `Server error: ${error.message}`);
+    console.error('Registration controller error:', error);
+    return res.status(500).json({ message: 'Internal server error during registration' });
   }
 };
 
-// @desc    Auth user (login) & get token
+// @desc    Authenticate user (login) & set session cookie
 // @route   POST /api/auth/login
 // @access  Public
 export const loginUser = async (req, res) => {
@@ -66,17 +61,15 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // 1. Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
 
     // 2. Validate password
     if (user && (await user.matchPassword(password))) {
-      // 3. Generate cookie + token
+      // 3. Set secure HTTP-only session cookie
       generateToken(res, user._id);
-      const token = createToken(user._id);
 
-      // 4. Send full response
-      res.status(200).json({
-        token,
+      return res.status(200).json({
+        message: 'Logged in successfully',
         user: {
           _id: user._id,
           username: user.username,
@@ -84,39 +77,44 @@ export const loginUser = async (req, res) => {
           role: user.role,
         },
       });
-    } else {
-      return handleError(res, 401, 'Invalid email or password');
     }
+
+    return res.status(401).json({ message: 'Invalid email or password' });
   } catch (error) {
-    return handleError(res, 500, `Server error: ${error.message}`);
+    console.error('Login controller error:', error);
+    return res.status(500).json({ message: 'Internal server error during login' });
   }
 };
 
-// @desc    Logout user / clear cookie
+// @desc    Logout user / clear session cookie
 // @route   POST /api/auth/logout
 // @access  Private
 export const logoutUser = (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
     expires: new Date(0),
   });
-  res.status(200).json({ message: 'User logged out successfully' });
+
+  return res.status(200).json({ message: 'User logged out successfully' });
 };
 
-// @desc    Get user profile
+// @desc    Get current user profile
 // @route   GET /api/auth/profile
 // @access  Private
 export const getUserProfile = async (req, res) => {
   const user = req.user;
 
   if (user) {
-    res.status(200).json({
+    return res.status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
     });
-  } else {
-    return handleError(res, 404, 'User not found');
   }
+
+  return res.status(404).json({ message: 'User not found' });
 };

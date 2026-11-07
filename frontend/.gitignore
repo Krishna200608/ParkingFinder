@@ -3,9 +3,7 @@ logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
 node_modules
 dist
@@ -17,8 +15,14 @@ dist-ssr
 !.vscode/extensions.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.exe
+
+# Environment
+.env
+.env.*
+!.env.example

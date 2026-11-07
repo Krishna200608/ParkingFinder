@@ -139,6 +139,9 @@ const EditSpotPage = () => {
   // Update address + coordinates after drag/click
   const handleAddressUpdate = (address, lat, lng) => {
     setFormData((prev) => ({ ...prev, address }));
+    if (lat !== undefined && lng !== undefined) {
+      setPosition([lat, lng]);
+    }
   };
 
   const handleSubmit = async (e) => {

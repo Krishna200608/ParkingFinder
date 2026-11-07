@@ -7,7 +7,16 @@ import { useAuth } from "../context/AuthContext";
  * If user is not logged in, redirect to /login.
  */
 const ProtectedRoute = () => {
-  const { userInfo } = useAuth();
+  const { userInfo, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh] text-gray-500 text-sm">
+        Verifying session...
+      </div>
+    );
+  }
+
   if (!userInfo) return <Navigate to="/login" replace />;
   return <Outlet />;
 };

@@ -6,7 +6,7 @@ import { User, Mail, Shield, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
-  const { userInfo, logout } = useAuth();
+  const { logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -14,13 +14,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const config = {
-          withCredentials: true,
-          headers: userInfo?.token
-            ? { Authorization: `Bearer ${userInfo.token}` }
-            : {},
-        };
-        const { data } = await axios.get("/api/auth/profile", config);
+        const { data } = await axios.get("/api/auth/profile", { withCredentials: true });
         setProfile(data);
       } catch (err) {
         console.error(err);

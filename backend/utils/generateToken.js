@@ -1,24 +1,29 @@
 import jwt from 'jsonwebtoken';
 
-// This function generates a signed JWT
-// We put the userId in the token's payload
+/**
+ * Generates a signed JWT and attaches it to the response as an HTTP-only cookie.
+ * Also returns the token string for API clients / testing.
+ *
+ * @param {import('express').Response} res
+ * @param {string} userId
+ * @returns {string} token
+ */
 const generateToken = (res, userId) => {
   const token = jwt.sign(
-    { userId }, // Payload
-    process.env.JWT_SECRET, // Secret key from .env
-    { expiresIn: '30d' } // Token expires in 30 days
+    { userId },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' } // Consistent 7-day session
   );
 
-  // We are sending the token as an http-only cookie
-  // This is MORE SECURE than storing it in localStorage on the frontend
   res.cookie('jwt', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development', // Use secure cookies in production
-    sameSite: 'strict', // Prevents CSRF attacks
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax', // Compatible with standard browser navigation and same-site API calls
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+    path: '/',
   });
 
-  return token; // We also return it in case the client wants to use it directly
+  return token;
 };
 
 export default generateToken;

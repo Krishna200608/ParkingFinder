@@ -6,29 +6,29 @@ import {
   updateParkingSpot,
   deleteParkingSpot,
   createSpotReview,
-  getMyParkingSpots, // ✅ New controller
+  getMyParkingSpots,
 } from '../controllers/spots.controller.js';
 import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// --- Host Dashboard: Get logged-in host's own spots ---
-router.route('/my')
-  .get(protect, isHostOrAdmin, getMyParkingSpots); // ✅ New route
+// Host dashboard: get logged-in host's listings with earnings
+router.get('/my', protect, isHostOrAdmin, getMyParkingSpots);
 
-// --- Public + Create routes ---
-router.route('/available')
-  .get(protect, getParkingSpots)
-  .post(protect, isHostOrAdmin, createParkingSpot);
+// Discovery (Public) and Create (Host / Admin)
+// Supported on standard REST / and backwards-compatible /available
+router.get('/', getParkingSpots);
+router.post('/', protect, isHostOrAdmin, createParkingSpot);
 
-// --- Single spot routes ---
-router.route('/:id')
-  .get(getParkingSpotById)
-  .put(protect, isHostOrAdmin, updateParkingSpot)
-  .delete(protect, isHostOrAdmin, deleteParkingSpot);
+router.get('/available', getParkingSpots);
+router.post('/available', protect, isHostOrAdmin, createParkingSpot);
 
-// --- Reviews ---
-router.route('/:id/reviews')
-  .post(protect, createSpotReview);
+// Single spot operations
+router.get('/:id', getParkingSpotById);
+router.put('/:id', protect, isHostOrAdmin, updateParkingSpot);
+router.delete('/:id', protect, isHostOrAdmin, deleteParkingSpot);
+
+// Reviews
+router.post('/:id/reviews', protect, createSpotReview);
 
 export default router;

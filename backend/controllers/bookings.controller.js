@@ -1,202 +1,192 @@
-import Booking from "../models/booking.model.js";
-import ParkingSpot from "../models/parkingSpot.model.js";
+import Booking from '../models/booking.model.js';
+import ParkingSpot from '../models/parkingSpot.model.js';
 
-// --- Helper function for handling errors ---
+// Helper function for handling error responses
 const handleError = (res, statusCode, message) => {
-	res.status(statusCode).json({ message });
+  return res.status(statusCode).json({ message });
 };
 
 // @desc    Create a new booking
 // @route   POST /api/bookings
 // @access  Private (Driver)
 export const createBooking = async (req, res) => {
-	try {
-		const { spotId, startTime, endTime, notes } = req.body;
-		const userId = req.user._id; // From 'protect' middleware
+  try {
+    const { spotId, startTime, endTime, notes } = req.body;
+    const userId = req.user._id;
 
-		// 1️⃣ Validate input
-		if (!spotId || !startTime || !endTime) {
-			return handleError(
-				res,
-				400,
-				"Please provide spotId, startTime, and endTime"
-			);
-		}
+    // 1. Validate required inputs
+    if (!spotId || !startTime || !endTime) {
+      return handleError(res, 400, 'Please provide spotId, startTime, and endTime');
+    }
 
-		const startTimeObj = new Date(startTime);
-		const endTimeObj = new Date(endTime);
+    const startTimeObj = new Date(startTime);
+    const endTimeObj = new Date(endTime);
 
-		if (isNaN(startTimeObj) || isNaN(endTimeObj)) {
-			return handleError(
-				res,
-				400,
-				"Invalid date format for startTime or endTime"
-			);
-		}
+    if (isNaN(startTimeObj.getTime()) || isNaN(endTimeObj.getTime())) {
+      return handleError(res, 400, 'Invalid date format for startTime or endTime');
+    }
 
-		if (endTimeObj <= startTimeObj) {
-			return handleError(res, 400, "End time must be after start time");
-		}
+    // Reject reservations in the past (allowing 5 minutes clock skew)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    if (startTimeObj < fiveMinutesAgo) {
+      return handleError(res, 400, 'Start time cannot be in the past');
+    }
 
-		// 2️⃣ Find the parking spot
-		const spot = await ParkingSpot.findById(spotId);
-		if (!spot) {
-			return handleError(res, 404, "Parking spot not found");
-		}
+    if (endTimeObj <= startTimeObj) {
+      return handleError(res, 400, 'End time must be after start time');
+    }
 
-		if (!spot.isAvailable) {
-			return handleError(res, 400, "This spot is currently not available");
-		}
+    // 2. Find the parking spot
+    const spot = await ParkingSpot.findById(spotId);
+    if (!spot) {
+      return handleError(res, 404, 'Parking spot not found');
+    }
 
-		// 3️⃣ --- Check for booking conflicts (time overlap) ---
-		// A booking conflicts if its time range overlaps with the requested range.
-		// Overlap logic: existing.start < new.end && existing.end > new.start
-		const overlappingBooking = await Booking.findOne({
-			spot: spotId,
-			status: { $in: ["pending", "confirmed", "active"] },
-			$or: [
-				{
-					startTime: { $lt: endTimeObj },
-					endTime: { $gt: startTimeObj },
-				},
-			],
-		});
+    if (!spot.isAvailable) {
+      return handleError(res, 400, 'This parking spot is currently not available for bookings');
+    }
 
-		if (overlappingBooking) {
-			const conflictStart = new Date(
-				overlappingBooking.startTime
-			).toLocaleString();
-			const conflictEnd = new Date(overlappingBooking.endTime).toLocaleString();
-			return handleError(
-				res,
-				409,
-				`Slot already booked from ${conflictStart} to ${conflictEnd}. Please choose a different time.`
-			);
-		}
+    // 3. Restriction: Hosts cannot book their own spot
+    if (spot.owner.toString() === userId.toString()) {
+      return handleError(res, 400, 'You cannot reserve your own parking spot');
+    }
 
-		// 4️⃣ --- Timestamp-based pricing ---
-		const durationMs = endTimeObj - startTimeObj;
-		const durationHours = durationMs / (1000 * 60 * 60); // convert ms → hours
-		const totalCost = Math.round(durationHours * spot.pricePerHour * 100) / 100; // round to 2 decimals
+    // 4. Check for booking conflicts (half-open interval overlap)
+    // Overlap condition: ExistingStart < RequestedEnd && ExistingEnd > RequestedStart
+    const overlappingBooking = await Booking.findOne({
+      spot: spotId,
+      status: { $in: ['pending', 'confirmed', 'active'] },
+      startTime: { $lt: endTimeObj },
+      endTime: { $gt: startTimeObj },
+    });
 
-		// 5️⃣ Create new booking
-		const booking = new Booking({
-			user: userId,
-			spot: spotId,
-			host: spot.owner, // from spot model
-			startTime: startTimeObj,
-			endTime: endTimeObj,
-			totalCost,
-			notes,
-			status: "confirmed",
-			paymentStatus: "paid",
-		});
+    if (overlappingBooking) {
+      const conflictStart = new Date(overlappingBooking.startTime).toLocaleString();
+      const conflictEnd = new Date(overlappingBooking.endTime).toLocaleString();
+      return handleError(
+        res,
+        409,
+        `Slot already booked from ${conflictStart} to ${conflictEnd}. Please choose a different time.`
+      );
+    }
 
-		const createdBooking = await booking.save();
+    // 5. Calculate pricing
+    const durationMs = endTimeObj.getTime() - startTimeObj.getTime();
+    const durationHours = durationMs / (1000 * 60 * 60);
+    const totalCost = Math.round(durationHours * spot.pricePerHour * 100) / 100;
 
-		// 6️⃣ Respond with success
-		res.status(201).json({
-			message: "Booking created successfully",
-			booking: createdBooking,
-		});
-	} catch (error) {
-		console.error("Booking creation error:", error);
-		return handleError(res, 500, `Server error: ${error.message}`);
-	}
+    // 6. Create booking with honest demo reservation status
+    const booking = new Booking({
+      user: userId,
+      spot: spotId,
+      host: spot.owner,
+      startTime: startTimeObj,
+      endTime: endTimeObj,
+      totalCost,
+      notes: notes || '',
+      status: 'confirmed',
+      paymentStatus: 'unpaid_demo',
+    });
+
+    const createdBooking = await booking.save();
+
+    return res.status(201).json({
+      message: 'Booking created successfully (Demo Reservation)',
+      booking: createdBooking,
+    });
+  } catch (error) {
+    console.error('Booking creation error:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
 };
 
 // @desc    Get all bookings for the logged-in user
-// @route   GET /api/bookings/mybookings
+// @route   GET /api/bookings/me
 // @access  Private
 export const getMyBookings = async (req, res) => {
-	try {
-		const bookings = await Booking.find({ user: req.user._id })
-			.populate("spot", "address pricePerHour location") // Populate spot details
-			.populate("host", "username"); // Populate host details
+  try {
+    const bookings = await Booking.find({ user: req.user._id })
+      .populate('spot', 'address pricePerHour location description')
+      .populate('host', 'username email')
+      .sort({ createdAt: -1 });
 
-		res.status(200).json(bookings);
-	} catch (error) {
-		return handleError(res, 500, `Server error: ${error.message}`);
-	}
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error fetching user bookings:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
 };
 
 // @desc    Get a single booking by ID
 // @route   GET /api/bookings/:id
 // @access  Private
 export const getBookingById = async (req, res) => {
-	try {
-		const booking = await Booking.findById(req.params.id)
-			.populate("user", "username email")
-			.populate("spot", "address description")
-			.populate("host", "username email");
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('user', 'username email')
+      .populate('spot', 'address description pricePerHour location')
+      .populate('host', 'username email');
 
-		if (!booking) {
-			return handleError(res, 404, "Booking not found");
-		}
+    if (!booking) {
+      return handleError(res, 404, 'Booking not found');
+    }
 
-		// 1. Check if user is authorized to view this booking
-		// Authorized if: they are the user, they are the host, or they are an admin
-		if (
-			booking.user._id.toString() !== req.user._id.toString() &&
-			booking.host._id.toString() !== req.user._id.toString() &&
-			req.user.role !== "admin"
-		) {
-			return handleError(res, 403, "User not authorized to view this booking");
-		}
+    // Authorization: Requester must be driver, host, or admin
+    const requesterId = req.user._id.toString();
+    const driverId = booking.user._id ? booking.user._id.toString() : booking.user.toString();
+    const hostId = booking.host._id ? booking.host._id.toString() : booking.host.toString();
 
-		res.status(200).json(booking);
-	} catch (error) {
-		return handleError(res, 500, `Server error: ${error.message}`);
-	}
+    if (driverId !== requesterId && hostId !== requesterId && req.user.role !== 'admin') {
+      return handleError(res, 403, 'User not authorized to view this booking');
+    }
+
+    return res.status(200).json(booking);
+  } catch (error) {
+    console.error('Error fetching booking by id:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
 };
 
 // @desc    Cancel a booking
 // @route   PUT /api/bookings/:id/cancel
 // @access  Private
 export const cancelBooking = async (req, res) => {
-	try {
-		const booking = await Booking.findById(req.params.id);
+  try {
+    const booking = await Booking.findById(req.params.id);
 
-		if (!booking) {
-			return handleError(res, 404, "Booking not found");
-		}
+    if (!booking) {
+      return handleError(res, 404, 'Booking not found');
+    }
 
-		// 1. Check if user is the one who made the booking (or an admin)
-		if (
-			booking.user.toString() !== req.user._id.toString() &&
-			req.user.role !== "admin"
-		) {
-			return handleError(
-				res,
-				403,
-				"User not authorized to cancel this booking"
-			);
-		}
+    // Authorization: Requester must be the booking driver or admin
+    const requesterId = req.user._id.toString();
+    const driverId = booking.user.toString();
 
-		// 2. Check if booking is already completed or cancelled
-		if (booking.status === "completed" || booking.status === "cancelled") {
-			return handleError(
-				res,
-				400,
-				`Cannot cancel a booking that is already ${booking.status}`
-			);
-		}
+    if (driverId !== requesterId && req.user.role !== 'admin') {
+      return handleError(res, 403, 'User not authorized to cancel this booking');
+    }
 
-		// TODO: Add logic for cancellation policy (e.g., cannot cancel 1 hour before)
+    // Status check
+    if (booking.status === 'completed' || booking.status === 'cancelled') {
+      return handleError(res, 400, `Cannot cancel a booking that is already ${booking.status}`);
+    }
 
-		// 3. Update status
-		booking.status = "cancelled";
-		const updatedBooking = await booking.save();
+    booking.status = 'cancelled';
+    const updatedBooking = await booking.save();
 
-		res.status(200).json(updatedBooking);
-	} catch (error) {
-		return handleError(res, 500, `Server error: ${error.message}`);
-	}
+    return res.status(200).json({
+      message: 'Booking cancelled successfully',
+      booking: updatedBooking,
+    });
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
 };
 
 // @desc    Get booked slots for a specific parking spot
 // @route   GET /api/bookings/spot/:spotId
-// @access  Public (anyone viewing the spot)
+// @access  Public
 export const getBookedSlotsForSpot = async (req, res) => {
   try {
     const { spotId } = req.params;
@@ -204,16 +194,19 @@ export const getBookedSlotsForSpot = async (req, res) => {
 
     const bookings = await Booking.find({
       spot: spotId,
-      endTime: { $gte: now }, // only future or ongoing
-      status: { $in: ["pending", "confirmed", "active"] },
+      endTime: { $gte: now },
+      status: { $in: ['pending', 'confirmed', 'active'] },
     })
-      .sort("startTime")
-      .select("startTime endTime -_id");
+      .sort('startTime')
+      .select('startTime endTime -_id');
 
-    // Suggest next 5 1-hour available slots (for today only)
+    // Generate suggested 1-hour slots for today without in-place mutation
     const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
 
     const allSlots = [];
     for (let i = 0; i < 24; i++) {
@@ -224,20 +217,20 @@ export const getBookedSlotsForSpot = async (req, res) => {
       }
     }
 
-    // Remove booked overlaps
-    const availableSlots = allSlots.filter((slot) =>
-      !bookings.some(
-        (b) =>
-          new Date(b.startTime) < slot.end && new Date(b.endTime) > slot.start
-      )
+    // Filter out slots overlapping with existing bookings
+    const availableSlots = allSlots.filter(
+      (slot) =>
+        !bookings.some(
+          (b) => new Date(b.startTime) < slot.end && new Date(b.endTime) > slot.start
+        )
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       bookedSlots: bookings,
       suggestedSlots: availableSlots.slice(0, 5),
     });
   } catch (error) {
-    console.error("Error fetching booked slots:", error);
-    res.status(500).json({ message: `Server error: ${error.message}` });
+    console.error('Error fetching booked slots:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
   }
 };

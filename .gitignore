@@ -11,6 +11,8 @@ pnpm-debug.log*
 # Environment & Secrets
 # ==========================
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
@@ -34,6 +36,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/.env
 frontend/.env.*
+!frontend/.env.example
 
 # ==========================
 # Backend Specific
@@ -42,8 +45,17 @@ backend/node_modules/
 backend/dist/
 backend/.env
 backend/.env.*
+!backend/.env.example
 backend/uploads/
 backend/logs/
+
+# ==========================
+# Certificates, Keys & Binaries
+# ==========================
+*.pem
+*.key
+*.crt
+*.exe
 
 # ==========================
 # IDE / OS Files
@@ -67,8 +79,7 @@ Thumbs.db
 *.temp
 /zip_project.py
 
-1.md
-*.mp4
 parking-finder.zip
-.zip
-screenshots/Video Synapsis.zip
+*.zip
+*.mp4
+screenshots/*.mp4

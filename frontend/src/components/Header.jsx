@@ -151,11 +151,10 @@ const Header = () => {
                 {openUser && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-50">
                     <Link
-                      to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
+                      to={userInfo.role === "host" || userInfo.role === "admin" ? "/host/dashboard" : "/dashboard"}
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
                     >
-                      
-                      {userInfo.role === "host" || "admin" ? "Dashboard" : "Booking Dashboard"}
+                      {userInfo.role === "host" || userInfo.role === "admin" ? "Dashboard" : "Booking Dashboard"}
                     </Link>
 
                     {userInfo.role === "host" && (

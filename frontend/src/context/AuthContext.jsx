@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
+// Enable credentials so cookies are sent on all axios requests
+axios.defaults.withCredentials = true;
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -8,48 +11,48 @@ export const AuthProvider = ({ children }) => {
     const stored = localStorage.getItem("userInfo");
     return stored ? JSON.parse(stored) : null;
   });
+  const [loading, setLoading] = useState(true);
 
-  // Called after login
+  // Synchronize user session from HTTP-only cookie on mount
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const { data } = await axios.get("/api/auth/profile");
+        setUserInfo(data);
+        localStorage.setItem("userInfo", JSON.stringify(data));
+      } catch {
+        // If cookie is invalid or absent, clear cached user info
+        setUserInfo(null);
+        localStorage.removeItem("userInfo");
+      } finally {
+        setLoading(false);
+      }
+    };
+    verifySession();
+  }, []);
+
+  // Called after login / registration
   const login = (data) => {
-    if (data?.token && data?.user) {
-      localStorage.setItem("userInfo", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-      setUserInfo(data.user);
+    const user = data?.user || data;
+    if (user?._id) {
+      localStorage.setItem("userInfo", JSON.stringify(user));
+      setUserInfo(user);
     }
   };
 
-  // Optional helper — used in older code, now works fine
-  const setAuthToken = (token) => {
-    if (token) {
-      localStorage.setItem("token", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-      localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
-    }
-  };
+  // Backwards-compatible helper
+  const setAuthToken = () => {};
 
-  // Logout clears everything
+  // Logout clears server-side cookie and local state
   const logout = async () => {
     try {
       await axios.post("/api/auth/logout");
     } catch (err) {
       console.warn("Logout request failed:", err.message);
     }
-    localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
-    delete axios.defaults.headers.common["Authorization"];
     setUserInfo(null);
   };
-
-  // Automatically attach token on page reload
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-  }, []);
 
   return (
     <AuthContext.Provider
@@ -58,7 +61,8 @@ export const AuthProvider = ({ children }) => {
         setUserInfo,
         login,
         logout,
-        setAuthToken, // ✅ Fix: this now exists
+        setAuthToken,
+        loading,
       }}
     >
       {children}

@@ -4,27 +4,19 @@ import {
   getMyBookings,
   getBookingById,
   cancelBooking,
-  getBookedSlotsForSpot
+  getBookedSlotsForSpot,
 } from '../controllers/bookings.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// All booking routes are private and require a logged-in user
-router.use(protect);
+// Public route: inspect booked slots and availability for a spot
+router.get('/spot/:spotId', getBookedSlotsForSpot);
 
-router.route('/')
-  .post(protect,createBooking); // Create a new booking
-
-router.get("/spot/:spotId", getBookedSlotsForSpot);
-
-router.route('/me')
-  .get(protect, getMyBookings); // Get all of the user's own bookings
-
-router.route('/:id')
-  .get(protect, getBookingById); // Get a single booking by its ID
-
-router.route('/:id/cancel')
-  .put(protect, cancelBooking); // Cancel a booking
+// Private routes: require authentication
+router.post('/', protect, createBooking);
+router.get('/me', protect, getMyBookings);
+router.get('/:id', protect, getBookingById);
+router.put('/:id/cancel', protect, cancelBooking);
 
 export default router;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
@@ -18,18 +18,9 @@ const HostDashboardPage = () => {
   const [spots, setSpots] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchSpots = async () => {
+  const fetchSpots = useCallback(async () => {
     try {
-      const config = {
-        withCredentials: true,
-        headers: {},
-      };
-
-      if (userInfo?.token) {
-        config.headers.Authorization = `Bearer ${userInfo.token}`;
-      }
-
-      const { data } = await axios.get("/api/spots/my", config);
+      const { data } = await axios.get("/api/spots/my", { withCredentials: true });
       setSpots(data);
     } catch (error) {
       console.error("Error fetching spots:", error);
@@ -37,11 +28,11 @@ const HostDashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchSpots();
-  }, []);
+  }, [fetchSpots]);
 
   if (loading)
     return (
@@ -74,7 +65,7 @@ const HostDashboardPage = () => {
           </div>
           <div className="flex gap-8 mt-6 md:mt-0">
             <div className="text-center">
-              <p className="text-2xl font-semibold">${totalEarnings.toFixed(2)}</p>
+              <p className="text-2xl font-semibold">₹{totalEarnings.toFixed(2)}</p>
               <p className="text-blue-100 text-sm">Total Earnings</p>
             </div>
             <div className="text-center">
@@ -136,7 +127,7 @@ const HostDashboardPage = () => {
                       <DollarSign size={16} className="text-green-500" />
                       Hourly Rate:
                     </span>
-                    <span className="font-medium">${spot.pricePerHour}/hr</span>
+                    <span className="font-medium">₹{spot.pricePerHour}/hr</span>
                   </p>
                   <p className="flex justify-between text-gray-700">
                     <span className="flex items-center gap-2">
@@ -151,7 +142,7 @@ const HostDashboardPage = () => {
                       Earnings:
                     </span>
                     <span className="font-semibold text-green-700">
-                      ${spot.totalEarnings?.toFixed(2) || "0.00"}
+                      ₹{spot.totalEarnings?.toFixed(2) || "0.00"}
                     </span>
                   </p>
                   <p className="flex justify-between text-gray-700">

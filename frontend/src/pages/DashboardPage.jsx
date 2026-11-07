@@ -33,6 +33,19 @@ const DashboardPage = () => {
 		}
 	};
 
+	const handleCancelBooking = async (bookingId) => {
+		if (!window.confirm("Are you sure you want to cancel this reservation?")) return;
+		try {
+			await axios.put(`/api/bookings/${bookingId}/cancel`);
+			toast.success("Reservation cancelled successfully");
+			setSelectedBooking(null);
+			fetchBookings();
+		} catch (err) {
+			console.error("Cancel booking error:", err);
+			toast.error(err.response?.data?.message || "Failed to cancel booking");
+		}
+	};
+
 	useEffect(() => {
 		fetchBookings();
 	}, []);
@@ -150,7 +163,15 @@ const DashboardPage = () => {
 								</div>
 
 								{/* Actions */}
-								<div className="mt-5 flex justify-end">
+								<div className="mt-5 flex justify-end gap-2">
+									{b.status !== "cancelled" && b.status !== "completed" && (
+										<button
+											onClick={() => handleCancelBooking(b._id)}
+											className="text-sm border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 transition"
+										>
+											Cancel
+										</button>
+									)}
 									<button
 										onClick={() => setSelectedBooking(b)}
 										className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
@@ -235,6 +256,8 @@ const DashboardPage = () => {
 									<span className="font-medium">Payment:</span>{" "}
 									{selectedBooking.paymentStatus === "paid" ? (
 										<span className="text-green-600 font-medium">Paid</span>
+									) : selectedBooking.paymentStatus === "unpaid_demo" ? (
+										<span className="text-blue-600 font-medium">Demo Reservation</span>
 									) : (
 										<span className="text-yellow-600 font-medium">Pending</span>
 									)}
@@ -279,6 +302,17 @@ const DashboardPage = () => {
 											</Marker>
 										</MapContainer>
 									</div>
+								</div>
+							)}
+
+							{selectedBooking.status !== "cancelled" && selectedBooking.status !== "completed" && (
+								<div className="mt-6 flex justify-end border-t pt-4">
+									<button
+										onClick={() => handleCancelBooking(selectedBooking._id)}
+										className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition"
+									>
+										Cancel Reservation
+									</button>
 								</div>
 							)}
 						</div>

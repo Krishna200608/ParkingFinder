@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { UserPlus, Mail, Lock, User, Eye, EyeOff, Info } from "lucide-react";
+import logoSvg from "../assets/logo.svg";
 
 const RegisterPage = () => {
   const [name, setName] = useState("");
@@ -75,7 +76,7 @@ const RegisterPage = () => {
 
           <div className="w-full flex justify-center">
             <img
-              src="/src/assets/logo.svg"
+              src={logoSvg}
               alt="Parking Finder Logo"
               className="w-64 h-64 object-contain rounded-lg shadow-md"
             />

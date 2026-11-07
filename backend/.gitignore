@@ -1,0 +1,17 @@
+# Node
+node_modules/
+dist/
+uploads/
+logs/
+*.log
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

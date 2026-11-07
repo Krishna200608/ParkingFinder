@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import logoSvg from "../assets/logo.svg";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setAuthToken, login } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,11 +26,10 @@ const LoginPage = () => {
       const res = await axios.post("/api/auth/login", { email, password });
       const data = res.data;
 
-      if (data?.token) {
-        setAuthToken(data.token);
-        await login(data);
+      if (data?.user) {
+        login(data.user);
         toast.success("Welcome back!");
-        navigate("/dashboard");
+        navigate(data.user.role === "host" ? "/host/dashboard" : "/dashboard");
       } else {
         toast.error("Invalid login response");
       }
@@ -53,7 +53,7 @@ const LoginPage = () => {
 
           <div className="w-full flex justify-center">
             <img
-              src="/src/assets/logo.svg"
+              src={logoSvg}
               alt="Parking Finder Logo"
               className="w-64 h-64 object-contain rounded-lg shadow-md"
             />

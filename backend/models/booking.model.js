@@ -38,15 +38,19 @@ const bookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled'],
-    default: 'pending',
+    enum: ['pending', 'confirmed', 'active', 'completed', 'cancelled', 'rejected', 'expired'],
+    default: 'confirmed',
   },
-  // We will add payment details here later (e.g., Stripe PaymentIntent ID)
+  // Payment status lifecycle
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed'],
-    default: 'pending',
-  }
+    enum: ['pending', 'paid', 'failed', 'unpaid_demo', 'not_required'],
+    default: 'unpaid_demo',
+  },
+  notes: {
+    type: String,
+    trim: true,
+  },
 }, {
   timestamps: true,
 });
