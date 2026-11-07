@@ -11,17 +11,6 @@ jobs:
     name: Lint, Test & Production Build
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd mongosh
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -32,6 +21,15 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      - name: Start MongoDB Replica Set
+        run: |
+          docker run -d --name mongodb -p 27017:27017 mongo:7.0 mongod --replSet rs0 --bind_ip_all
+          until docker exec mongodb mongosh --eval "rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: '127.0.0.1:27017' }] }).ok || rs.status().ok" > /dev/null 2>&1; do
+            echo "Waiting for MongoDB replica set to initialize..."
+            sleep 1
+          done
+          echo "MongoDB replica set initialized successfully!"
+
       - name: Install Dependencies
         run: npm ci
 
@@ -40,7 +38,7 @@ jobs:
 
       - name: Run Test Suites (Vitest)
         env:
-          MONGO_URI: mongodb://localhost:27017/parkingfinder_ci
+          MONGO_URI: mongodb://127.0.0.1:27017/parkingfinder_ci?directConnection=true
           JWT_SECRET: ci_secret_key_testing_12345
           NODE_ENV: test
         run: npm test
