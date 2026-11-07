@@ -6,8 +6,10 @@ import app from './app.js';
 import connectDB from './db.js';
 
 // Resolve directory path and configure environment variables
+// Checks backend/.env first, then falls back to root .env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 const PORT = process.env.PORT || 5001;
 

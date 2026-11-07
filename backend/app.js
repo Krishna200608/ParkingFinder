@@ -4,10 +4,18 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/auth.routes.js';
 import spotRoutes from './routes/spots.routes.js';
 import bookingRoutes from './routes/bookings.routes.js';
+
+// Resolve environment variables from backend/.env or root .env
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 const app = express();
 
@@ -97,3 +105,4 @@ app.use((err, req, res, next) => {
 });
 
 export default app;
+
