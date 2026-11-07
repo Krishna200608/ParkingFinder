@@ -19,6 +19,7 @@ import AboutPage from "./pages/AboutPage";
 import PricingPage from "./pages/PricingPage";
 import ContactPage from "./pages/ContactPage";
 import ProfilePage from "./pages/ProfilePage";
+import SpotDetailsPage from "./pages/SpotDetailsPage";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
 					{/* Public */}
 					<Route path="/" element={<HomePage />} />
 					<Route path="/find" element={<MapPage />} />
+					<Route path="/spots/:id" element={<SpotDetailsPage />} />
 					<Route path="/login" element={<LoginPage />} />
 					<Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />

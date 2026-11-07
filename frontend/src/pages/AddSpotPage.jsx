@@ -66,10 +66,14 @@ const AddSpotPage = () => {
 	const { userInfo } = useAuth();
 	const navigate = useNavigate();
 	const [formData, setFormData] = useState({
-		spotType: "",
+		title: "",
+		spotType: "p2p",
 		address: "",
 		description: "",
 		pricePerHour: "",
+		vehicleSize: "any",
+		amenities: [],
+		accessInstructions: "",
 	});
 
 	const [radius, setRadius] = useState(5);
@@ -316,6 +320,21 @@ const AddSpotPage = () => {
 					</h2>
 
 					<form onSubmit={handleSubmit} className="space-y-5">
+						{/* Spot Title */}
+						<div>
+							<label className="block text-sm font-medium mb-1">
+								Spot Title / Name
+							</label>
+							<input
+								type="text"
+								name="title"
+								value={formData.title}
+								onChange={handleChange}
+								placeholder="e.g. Downtown Secure Garage or Driveway near Metro"
+								className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+							/>
+						</div>
+
 						{/* Spot Type */}
 						<div>
 							<label className="block text-sm font-medium mb-1">
@@ -403,18 +422,96 @@ const AddSpotPage = () => {
 							></textarea>
 						</div>
 
-						{/* Price */}
+						{/* Vehicle Compatibility & Price */}
+						<div className="grid grid-cols-2 gap-3">
+							<div>
+								<label className="block text-sm font-medium mb-1">
+									Vehicle Size
+								</label>
+								<select
+									name="vehicleSize"
+									value={formData.vehicleSize}
+									onChange={handleChange}
+									className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm bg-white"
+								>
+									<option value="any">Any Vehicle</option>
+									<option value="compact">Compact / Hatchback</option>
+									<option value="sedan">Sedan</option>
+									<option value="suv">SUV / Truck</option>
+								</select>
+							</div>
+
+							<div>
+								<label className="block text-sm font-medium mb-1">
+									Price Per Hour ($) <span className="text-red-500">*</span>
+								</label>
+								<input
+									type="number"
+									name="pricePerHour"
+									step="0.01"
+									value={formData.pricePerHour}
+									onChange={handleChange}
+									className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+								/>
+							</div>
+						</div>
+
+						{/* Amenities Checkboxes */}
+						<div>
+							<label className="block text-sm font-medium mb-1.5">
+								Amenities & Features
+							</label>
+							<div className="grid grid-cols-2 gap-2 text-xs">
+								{[
+									{ key: "covered", label: "Covered Parking" },
+									{ key: "ev_charging", label: "EV Supercharging" },
+									{ key: "cctv", label: "24/7 CCTV / Security" },
+									{ key: "disabled_access", label: "Accessible / Disabled Bay" },
+									{ key: "valet", label: "Valet Service" },
+									{ key: "gated", label: "Gated Access Barrier" },
+								].map((item) => {
+									const isChecked = formData.amenities?.includes(item.key);
+									return (
+										<label
+											key={item.key}
+											className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
+												isChecked
+													? "bg-blue-50 border-blue-300 text-blue-700 font-medium"
+													: "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+											}`}
+										>
+											<input
+												type="checkbox"
+												checked={isChecked}
+												onChange={() => {
+													setFormData((prev) => ({
+														...prev,
+														amenities: isChecked
+															? prev.amenities.filter((k) => k !== item.key)
+															: [...prev.amenities, item.key],
+													}));
+												}}
+												className="accent-blue-600"
+											/>
+											<span>{item.label}</span>
+										</label>
+									);
+								})}
+							</div>
+						</div>
+
+						{/* Access Instructions */}
 						<div>
 							<label className="block text-sm font-medium mb-1">
-								Price Per Hour ($) <span className="text-red-500">*</span>
+								Access & Entry Instructions
 							</label>
 							<input
-								type="number"
-								name="pricePerHour"
-								step="0.01"
-								value={formData.pricePerHour}
+								type="text"
+								name="accessInstructions"
+								value={formData.accessInstructions}
 								onChange={handleChange}
-								className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+								placeholder="e.g. Ring intercom 3B, park in designated slot #12"
+								className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
 							/>
 						</div>
 

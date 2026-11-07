@@ -73,10 +73,14 @@ function FlyToHelper({ target }) {
 const EditSpotPage = () => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
+    title: "",
     address: "",
     description: "",
     pricePerHour: "",
-    spotType: "",
+    spotType: "p2p",
+    vehicleSize: "any",
+    amenities: [],
+    accessInstructions: "",
   });
   const [position, setPosition] = useState([28.6139, 77.209]); // Default Delhi
   const [mapCenter, setMapCenter] = useState([28.6139, 77.209]);
@@ -91,10 +95,14 @@ const EditSpotPage = () => {
         setLoading(true);
         const { data } = await axios.get(`/api/spots/${id}`);
         setFormData({
+          title: data.title || "",
           address: data.address || "",
           description: data.description || "",
           pricePerHour: data.pricePerHour || "",
           spotType: data.spotType || "p2p",
+          vehicleSize: data.vehicleSize || "any",
+          amenities: Array.isArray(data.amenities) ? data.amenities : [],
+          accessInstructions: data.accessInstructions || "",
         });
         if (data.location?.coordinates) {
           const coords = [data.location.coordinates[1], data.location.coordinates[0]];
@@ -235,6 +243,20 @@ const EditSpotPage = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-700">
+                Spot Title / Name
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+                placeholder="e.g. Connaught Place Premium Garage"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
                 Address
               </label>
               <input
@@ -279,7 +301,7 @@ const EditSpotPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Price Per Hour (₹)
+                Price Per Hour ($)
               </label>
               <input
                 type="number"
@@ -290,6 +312,80 @@ const EditSpotPage = () => {
                 placeholder="Enter price per hour"
                 min="0"
                 required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Vehicle Compatibility
+              </label>
+              <select
+                name="vehicleSize"
+                value={formData.vehicleSize}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
+              >
+                <option value="any">Any Vehicle</option>
+                <option value="compact">Compact / Hatchback</option>
+                <option value="sedan">Sedan</option>
+                <option value="suv">SUV / Truck</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Amenities & Features
+              </label>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {[
+                  { key: "covered", label: "Covered Parking" },
+                  { key: "ev_charging", label: "EV Supercharging" },
+                  { key: "cctv", label: "24/7 CCTV / Security" },
+                  { key: "disabled_access", label: "Accessible / Disabled Bay" },
+                  { key: "valet", label: "Valet Service" },
+                  { key: "gated", label: "Gated Access Barrier" },
+                ].map((item) => {
+                  const isChecked = formData.amenities?.includes(item.key);
+                  return (
+                    <label
+                      key={item.key}
+                      className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
+                        isChecked
+                          ? "bg-blue-50 border-blue-300 text-blue-700 font-medium"
+                          : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            amenities: isChecked
+                              ? prev.amenities.filter((k) => k !== item.key)
+                              : [...prev.amenities, item.key],
+                          }));
+                        }}
+                        className="accent-blue-600"
+                      />
+                      <span>{item.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Access & Entry Instructions
+              </label>
+              <input
+                type="text"
+                name="accessInstructions"
+                value={formData.accessInstructions}
+                onChange={handleChange}
+                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+                placeholder="e.g. Ring intercom 3B or enter code #1234"
               />
             </div>
 

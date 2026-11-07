@@ -7,18 +7,38 @@ const handleError = (res, statusCode, message) => {
   return res.status(statusCode).json({ message });
 };
 
+// Haversine formula to compute great-circle distance in kilometers
+const calculateDistanceKm = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+};
+
 // @desc    Create a new parking spot
 // @route   POST /api/spots
 // @access  Private (Host or Admin)
 export const createParkingSpot = async (req, res) => {
   try {
     const {
+      title,
       spotType = 'p2p',
       address,
       longitude,
       latitude,
       description,
       pricePerHour,
+      amenities = [],
+      vehicleSize = 'any',
+      accessInstructions = '',
+      images = [],
     } = req.body;
 
     // Resolve coordinates from flat inputs or nested GeoJSON
@@ -48,11 +68,16 @@ export const createParkingSpot = async (req, res) => {
     };
 
     const spot = new ParkingSpot({
+      title: title || address.split(',')[0],
       spotType,
       address,
       location,
       description: description || '',
       pricePerHour: price,
+      amenities: Array.isArray(amenities) ? amenities : [],
+      vehicleSize,
+      accessInstructions,
+      images: Array.isArray(images) ? images : [],
       owner: req.user._id,
     });
 
@@ -64,22 +89,38 @@ export const createParkingSpot = async (req, res) => {
   }
 };
 
-// @desc    Get all parking spots (with optional geospatial query)
+// @desc    Get all parking spots (with multi-criteria & geospatial discovery)
 // @route   GET /api/spots
 // @access  Public
 export const getParkingSpots = async (req, res) => {
   try {
-    const { lat, lng, radius } = req.query;
+    const {
+      lat,
+      lng,
+      radius,
+      minPrice,
+      maxPrice,
+      spotType,
+      vehicleSize,
+      amenities,
+      search,
+      availableOnly,
+      sort,
+    } = req.query;
 
     let query = {};
 
-    // Geospatial "Find Near Me" query using $near with 2dsphere index
-    if (lat && lng) {
-      const parsedLat = parseFloat(lat);
-      const parsedLng = parseFloat(lng);
+    // 1. Geospatial "Find Near Me" query using $near with 2dsphere index
+    let parsedLat = null;
+    let parsedLng = null;
+    if (lat !== undefined && lng !== undefined) {
+      const pLat = parseFloat(lat);
+      const pLng = parseFloat(lng);
 
-      if (!isNaN(parsedLat) && !isNaN(parsedLng)) {
-        const radiusMeters = radius ? parseInt(radius, 10) : 5000; // default 5km
+      if (!isNaN(pLat) && !isNaN(pLng)) {
+        parsedLat = pLat;
+        parsedLng = pLng;
+        const radiusMeters = radius ? parseInt(radius, 10) : 50000; // default 50km
         query.location = {
           $near: {
             $geometry: {
@@ -92,14 +133,113 @@ export const getParkingSpots = async (req, res) => {
       }
     }
 
-    // Exclude spots owned by the logged-in user if authenticated
+    // 2. Price filtering
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      query.pricePerHour = {};
+      if (minPrice !== undefined && !isNaN(parseFloat(minPrice))) {
+        query.pricePerHour.$gte = parseFloat(minPrice);
+      }
+      if (maxPrice !== undefined && !isNaN(parseFloat(maxPrice))) {
+        query.pricePerHour.$lte = parseFloat(maxPrice);
+      }
+    }
+
+    // 3. Spot Type (p2p vs operator)
+    if (spotType && spotType !== 'all') {
+      query.spotType = spotType;
+    }
+
+    // 4. Vehicle Size compatibility
+    if (vehicleSize && vehicleSize !== 'any') {
+      query.$or = [
+        { vehicleSize: vehicleSize },
+        { vehicleSize: 'any' },
+        { vehicleSize: { $exists: false } },
+      ];
+    }
+
+    // 5. Amenities / Features filter
+    if (amenities) {
+      const amenityList = Array.isArray(amenities)
+        ? amenities
+        : amenities.split(',').map((a) => a.trim().toLowerCase()).filter(Boolean);
+      if (amenityList.length > 0) {
+        query.amenities = { $all: amenityList };
+      }
+    }
+
+    // 6. Availability filter
+    if (availableOnly === 'true' || availableOnly === true) {
+      query.isAvailable = true;
+    }
+
+    // 7. Text / Keyword Search
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      const searchConditions = [
+        { title: searchRegex },
+        { address: searchRegex },
+        { description: searchRegex },
+      ];
+      if (query.$or) {
+        query.$and = [{ $or: query.$or }, { $or: searchConditions }];
+        delete query.$or;
+      } else {
+        query.$or = searchConditions;
+      }
+    }
+
+    // 8. Exclude spots owned by the logged-in user if authenticated
     if (req.user?._id) {
       query.owner = { $ne: req.user._id };
     }
 
-    const spots = await ParkingSpot.find(query)
-      .populate('owner', 'username role')
+    // Build query pipeline
+    let spotQuery = ParkingSpot.find(query)
+      .populate('owner', 'username role email createdAt')
       .lean();
+
+    // Default sorting when not restricted by $near
+    if (!query.location) {
+      if (sort === 'price_asc') {
+        spotQuery = spotQuery.sort({ pricePerHour: 1 });
+      } else if (sort === 'price_desc') {
+        spotQuery = spotQuery.sort({ pricePerHour: -1 });
+      } else if (sort === 'rating_desc') {
+        spotQuery = spotQuery.sort({ rating: -1 });
+      } else {
+        spotQuery = spotQuery.sort({ createdAt: -1 });
+      }
+    }
+
+    let spots = await spotQuery;
+
+    // Attach calculated distance in kilometers if lat/lng provided
+    if (parsedLat !== null && parsedLng !== null) {
+      spots = spots.map((spot) => {
+        const spotLng = spot.location?.coordinates?.[0];
+        const spotLat = spot.location?.coordinates?.[1];
+        let distanceKm = null;
+        if (spotLat !== undefined && spotLng !== undefined) {
+          distanceKm = calculateDistanceKm(parsedLat, parsedLng, spotLat, spotLng);
+        }
+        return {
+          ...spot,
+          distanceKm,
+        };
+      });
+
+      // Apply client-requested ordering if $near was active
+      if (sort === 'price_asc') {
+        spots.sort((a, b) => a.pricePerHour - b.pricePerHour);
+      } else if (sort === 'price_desc') {
+        spots.sort((a, b) => b.pricePerHour - a.pricePerHour);
+      } else if (sort === 'rating_desc') {
+        spots.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      } else if (sort === 'distance') {
+        spots.sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+      }
+    }
 
     return res.status(200).json(spots);
   } catch (error) {
@@ -114,7 +254,7 @@ export const getParkingSpots = async (req, res) => {
 export const getParkingSpotById = async (req, res) => {
   try {
     const spot = await ParkingSpot.findById(req.params.id)
-      .populate('owner', 'username role')
+      .populate('owner', 'username role email createdAt')
       .populate('reviews.user', 'username');
 
     if (spot) {
@@ -144,6 +284,7 @@ export const updateParkingSpot = async (req, res) => {
     }
 
     // Update basic fields if provided
+    if (req.body.title !== undefined) spot.title = req.body.title;
     if (req.body.spotType) spot.spotType = req.body.spotType;
     if (req.body.address) spot.address = req.body.address;
     if (req.body.description !== undefined) spot.description = req.body.description;
@@ -153,6 +294,18 @@ export const updateParkingSpot = async (req, res) => {
     }
     if (req.body.isAvailable !== undefined) {
       spot.isAvailable = Boolean(req.body.isAvailable);
+    }
+    if (req.body.amenities !== undefined && Array.isArray(req.body.amenities)) {
+      spot.amenities = req.body.amenities;
+    }
+    if (req.body.vehicleSize !== undefined) {
+      spot.vehicleSize = req.body.vehicleSize;
+    }
+    if (req.body.accessInstructions !== undefined) {
+      spot.accessInstructions = req.body.accessInstructions;
+    }
+    if (req.body.images !== undefined && Array.isArray(req.body.images)) {
+      spot.images = req.body.images;
     }
 
     // Update location if coordinates provided
@@ -304,6 +457,156 @@ export const getMyParkingSpots = async (req, res) => {
     return res.status(200).json(spotsWithEarnings);
   } catch (error) {
     console.error('Error fetching host spots:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
+};
+
+// @desc    Seed realistic demo spots for discovery and live demonstrations
+// @route   POST /api/spots/seed
+// @access  Public (Idempotent seed helper)
+export const seedDemoSpots = async (req, res) => {
+  try {
+    const spotCount = await ParkingSpot.countDocuments();
+    if (spotCount > 0 && req.query.force !== 'true') {
+      return res.status(200).json({
+        message: `Database already contains ${spotCount} spots. Pass ?force=true to seed additional spots.`,
+        count: spotCount,
+      });
+    }
+
+    // Find or create demo host user
+    let demoHost = await User.findOne({ role: 'host' });
+    if (!demoHost) {
+      demoHost = await User.create({
+        username: 'MetroHost',
+        email: 'host@parkingfinder.demo',
+        password: 'Password123!',
+        role: 'host',
+      });
+    }
+
+    const demoSpotsData = [
+      {
+        title: 'Connaught Place Premium Garage',
+        address: 'Block B, Inner Circle, Connaught Place, New Delhi, 110001',
+        location: { type: 'Point', coordinates: [77.2195, 28.6328] }, // [lng, lat]
+        pricePerHour: 15,
+        spotType: 'operator',
+        vehicleSize: 'any',
+        amenities: ['covered', 'ev_charging', 'cctv', 'disabled_access', 'gated'],
+        accessInstructions: 'Show QR confirmation at the automated gate barrier.',
+        description: 'Multi-level secure commercial parking facility with 24/7 CCTV surveillance, rapid EV chargers, and reserved disabled bays in central Delhi.',
+        rating: 4.8,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Cyber City Corporate Parking Bay',
+        address: 'DLF Cyber City, Tower 10, Gurugram, Haryana, 122002',
+        location: { type: 'Point', coordinates: [77.0888, 28.4950] },
+        pricePerHour: 12,
+        spotType: 'operator',
+        vehicleSize: 'suv',
+        amenities: ['covered', 'cctv', 'valet', 'gated'],
+        accessInstructions: 'Valet desk on basement level 1.',
+        description: 'Convenient business hub parking space suitable for SUVs and executive sedans. Full security and valet service included.',
+        rating: 4.7,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Hauz Khas Village Private Driveway',
+        address: 'Deer Park Rd, Hauz Khas Village, New Delhi, 110016',
+        location: { type: 'Point', coordinates: [77.1942, 28.5494] },
+        pricePerHour: 8,
+        spotType: 'p2p',
+        vehicleSize: 'sedan',
+        amenities: ['cctv', 'lit_lot'],
+        accessInstructions: 'Gate 2 on Deer Park Rd. Code will be sent on booking.',
+        description: 'Private residential driveway in Hauz Khas. Easy 3-minute walking distance to popular cafes, restaurants, and historical monuments.',
+        rating: 4.9,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Aerocity Express Transit Parking',
+        address: 'Hospitality District, Aerocity, Indira Gandhi International Airport, New Delhi, 110037',
+        location: { type: 'Point', coordinates: [77.1215, 28.5501] },
+        pricePerHour: 20,
+        spotType: 'operator',
+        vehicleSize: 'any',
+        amenities: ['covered', 'ev_charging', 'cctv', 'disabled_access', 'valet'],
+        accessInstructions: 'Follow signs for P3 Underground Terminal Transit.',
+        description: 'High-speed airport transit parking with continuous EV supercharging, CCTV, and covered weather protection right next to Delhi Airport.',
+        rating: 4.9,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Saket District Centre Covered Bay',
+        address: 'Press Enclave Marg, Saket District Centre, Sector 6, New Delhi, 110017',
+        location: { type: 'Point', coordinates: [77.2183, 28.5284] },
+        pricePerHour: 10,
+        spotType: 'p2p',
+        vehicleSize: 'compact',
+        amenities: ['covered', 'cctv'],
+        accessInstructions: 'Park in designated spot #24.',
+        description: 'Secure basement slot adjacent to Select Citywalk Mall. Ideal for compact and mid-size city vehicles.',
+        rating: 4.5,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Indiranagar 100ft Road Hub',
+        address: '100 Feet Rd, HAL 2nd Stage, Indiranagar, Bengaluru, 560038',
+        location: { type: 'Point', coordinates: [77.6412, 12.9716] },
+        pricePerHour: 14,
+        spotType: 'operator',
+        vehicleSize: 'any',
+        amenities: ['covered', 'ev_charging', 'cctv'],
+        accessInstructions: 'Automated barrier lifts upon plate recognition or reservation code.',
+        description: 'Prime retail district parking space with EV chargers and covered shade in Bengaluru.',
+        rating: 4.8,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'BKC Financial Center Executive Spot',
+        address: 'G Block, Bandra Kurla Complex, Bandra East, Mumbai, 400051',
+        location: { type: 'Point', coordinates: [72.8687, 19.0664] },
+        pricePerHour: 22,
+        spotType: 'operator',
+        vehicleSize: 'any',
+        amenities: ['covered', 'cctv', 'valet', 'disabled_access'],
+        accessInstructions: 'Executive lane 3 entrance.',
+        description: 'State-of-the-art corporate parking facility in the heart of Mumbai financial hub.',
+        rating: 4.9,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+      {
+        title: 'Manhattan Midtown Secure Garage',
+        address: '350 5th Ave, New York, NY 10118',
+        location: { type: 'Point', coordinates: [-73.9857, 40.7484] },
+        pricePerHour: 35,
+        spotType: 'operator',
+        vehicleSize: 'any',
+        amenities: ['covered', 'cctv', 'valet', 'ev_charging'],
+        accessInstructions: 'Entrance on 33rd St between 5th and 6th Ave.',
+        description: 'Prime Manhattan parking garage located steps away from Empire State Building and Herald Square.',
+        rating: 4.9,
+        isAvailable: true,
+        owner: demoHost._id,
+      },
+    ];
+
+    const inserted = await ParkingSpot.insertMany(demoSpotsData);
+    return res.status(201).json({
+      message: `Successfully seeded ${inserted.length} realistic demo parking spots across key metro locations.`,
+      spots: inserted,
+    });
+  } catch (error) {
+    console.error('Error seeding demo spots:', error);
     return handleError(res, 500, `Server error: ${error.message}`);
   }
 };

@@ -39,6 +39,10 @@ const parkingSpotSchema = new mongoose.Schema({
   },
 
   // --- Details ---
+  title: {
+    type: String,
+    trim: true,
+  },
   description: {
     type: String,
     trim: true,
@@ -46,6 +50,24 @@ const parkingSpotSchema = new mongoose.Schema({
   pricePerHour: {
     type: Number,
     required: [true, 'Price is required (can be 0)'],
+  },
+  amenities: {
+    type: [String],
+    default: [],
+  },
+  vehicleSize: {
+    type: String,
+    enum: ['compact', 'sedan', 'suv', 'truck', 'any'],
+    default: 'any',
+  },
+  accessInstructions: {
+    type: String,
+    trim: true,
+    default: '',
+  },
+  images: {
+    type: [String],
+    default: [],
   },
 
   // --- Real-time Status ---
@@ -77,9 +99,13 @@ const parkingSpotSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// --- Mongoose Index ---
+// --- Mongoose Indexes ---
 // Create a 2dsphere index for geospatial queries (finding spots near a point)
 parkingSpotSchema.index({ location: '2dsphere' });
+// Compound index for availability and pricing queries
+parkingSpotSchema.index({ isAvailable: 1, pricePerHour: 1 });
+// Text index for search discovery across title, address and description
+parkingSpotSchema.index({ title: 'text', address: 'text', description: 'text' });
 
 // --- Mongoose Middleware ---
 // Calculate average rating before saving

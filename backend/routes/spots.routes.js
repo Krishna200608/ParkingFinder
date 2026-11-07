@@ -7,10 +7,14 @@ import {
   deleteParkingSpot,
   createSpotReview,
   getMyParkingSpots,
+  seedDemoSpots,
 } from '../controllers/spots.controller.js';
 import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
+
+// Demo data seeder (for live portfolio demonstrations)
+router.post('/seed', seedDemoSpots);
 
 // Host dashboard: get logged-in host's listings with earnings
 router.get('/my', protect, isHostOrAdmin, getMyParkingSpots);

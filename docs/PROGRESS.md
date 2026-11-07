@@ -1,6 +1,6 @@
 # ParkingFinder 2.0 — Progress Tracking Log
 
-## Project State: Stage 3 Completed (Core Booking Engine & Concurrency Safety Verified)
+## Project State: Stage 4 Completed (Modern Parking Discovery, Geocoding & Filters)
 *Last Updated: 2026-11-07*
 
 ---
@@ -13,46 +13,48 @@
 | **Stage 1** | **Security & Architecture Cleanup** | **COMPLETED** | Untrack keys/binaries, unify cookie auth, fix ESLint errors, Zod validation, Helmet, rate limiting |
 | **Stage 2** | **Vercel Deployment Foundation** | **COMPLETED** | Decouple Express server (`app.js`), serverless handler (`api/index.js`), connection pooling, `vercel.json` |
 | **Stage 3** | **Core Booking Engine** | **COMPLETED** | Transactional double-booking prevention, half-open intervals, demo status, multi-day availability, Vitest suite |
-| **Stage 4** | **Parking Discovery & Maps** | **NEXT** | Synchronized map/list, search filters, spot details page, favourites, Nominatim rate compliance |
-| **Stage 5** | **Host Marketplace & Admin** | Planned | Host listing CRUD, verified review policy, host earnings analytics, admin moderation dashboard |
+| **Stage 4** | **Parking Discovery & Maps** | **COMPLETED** | Synchronized map/list, search filters, spot details page, favourites, Nominatim rate compliance, chunk splitting |
+| **Stage 5** | **Host Marketplace & Admin** | **NEXT** | Host listing CRUD, verified review policy, host earnings analytics, admin moderation dashboard |
 | **Stage 6** | **Advanced Differentiators** | Planned | Geospatial demand heatmap, dynamic pricing simulator, EV charging filters, PWA offline shell |
 | **Stage 7** | **QA, CI/CD & Final Release** | Planned | Vitest & Supertest suites, GitHub Actions workflow, performance/a11y optimization, portfolio docs |
 
 ---
 
-## 2. Stage 3 Verification Metrics
+## 2. Stage 4 Verification Metrics
 
-- **Git Working Tree:** Active branch `feature/booking-engine`.
-- **Double-Booking & Concurrency Engine ([`backend/controllers/bookings.controller.js`](file:///d:/Web%20D/ParkingFinder/backend/controllers/bookings.controller.js)):**
-  - Implemented transactional execution with MongoDB session and exponential backoff retry (`executeWithRetry`).
-  - Added exclusive spot-level document write lock via atomic increment (`$inc: { bookingSequence: 1 }`).
-  - Strict half-open interval overlap checks: $[StartTime, EndTime)$, ensuring $ExistingStart < RequestedEnd \land ExistingEnd > RequestedStart$.
-  - Exact contiguous boundary bookings (e.g. 10:00-12:00 and 12:00-14:00) cleanly supported without false collisions.
-  - Past booking rejection and invalid time window checks.
-  - Host self-booking prevention.
-- **Model Enhancements ([`backend/models/booking.model.js`](file:///d:/Web%20D/ParkingFinder/backend/models/booking.model.js)):**
-  - Added price snapshots (`pricePerHourSnapshot`, `totalAmount`) to protect past transactions against host rate changes.
-  - Transparent demo statuses: `paymentStatus: 'unpaid_demo'` or `'not_required'` with `paymentMethod: 'demo'`.
-  - Added full cancellation audit trail (`cancelledAt`, `cancelledBy`, `cancellationReason`).
-  - Added compound indexes: `{ parkingSpot: 1, status: 1, startTime: 1, endTime: 1 }`.
-- **Dynamic Availability Endpoint:**
-  - `GET /api/bookings/spot/:spotId/availability?date=YYYY-MM-DD` computes real-time occupied intervals and contiguous free slots.
-- **Frontend Upgrades ([`frontend/src/components/booking/BookingModal.jsx`](file:///d:/Web%20D/ParkingFinder/frontend/src/components/booking/BookingModal.jsx)):**
-  - Lifted artificial single-day constraint, allowing flexible multi-hour and multi-day reservations.
-  - Real-time availability indicator fetching busy ranges dynamically.
-  - Transparent "Demo Reservation" badges.
-- **Automated Vitest Test Suite ([`test/booking.test.js`](file:///d:/Web%20D/ParkingFinder/test/booking.test.js)):**
-  - 10 automated test cases passing (10/10 in 8.2s).
-  - Concurrency race condition test validates that strictly one of two simultaneous overlapping requests succeeds, while the second receives HTTP 409 Conflict.
-- **Frontend Lint & Build:**
+- **Git Working Tree:** Active branch `feature/discovery-and-maps`.
+- **Geospatial Discovery & Multi-Parameter Backend Engine ([`backend/controllers/spots.controller.js`](file:///d:/Web%20D/ParkingFinder/backend/controllers/spots.controller.js)):**
+  - Upgraded `getParkingSpots` to support multi-dimensional queries: `maxPrice`, `spotType`, `vehicleSize`, `amenities`, and `search`.
+  - Added Haversine distance calculator attaching computed `distanceKm` to every returned spot when `lat` and `lng` coordinates are supplied.
+  - Implemented dynamic in-memory and MongoDB sorting: `distance`, `price_asc`, `price_desc`, `rating_desc`.
+  - Added idempotent demo seeder endpoint: `POST /api/spots/seed` populating realistic spaces across Delhi, Gurugram, Bengaluru, Mumbai, and New York.
+  - Added verified reviews endpoint: `POST /api/spots/:id/reviews` computing updated average rating.
+- **Model Upgrades ([`backend/models/parkingSpot.model.js`](file:///d:/Web%20D/ParkingFinder/backend/models/parkingSpot.model.js)):**
+  - Added fields: `title`, `amenities` (array of strings), `vehicleSize` (enum), `accessInstructions`, `images`.
+  - Added compound index `{ isAvailable: 1, pricePerHour: 1 }` and text index `{ title: 'text', address: 'text', description: 'text' }`.
+- **Modern Synchronized Discovery Experience ([`frontend/src/pages/MapPage.jsx`](file:///d:/Web%20D/ParkingFinder/frontend/src/pages/MapPage.jsx)):**
+  - Interactive search bar powered by OpenStreetMap Nominatim with 450ms debounce and autocomplete dropdown.
+  - Multi-dimensional filter toolbar: quick amenity badges (EV, Covered, CCTV), price range slider, vehicle compatibility selector, and sort menu.
+  - Bi-directional synchronization: list item click/hover focuses marker popup; map marker click scrolls to and highlights corresponding card.
+  - Driver saved/favourite spots persisted in `localStorage` with instantaneous filtering.
+  - Empty-state helper with one-click demo data population.
+- **Dedicated Spot Details Page ([`frontend/src/pages/SpotDetailsPage.jsx`](file:///d:/Web%20D/ParkingFinder/frontend/src/pages/SpotDetailsPage.jsx)):**
+  - Route `/spots/:id` registered in `frontend/src/App.jsx`.
+  - Displays complete spot specs, verified host badge, amenity icon grid, mini Leaflet map with directions link, real-time availability interval inspector, and driver reviews with star ratings.
+- **Vite Production Chunk Splitting ([`frontend/vite.config.js`](file:///d:/Web%20D/ParkingFinder/frontend/vite.config.js)):**
+  - Configured `rollupOptions.output.manualChunks` into `vendor`, `leaflet`, and `ui` bundles.
+  - Eliminated 500kB warning; total build time dropped to 5.96s.
+- **Automated Vitest Test Suite ([`test/discovery.test.js`](file:///d:/Web%20D/ParkingFinder/test/discovery.test.js)):**
+  - 10 new automated test cases for discovery, geospatial queries, filtering, sorting, details, reviews, and seeding.
+  - Combined suite passing cleanly: **20 passed (20)** across 2 test files.
+- **Frontend Code Quality:**
   - `npm run lint` passes with 0 errors and 0 warnings.
-  - `npm run build` generates production assets cleanly.
+  - `npm run build` succeeds cleanly.
 
 ---
 
-## 3. Immediate Next Steps (Stage 4: Parking Discovery & Maps)
-1. Synchronize Leaflet map markers and spot card list selection in `frontend/src/pages/MapPage.jsx`.
-2. Add comprehensive filtering: price range, vehicle size, distance radius, spot type (covered/uncovered/valet/EV).
-3. Search by locality/address with Nominatim OpenStreetMap geocoding adhering to OSM rate limits (1 req/sec debounce, custom `User-Agent`).
-4. Dedicated Spot Details Page (`/spots/:id`) showing amenities, full availability calendar, and host details.
-5. Driver saved/favourite spots feature persisted in local storage or user profile.
+## 3. Immediate Next Steps (Stage 5: Host Marketplace & Admin Experience)
+1. Host Listing Management UI: Enhance `HostDashboardPage.jsx` with quick availability toggle, occupancy metrics, and earnings summary.
+2. Verified Review Gating: Enforce rule that only drivers who have completed an actual reservation on a spot can post a review.
+3. Host Earnings Analytics: Visual breakdown of monthly/weekly revenue and utilization rates.
+4. Admin Moderation Portal: Allow administrative role to inspect all listings, toggle status, and moderate flagged reviews.
