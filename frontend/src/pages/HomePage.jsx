@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
 import {
   Car,
   MapPin,
@@ -13,6 +15,7 @@ import {
   TrendingUp,
   CheckCircle2,
   CalendarCheck,
+  X,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -20,10 +23,12 @@ import { Badge } from "../components/ui/Badge";
 import { useAuth } from "../context/AuthContext";
 
 export default function HomePage() {
-  const { userInfo } = useAuth();
+  const { userInfo, login } = useAuth();
   const navigate = useNavigate();
   const [quickQuery, setQuickQuery] = useState("");
   const [activePersona, setActivePersona] = useState("driver"); // 'driver' | 'host'
+  const [showHostUpgradeModal, setShowHostUpgradeModal] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
   const handleHeroSearch = (e) => {
     e.preventDefault();
@@ -31,6 +36,37 @@ export default function HomePage() {
       navigate(`/find?search=${encodeURIComponent(quickQuery.trim())}`);
     } else {
       navigate("/find");
+    }
+  };
+
+  const handleListSpaceClick = () => {
+    if (!userInfo) {
+      navigate("/register");
+      return;
+    }
+    if (userInfo.role === "host" || userInfo.role === "admin") {
+      navigate("/host/add-spot");
+      return;
+    }
+    // Authenticated Driver -> Prompt with upgrade modal
+    setShowHostUpgradeModal(true);
+  };
+
+  const handleUpgradeToHost = async () => {
+    try {
+      setIsUpgrading(true);
+      const { data } = await axios.post("/api/auth/switch-role", { role: "host" });
+      if (data?.user) {
+        login(data.user);
+        toast.success("Host account activated! Welcome to the space host marketplace.");
+        setShowHostUpgradeModal(false);
+        navigate("/host/add-spot");
+      }
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      toast.error(err?.response?.data?.message || "Failed to activate host account");
+    } finally {
+      setIsUpgrading(false);
     }
   };
 
@@ -356,7 +392,7 @@ export default function HomePage() {
               <Button
                 variant="primary"
                 size="md"
-                href={userInfo ? "/host/add-spot" : "/register"}
+                onClick={handleListSpaceClick}
                 className="bg-[#2563EB] hover:bg-blue-600 text-white"
               >
                 List Your Space
@@ -364,7 +400,7 @@ export default function HomePage() {
               <Button
                 variant="secondary"
                 size="md"
-                href="/pricing"
+                to="/pricing"
                 className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
               >
                 Calculate Potential Yield
@@ -387,7 +423,7 @@ export default function HomePage() {
             <Button
               variant="primary"
               size="lg"
-              href="/find"
+              to="/find"
             >
               <Search size={16} />
               <span>Explore Interactive Map</span>
@@ -396,7 +432,7 @@ export default function HomePage() {
               <Button
                 variant="secondary"
                 size="lg"
-                href={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
+                to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
               >
                 Go to My Dashboard
               </Button>
@@ -404,7 +440,7 @@ export default function HomePage() {
               <Button
                 variant="secondary"
                 size="lg"
-                href="/register"
+                to="/register"
               >
                 Create Account
               </Button>
@@ -412,6 +448,72 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── BECOME HOST UPGRADE MODAL ──────────────────────────── */}
+      {showHostUpgradeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-[#DDE3EA] space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center">
+                <ShieldCheck size={20} />
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowHostUpgradeModal(false)}
+                className="p-1 rounded-lg text-[#94A3B8] hover:text-[#17243A] hover:bg-[#F4F6F8] cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-[#17243A] tracking-tight">
+                Activate Space Host Mode
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                You are currently signed in as a Driver (<strong>{userInfo?.username}</strong>).
+              </p>
+              <p className="text-xs text-[#475569] mt-3 leading-relaxed">
+                To list a parking space, garage, or driveway, activate Host mode on your account. It takes one click, and gives you instant access to listing tools and rental payouts.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#475569]">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={13} className="text-[#16845B] shrink-0" />
+                <span>Monetize unused residential driveways or garages</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={13} className="text-[#16845B] shrink-0" />
+                <span>Set custom hourly rates & availability schedules</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={13} className="text-[#16845B] shrink-0" />
+                <span>Live driver tracking and verified post-stay payouts</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#F1F5F9]">
+              <Button
+                variant="ghost"
+                size="md"
+                onClick={() => setShowHostUpgradeModal(false)}
+                disabled={isUpgrading}
+              >
+                Maybe Later
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleUpgradeToHost}
+                isLoading={isUpgrading}
+              >
+                Activate Host & List Space
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

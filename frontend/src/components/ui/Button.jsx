@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Button({
   children,
@@ -11,10 +12,12 @@ export default function Button({
   className = "",
   icon: Icon,
   iconPosition = "left",
+  href,
+  to,
   ...props
 }) {
   const baseClasses =
-    "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none select-none";
+    "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none select-none cursor-pointer";
 
   const sizeClasses = {
     sm: "text-xs px-2.5 py-1.5 rounded-lg gap-1.5 h-8",
@@ -37,16 +40,10 @@ export default function Button({
       "bg-white text-[#DC4545] border border-red-200 hover:bg-red-50 active:bg-red-100",
   };
 
-  return (
-    <button
-      type={type}
-      disabled={disabled || isLoading}
-      onClick={onClick}
-      className={`${baseClasses} ${sizeClasses[size] || sizeClasses.md} ${
-        variantClasses[variant] || variantClasses.primary
-      } ${className}`}
-      {...props}
-    >
+  const destination = to || href;
+
+  const content = (
+    <>
       {isLoading ? (
         <>
           <svg
@@ -79,7 +76,57 @@ export default function Button({
           {Icon && iconPosition === "right" && <Icon size={size === "sm" ? 14 : 16} aria-hidden="true" />}
         </>
       )}
+    </>
+  );
+
+  const combinedClasses = `${baseClasses} ${sizeClasses[size] || sizeClasses.md} ${
+    variantClasses[variant] || variantClasses.primary
+  } ${className}`.trim();
+
+  // If a destination link is provided, render Link or anchor
+  if (destination && !disabled && !isLoading) {
+    const isExternal =
+      destination.startsWith("http://") ||
+      destination.startsWith("https://") ||
+      destination.startsWith("//") ||
+      destination.startsWith("mailto:");
+
+    if (isExternal) {
+      return (
+        <a
+          href={destination}
+          target="_blank"
+          rel="noreferrer"
+          onClick={onClick}
+          className={combinedClasses}
+          {...props}
+        >
+          {content}
+        </a>
+      );
+    }
+
+    return (
+      <Link
+        to={destination}
+        onClick={onClick}
+        className={combinedClasses}
+        {...props}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type={type}
+      disabled={disabled || isLoading}
+      onClick={onClick}
+      className={combinedClasses}
+      {...props}
+    >
+      {content}
     </button>
   );
 }
-

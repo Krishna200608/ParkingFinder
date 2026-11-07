@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   getUserProfile,
+  switchUserRole,
 } from '../controllers/auth.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { validate, registerSchema, loginSchema } from '../middleware/validate.middleware.js';
@@ -17,5 +18,6 @@ router.post('/login', validate(loginSchema), loginUser);
 // Private routes (protected by HTTP-only cookie / Bearer auth)
 router.post('/logout', protect, logoutUser);
 router.get('/profile', protect, getUserProfile);
+router.post('/switch-role', protect, switchUserRole);
 
 export default router;

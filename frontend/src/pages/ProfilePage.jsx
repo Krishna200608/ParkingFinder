@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-import { User, Mail, Shield, LogOut, Calendar } from "lucide-react";
+import { User, Mail, Shield, LogOut, Plus, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -10,9 +10,10 @@ import { Badge } from "../components/ui/Badge";
 import PageHeader from "../components/ui/PageHeader";
 
 export default function ProfilePage() {
-  const { logout } = useAuth();
+  const { logout, login } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSwitchingRole, setIsSwitchingRole] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +39,23 @@ export default function ProfilePage() {
       navigate("/login");
     } catch {
       toast.error("Logout failed");
+    }
+  };
+
+  const handleSwitchRole = async (targetRole) => {
+    try {
+      setIsSwitchingRole(true);
+      const { data } = await axios.post("/api/auth/switch-role", { role: targetRole });
+      if (data?.user) {
+        login(data.user);
+        setProfile(data.user);
+        toast.success(data.message || `Switched to ${targetRole} mode`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || "Failed to switch role");
+    } finally {
+      setIsSwitchingRole(false);
     }
   };
 
@@ -97,9 +115,28 @@ export default function ProfilePage() {
 
         {/* Action Row */}
         <div className="mt-6 pt-5 border-t border-[#F1F5F9] flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[11px] text-[#94A3B8]">
-            To modify your email or role permissions, contact support.
-          </p>
+          <div className="flex items-center gap-2">
+            {profile?.role === "driver" ? (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => handleSwitchRole("host")}
+                isLoading={isSwitchingRole}
+              >
+                <Plus size={13} />
+                <span>Activate Host Status</span>
+              </Button>
+            ) : (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleSwitchRole("driver")}
+                isLoading={isSwitchingRole}
+              >
+                <span>Switch to Driver Mode</span>
+              </Button>
+            )}
+          </div>
           <Button
             variant="danger"
             size="sm"

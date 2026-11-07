@@ -118,3 +118,34 @@ export const getUserProfile = async (req, res) => {
 
   return res.status(404).json({ message: 'User not found' });
 };
+
+// @desc    Switch user role between driver and host
+// @route   POST /api/auth/switch-role
+// @access  Private
+export const switchUserRole = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { role } = req.body;
+    const targetRole = role === 'driver' ? 'driver' : 'host';
+
+    user.role = targetRole;
+    await user.save();
+
+    return res.status(200).json({
+      message: `Account role updated to ${targetRole === 'host' ? 'Host' : 'Driver'} successfully.`,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error('Switch role error:', error);
+    return res.status(500).json({ message: 'Failed to switch user role' });
+  }
+};

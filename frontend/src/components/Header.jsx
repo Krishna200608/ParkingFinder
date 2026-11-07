@@ -205,6 +205,17 @@ export default function Header() {
                     </Link>
                   )}
 
+                  {userInfo.role === "driver" && (
+                    <Link
+                      to="/profile"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                    >
+                      <Plus size={14} className="text-blue-600" />
+                      <span>Become a Host</span>
+                    </Link>
+                  )}
+
                   <Link
                     to="/profile"
                     onClick={() => setUserDropdownOpen(false)}
