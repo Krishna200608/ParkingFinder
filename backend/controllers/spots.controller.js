@@ -625,3 +625,39 @@ export const seedDemoSpots = async (req, res) => {
     return handleError(res, 500, `Server error: ${error.message}`);
   }
 };
+
+// @desc    Get parking demand heatmap geospatial points
+// @route   GET /api/spots/demand-heatmap
+// @access  Public
+export const getDemandHeatmap = async (req, res) => {
+  try {
+    const spots = await ParkingSpot.find({ isAvailable: true })
+      .select('title address location pricePerHour rating reviews spotType')
+      .lean();
+
+    const heatmapPoints = spots.map((s) => {
+      const lng = s.location?.coordinates?.[0] || 77.209;
+      const lat = s.location?.coordinates?.[1] || 28.6139;
+      // Synthesize high-demand density weight based on rating, reviews count and operator status
+      const reviewWeight = Math.min(0.4, (s.reviews?.length || 0) * 0.1);
+      const ratingWeight = ((s.rating || 4) / 5) * 0.5;
+      const typeWeight = s.spotType === 'operator' ? 0.1 : 0.05;
+      const intensity = Math.min(1.0, Math.max(0.3, ratingWeight + reviewWeight + typeWeight));
+
+      return {
+        _id: s._id,
+        lat,
+        lng,
+        intensity: Math.round(intensity * 100) / 100,
+        title: s.title || s.address,
+        pricePerHour: s.pricePerHour,
+        spotType: s.spotType,
+      };
+    });
+
+    return res.status(200).json(heatmapPoints);
+  } catch (error) {
+    console.error('Error calculating demand heatmap:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
+};

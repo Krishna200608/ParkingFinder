@@ -12,10 +12,25 @@
 			crossorigin=""
 		/>
 
-		<title>frontend</title>
+		<title>ParkingFinder — Smart Parking Discovery & Reservations</title>
+		<meta
+			name="description"
+			content="Find, compare, and reserve urban parking spaces with real-time maps, verified amenities, and dynamic pricing."
+		/>
+		<meta name="theme-color" content="#2563eb" />
+		<link rel="manifest" href="/manifest.json" />
 	</head>
 	<body>
 		<div id="root"></div>
 		<script type="module" src="/src/main.jsx"></script>
+		<script>
+			if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+				window.addEventListener('load', () => {
+					navigator.serviceWorker.register('/sw.js').catch((err) => {
+						console.log('SW registration skipped:', err);
+					});
+				});
+			}
+		</script>
 	</body>
 </html>

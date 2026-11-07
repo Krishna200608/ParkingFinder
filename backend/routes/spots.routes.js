@@ -8,10 +8,14 @@ import {
   createSpotReview,
   getMyParkingSpots,
   seedDemoSpots,
+  getDemandHeatmap,
 } from '../controllers/spots.controller.js';
 import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
+
+// Geospatial demand heatmap data
+router.get('/demand-heatmap', getDemandHeatmap);
 
 // Demo data seeder (for live portfolio demonstrations)
 router.post('/seed', seedDemoSpots);

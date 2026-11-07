@@ -29,6 +29,7 @@ import {
 	RotateCcw,
 	Layers,
 	Sparkles,
+	Flame,
 } from "lucide-react";
 
 const DefaultIcon = L.icon({
@@ -69,11 +70,28 @@ const MapPage = () => {
 	const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 	const [savedFavorites, setSavedFavorites] = useState([]);
 	const [showFilterDrawer, setShowFilterDrawer] = useState(false);
+	const [showHeatmap, setShowHeatmap] = useState(false);
+	const [heatmapPoints, setHeatmapPoints] = useState([]);
 
 	const mapRef = useRef();
 	const markerRefs = useRef({});
 	const cardRefs = useRef({});
 	const searchTimeoutRef = useRef(null);
+
+	// Toggle demand heatmap overlay
+	const toggleHeatmap = async () => {
+		const nextState = !showHeatmap;
+		setShowHeatmap(nextState);
+		if (nextState && heatmapPoints.length === 0) {
+			try {
+				const { data } = await axios.get("/api/spots/demand-heatmap");
+				setHeatmapPoints(Array.isArray(data) ? data : []);
+				toast.success("Demands heatmap overlay activated");
+			} catch (err) {
+				console.error("Heatmap fetch error:", err);
+			}
+		}
+	};
 
 	// Load favorites from localStorage
 	useEffect(() => {
@@ -440,6 +458,19 @@ const MapPage = () => {
 						>
 							<ShieldCheck size={14} /> CCTV
 						</button>
+
+						<button
+							onClick={toggleHeatmap}
+							className={`px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition ${
+								showHeatmap
+									? "bg-gradient-to-r from-amber-500 to-rose-600 text-white border-transparent shadow-xs"
+									: "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100"
+							}`}
+							title="Toggle parking demand density heatmap"
+						>
+							<Flame size={14} className={showHeatmap ? "text-white" : "text-amber-500"} />
+							Demand Heatmap
+						</button>
 					</div>
 
 					{/* Sort & Count */}
@@ -595,6 +626,45 @@ const MapPage = () => {
 								weight: 1.5,
 							}}
 						/>
+
+						{/* Geospatial Demand Heatmap Overlay */}
+						{showHeatmap &&
+							heatmapPoints.map((hp) => (
+								<Circle
+									key={`heat-${hp._id}`}
+									center={[hp.lat, hp.lng]}
+									radius={850}
+									pathOptions={{
+										color:
+											hp.intensity >= 0.75
+												? "#dc2626"
+												: hp.intensity >= 0.5
+												? "#f59e0b"
+												: "#2563eb",
+										fillColor:
+											hp.intensity >= 0.75
+												? "#ef4444"
+												: hp.intensity >= 0.5
+												? "#fbbf24"
+												: "#60a5fa",
+										fillOpacity: 0.35,
+										weight: 1,
+									}}
+								>
+									<Popup>
+										<div className="text-xs space-y-1">
+											<p className="font-bold text-gray-800 flex items-center gap-1">
+												<Flame size={12} className="text-rose-500" />
+												Demand Density: {Math.round(hp.intensity * 100)}%
+											</p>
+											<p className="text-gray-600 line-clamp-1">{hp.title}</p>
+											<p className="font-semibold text-blue-600">
+												Base: ${hp.pricePerHour}/hr
+											</p>
+										</div>
+									</Popup>
+								</Circle>
+							))}
 
 						{/* Markers for all spots */}
 						{spots.map((spot) => {

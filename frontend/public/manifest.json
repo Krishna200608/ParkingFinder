@@ -1,0 +1,23 @@
+{
+  "name": "ParkingFinder — Smart Parking Platform",
+  "short_name": "ParkingFinder",
+  "description": "Find, compare, and reserve parking spaces with real-time maps and dynamic pricing.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
