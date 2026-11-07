@@ -1,165 +1,141 @@
-# ParkingFinder 2.0 — Deployment Guide
+# ParkingFinder 2.0 — Production Deployment Guide (Vercel Free + MongoDB Atlas)
 
-## 1. Architecture Overview
-ParkingFinder is designed for zero-cost deployment using:
-1. **Frontend:** React/Vite SPA hosted on Vercel's Global Edge CDN.
-2. **Backend:** Express API deployed as a Vercel Serverless Function running on Node.js.
-3. **Database:** Persistent MongoDB Atlas Free M0 replica set cluster (512 MB).
+## 1. Zero-Cost Deployment Architecture
 
-```
-                      +-----------------------------+
-                      |         Vercel CDN          |
-                      |  (Static Assets / SPA HTML) |
-                      +--------------+--------------+
-                                     |
-              +----------------------+----------------------+
-              |                                             |
-              ▼                                             ▼
-       /* (SPA Routes)                             /api/* (API Routes)
-     Rewritten to index.html                     Serverless Express Handler
-              |                                     (api/index.js)
-              ▼                                             |
-       React 19 App                                         ▼
-                                                    MongoDB Atlas M0
-                                                    (Persistent Cluster)
+ParkingFinder is architected for continuous zero-cost hosting utilizing **Vercel Hobby** (Frontend CDN + Serverless Node.js Functions) paired with **MongoDB Atlas Free Tier** (M0 Replica Set).
+
+```mermaid
+flowchart TD
+    Browser["User Browser (Desktop / Mobile)"]
+
+    subgraph Vercel ["Vercel Global Edge Network (Hobby Tier: ₹0/mo)"]
+        CDN["Static Asset CDN\n(HTML, JS, CSS from frontend/dist)"]
+        Router["Vercel URL Rewrite Layer (vercel.json)"]
+        Serverless["Serverless Function Handler (/api/*)\n(api/index.js -> backend/app.js)"]
+    end
+
+    subgraph Atlas ["MongoDB Atlas Free Tier (M0 Cluster: ₹0/mo)"]
+        MongoDB[("Atlas Replica Set\nCached Connection Pool & GeoJSON 2dsphere")]
+    end
+
+    Browser -->|Request| Router
+    Router -->|Static Assets & SPA Paths /.*| CDN
+    Router -->|API Requests /api/.*| Serverless
+    Serverless <-->|Cached Mongoose Conn Pool| MongoDB
 ```
 
 ---
 
-## 2. Serverless Express Adaptation
+## 2. Serverless Express & Connection Architecture
 
-In traditional hosting, Express runs an infinite event loop using `app.listen(PORT)`. In Vercel serverless execution, requests are dispatched to an exported request handler function:
+### 2.1 Decoupled Application Architecture
+- **Application Core ([`backend/app.js`](file:///d:/Web%20D/ParkingFinder/backend/app.js)):** Configures Helmet, CORS, cookie parser, rate limiters, error middleware, and API routes without invoking `app.listen()`.
+- **Local Dev Server ([`backend/server.js`](file:///d:/Web%20D/ParkingFinder/backend/server.js)):** Awaits database connection before starting local HTTP listener on port 5001.
+- **Serverless Entrypoint ([`api/index.js`](file:///d:/Web%20D/ParkingFinder/api/index.js)):** Invoked dynamically on Vercel upon `/api/*` traffic; dispatches to Express app with cached database pooling.
 
+### 2.2 Mongoose Connection Caching ([`backend/db.js`](file:///d:/Web%20D/ParkingFinder/backend/db.js))
+In serverless runtimes, unmanaged connection opens exhaust database connections during traffic spikes. The connection is cached globally:
 ```javascript
-// api/index.js (Production Serverless Entrypoint)
-import app from '../backend/app.js';
-import connectDB from '../backend/db.js';
-
-export default async function handler(req, res) {
-  await connectDB();
-  return app(req, res);
-}
-```
-
-### 2.1 Mongoose Connection Caching Pattern
-To avoid exhausting MongoDB Atlas connection pools across serverless function invocations, Mongoose connections must be cached globally:
-
-```javascript
-// backend/db.js
-import mongoose from 'mongoose';
-
-let cached = global.mongoose;
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+let cached = global.mongoose || (global.mongoose = { conn: null, promise: null });
 
 const connectDB = async () => {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
+  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
   if (!cached.promise) {
-    const opts = {
+    cached.promise = mongoose.connect(process.env.MONGO_URI, {
       bufferCommands: false,
       maxPoolSize: 10,
-    };
-    cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongooseInstance) => {
-      return mongooseInstance;
+      serverSelectionTimeoutMS: 8000,
     });
   }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
+  cached.conn = await cached.promise;
   return cached.conn;
 };
-
-export default connectDB;
 ```
 
----
-
-## 3. Vercel Project Configuration (`vercel.json`)
-
-The root `vercel.json` coordinates client-side routing and serverless function routing:
-
-```json
-{
-  "version": 2,
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/dist/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/dist/index.html"
-    }
-  ]
-}
-```
+### 2.3 Routing Configuration ([`vercel.json`](file:///d:/Web%20D/ParkingFinder/vercel.json))
+- `/api/(.*)` rewrites to `/api/index.js`
+- `/(.*)` rewrites to `/index.html` (resolving client-side deep links on refresh for `/find`, `/dashboard`, `/host/dashboard`, etc.)
 
 ---
 
-## 4. Environment Variables Checklist
+## 3. Step-by-Step Manual Deployment Guide
 
-Set these environment variables in the Vercel Project Settings under **Settings > Environment Variables**:
-
-| Variable Name | Environment | Description | Example / Format |
-| :--- | :--- | :--- | :--- |
-| `NODE_ENV` | Production, Preview | Execution environment | `production` |
-| `MONGO_URI` | Production, Preview | MongoDB Atlas connection string | `mongodb+srv://<user>:<password>@cluster0.mongodb.net/parkingfinder?retryWrites=true&w=majority` |
-| `JWT_SECRET` | Production, Preview | Cryptographically random secret | Minimum 32-character high-entropy string |
-| `PORT` | Local Development | Local listening port | `5001` |
-
-> [!WARNING]
-> Never commit actual credentials or production `.env` files to Git. Ensure `.env` is listed in all `.gitignore` files.
-
----
-
-## 5. Step-by-Step Deployment Procedure
-
-### Step 5.1: Prepare MongoDB Atlas Free Cluster
+### Phase 1: MongoDB Atlas Free Cluster Setup
 1. Log in to [MongoDB Atlas](https://cloud.mongodb.com/).
-2. Create a free **M0 Sandbox Cluster** in your preferred cloud provider and region.
-3. Under **Database Access**, create a database user with `readWriteAnyDatabase` privileges.
-4. Under **Network Access**, add IP Access `0.0.0.0/0` (Allow Access from Anywhere) to permit connections from dynamic Vercel serverless IPs.
-5. In the cluster overview, click **Connect > Drivers > Node.js** and copy the connection string. Replace `<username>` and `<password>` with your database user credentials.
+2. Click **Create** > Choose **M0 Free (Shared Cluster)**.
+3. Select your nearest cloud provider region (e.g. AWS `ap-south-1` Mumbai or closest region).
+4. Under **Security > Database Access**:
+   - Create a database user (e.g., `parking_admin`).
+   - Assign the **Read and write to any database** built-in role.
+   - Generate a strong password and save it securely.
+5. Under **Security > Network Access**:
+   - Click **Add IP Address**.
+   - Select **Allow Access from Anywhere** (`0.0.0.0/0`) to allow dynamic Vercel serverless IP connections.
+6. In **Database Deployments**, click **Connect** > **Drivers** > **Node.js**:
+   - Copy the connection string format:
+     `mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/parkingfinder?retryWrites=true&w=majority`
+   - Replace `<username>` and `<password>` with your database credentials.
 
-### Step 5.2: Configure Vercel Project
-1. Log in to [Vercel](https://vercel.com/) and click **Add New > Project**.
-2. Import the `Krishna200608/ParkingFinder` GitHub repository.
-3. Configure the Project Settings:
+---
+
+### Phase 2: Vercel Project Setup
+1. Push your repository commits to GitHub (`https://github.com/Krishna200608/ParkingFinder`).
+2. Log in to [Vercel](https://vercel.com/) and click **Add New > Project**.
+3. Import the `Krishna200608/ParkingFinder` repository.
+4. In the **Configure Project** screen, configure:
    - **Framework Preset:** `Vite`
-   - **Root Directory:** `./`
-   - **Build Command:** `npm run build --prefix frontend`
+   - **Root Directory:** `./` (Leave as repository root)
+   - **Build Command:** `npm run build` (Overridden by root `package.json` to build frontend)
    - **Output Directory:** `frontend/dist`
    - **Install Command:** `npm install`
-4. Add the required Environment Variables (`MONGO_URI`, `JWT_SECRET`, `NODE_ENV`).
-5. Click **Deploy**.
+5. Expand **Environment Variables** and add:
+
+| Key | Value | Description |
+| :--- | :--- | :--- |
+| `NODE_ENV` | `production` | Enables production security optimizations |
+| `MONGO_URI` | `mongodb+srv://...` | MongoDB Atlas connection string |
+| `JWT_SECRET` | `your-32-char-random-secret` | High-entropy random cryptographic key |
+
+6. Click **Deploy**.
 
 ---
 
-## 6. Post-Deployment Smoke Test Runbook
+## 4. Post-Deployment Smoke-Test Verification Runbook
 
-Perform this sequential verification immediately after deployment:
+Perform this sequential check immediately after the Vercel deployment completes:
 
-1. **Static App Loading:** Navigate to the live Vercel URL. Verify the hero section, illustrations, and navigation bar render correctly.
-2. **Deep-Link SPA Refresh:** Navigate directly to `/find` and refresh the browser. Confirm that the map loads without a 404 error.
-3. **API Health Check:** Visit `https://<your-vercel-domain>/api/health`. Verify that JSON `{ status: "ok", db: "connected" }` is returned.
-4. **User Registration:** Register a new driver account. Verify that a user profile is created and you are redirected to login.
-5. **Driver Login & Session:** Log in with the registered credentials. Inspect DevTools cookies to confirm the secure HTTP-only `jwt` cookie is set.
-6. **Geospatial Discovery:** Open `/find`. Verify that parking spot markers appear on the map and that zooming or centering functions smoothly.
-7. **Reservation Creation:** Click a parking spot, select an available future time interval, and submit a reservation. Verify that the booking confirmation displays cleanly.
-8. **Dashboard Verification:** Open `/dashboard`. Confirm the new reservation appears in the booking list with status `confirmed` and `unpaid_demo`.
-9. **Cancellation Flow:** Click **Cancel Booking**. Verify that the status updates to `cancelled` and the time slot becomes available again.
-10. **Host Workflow:** Register a new host account, visit `/host/dashboard`, click **Add Spot**, submit new spot coordinates, and verify the listing appears in search.
-
+1. **Static App Loading:**
+   - Navigate to `https://<your-project>.vercel.app/`
+   - Verify that the hero banner, animations, and icons render cleanly without broken image paths.
+2. **Deep-Link SPA Refresh:**
+   - Navigate to `https://<your-project>.vercel.app/find`
+   - Press browser Refresh (F5). Verify that the map loads rather than a 404 error.
+3. **API Health Endpoint:**
+   - Open `https://<your-project>.vercel.app/api/health`
+   - Expected response:
+     ```json
+     {
+       "status": "ok",
+       "timestamp": "...",
+       "uptime": 1.2,
+       "db": "connected"
+     }
+     ```
+4. **User Registration & Cookie Issuance:**
+   - Open `/register` and create a driver account.
+   - In DevTools (Application > Cookies), verify that the `jwt` cookie is set with `HttpOnly`, `Secure`, and `SameSite=Lax`.
+5. **Driver Login & Dashboard:**
+   - Log in with the registered driver credentials.
+   - Navigate to `/dashboard` and confirm the page loads without authentication errors.
+6. **Geospatial Spot Discovery:**
+   - Open `/find`. Verify that parking spot markers appear on the Leaflet map and the list renders nearby spots.
+7. **Reservation Creation:**
+   - Click a parking spot, pick an available time interval, and click Reserve.
+   - Verify that the booking modal confirms the reservation with `Demo Reservation` status.
+8. **Reservation Cancellation:**
+   - Open `/dashboard`. Click **Cancel Reservation**.
+   - Verify that the status updates to `cancelled`.
+9. **Host Spot Creation:**
+   - Register or log in as a host.
+   - Navigate to `/host/add-spot`. Drop a marker on the map, set hourly pricing, and submit.
+   - Verify the spot appears on the host dashboard and in the `/find` map view.

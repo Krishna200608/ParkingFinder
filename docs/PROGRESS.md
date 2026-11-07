@@ -1,6 +1,6 @@
 # ParkingFinder 2.0 — Progress Tracking Log
 
-## Project State: Stage 1 Completed (Security & Architecture Cleanup)
+## Project State: Stage 2 Completed (Vercel Free-Tier Deployment Ready)
 *Last Updated: 2026-11-07*
 
 ---
@@ -11,8 +11,8 @@
 | :--- | :--- | :--- | :--- |
 | **Stage 0** | **Repository Discovery & Technical Audit** | **COMPLETED** | Complete code audit, runtime tests, failure documentation, architecture docs, audit reports |
 | **Stage 1** | **Security & Architecture Cleanup** | **COMPLETED** | Untrack keys/binaries, unify cookie auth, fix ESLint errors, Zod validation, Helmet, rate limiting |
-| **Stage 2** | **Vercel Deployment Foundation** | **NEXT** | Decouple Express server, add serverless handler, connection caching, vercel.json, live smoke test |
-| **Stage 3** | **Core Booking Engine** | Planned | Transactional double-booking prevention, half-open intervals, demo status, multi-day availability |
+| **Stage 2** | **Vercel Deployment Foundation** | **COMPLETED** | Decouple Express server (`app.js`), serverless handler (`api/index.js`), connection pooling, `vercel.json` |
+| **Stage 3** | **Core Booking Engine** | **NEXT** | Transactional double-booking prevention, half-open intervals, demo status, multi-day availability |
 | **Stage 4** | **Parking Discovery & Maps** | Planned | Synchronized map/list, search filters, spot details page, favourites, Nominatim rate compliance |
 | **Stage 5** | **Host Marketplace & Admin** | Planned | Host listing CRUD, verified review policy, host earnings analytics, admin moderation dashboard |
 | **Stage 6** | **Advanced Differentiators** | Planned | Geospatial demand heatmap, dynamic pricing simulator, EV charging filters, PWA offline shell |
@@ -20,28 +20,29 @@
 
 ---
 
-## 2. Stage 1 Verification Metrics
+## 2. Stage 2 Verification Metrics
 
-- **Git Working Tree:** Active branch `feature/security-cleanup`.
-- **Frontend Linter (`npm run lint --prefix frontend`):**
-  - Status: **PASSED (0 errors, 0 warnings)**.
-  - All 13 previous issues (9 errors, 4 warnings) resolved.
-- **Frontend Production Build (`npm run build --prefix frontend`):**
-  - Status: **PASSED (Exit Code 0 in 14.06s)**.
-  - Static asset imports (`logo.svg`, `logo.png`) bundled safely into `dist/assets/`.
-- **Backend Syntax Validation (`node --check`):**
-  - Status: **PASSED (All backend JS files validated)**.
-- **Runtime Security Tests:**
-  - Role escalation prevention: **VERIFIED** (Attempted `role: 'admin'` rejected with HTTP 400).
-  - Cookie issuance: **VERIFIED** (`Set-Cookie: jwt=...; HttpOnly; SameSite=Lax`).
-  - Diagnostic health check: **VERIFIED** (`/api/health` returns status `ok`, `db: connected`).
-  - Rate limiting & Helmet: **VERIFIED** (Defensive headers active, 429 triggered on flood).
+- **Git Working Tree:** Active branch `feature/vercel-deployment`.
+- **Backend Architecture Decoupling:**
+  - `backend/app.js`: Clean Express application module (export default `app`).
+  - `backend/server.js`: Dedicated local runner awaiting `connectDB()` before listening on port 5001.
+  - `api/index.js`: Vercel serverless function entrypoint dispatching `/api/*` requests.
+- **Connection Caching ([`backend/db.js`](file:///d:/Web%20D/ParkingFinder/backend/db.js)):**
+  - Cached Mongoose promise & connection pool (`global.mongoose = { conn, promise }`).
+  - Max pool size set to 10 to preserve free MongoDB Atlas 500-connection ceiling.
+  - Removed fatal `process.exit(1)` from serverless path.
+- **Vercel Routing Configuration ([`vercel.json`](file:///d:/Web%20D/ParkingFinder/vercel.json)):**
+  - Configured rewrites: `/api/*` routed to `api/index.js`; all other paths routed to `index.html`.
+- **Monorepo Workspaces & Build Pipeline:**
+  - Configured npm workspaces in root `package.json` (`"workspaces": ["backend", "frontend"]`).
+  - Root build command (`npm run build`) builds `frontend/dist` in 6.95s.
+  - Root lint command (`npm run lint`) passes cleanly with 0 errors and 0 warnings.
+  - Syntax check on `api/index.js` validated with `node --check`.
 
 ---
 
-## 3. Immediate Next Steps (Stage 2: Vercel Free-Tier Deployment)
-1. Decouple Express server into a reusable application module (`backend/app.js`) and local dev listener (`backend/server.js`).
-2. Implement Vercel serverless entry point (`api/index.js`).
-3. Implement global Mongoose connection caching in `backend/db.js` to prevent Atlas connection exhaustion.
-4. Configure `vercel.json` for SPA deep-link routing and serverless function dispatch.
-5. Create smoke-test checklist for live deployment on Vercel Hobby.
+## 3. Immediate Next Steps (Stage 3: Core Booking Engine)
+1. Implement transactional / versioned double-booking prevention in `backend/controllers/bookings.controller.js`.
+2. Enforce half-open interval overlap checks $[StartTime, EndTime)$.
+3. Multi-day and flexible date range availability calculator endpoint (`/api/bookings/spot/:spotId/availability`).
+4. Cancellation policy logic restoring spot availability dynamically.

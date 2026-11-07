@@ -1,35 +1,52 @@
 import mongoose from 'mongoose';
 
+/**
+ * Global cache across serverless function invocations.
+ * In local development, this prevents duplicate connections during nodemon restarts.
+ * In Vercel serverless execution, this reuses existing container connections across invocations.
+ */
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-  try {
-    // Attempt connection
-    const conn = await mongoose.connect(process.env.MONGO_URI, {});
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  const uri = process.env.MONGO_URI;
 
-    // --- Connection Event Logging ---
-    mongoose.connection.on('connected', () => {
-      console.log('🟢 Mongoose connected to database');
-    });
-
-    mongoose.connection.on('error', (err) => {
-      console.error(`❌ Mongoose connection error: ${err.message}`);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.warn('🟠 Mongoose disconnected');
-    });
-
-    // Handle process termination
-    process.on('SIGINT', async () => {
-      await mongoose.connection.close();
-      console.log('🔴 Mongoose connection closed due to app termination');
-      process.exit(0);
-    });
-
-  } catch (error) {
-    console.error(`❌ Error: ${error.message}`);
-    process.exit(1); // Exit process with failure
+  if (!uri) {
+    throw new Error('MONGO_URI environment variable is not defined.');
   }
+
+  // 1. Return active connection if ready
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
+
+  // 2. Initiate connection promise if none exists
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false, // Fail fast rather than buffering commands when offline
+      maxPoolSize: 10,       // Conserve connections for MongoDB Atlas Free M0 cluster
+      serverSelectionTimeoutMS: 8000,
+    };
+
+    cached.promise = mongoose.connect(uri, opts).then((instance) => {
+      console.log(`✅ MongoDB Connected: ${instance.connection.host}`);
+      return instance;
+    });
+  }
+
+  // 3. Await connection
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null; // Reset promise on failure so next invocation can retry
+    console.error(`❌ MongoDB connection error: ${error.message}`);
+    throw error;
+  }
+
+  return cached.conn;
 };
 
 export default connectDB;
