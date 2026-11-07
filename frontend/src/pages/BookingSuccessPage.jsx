@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
-import { CheckCircle, Calendar, Clock, MapPin, Receipt, ArrowRight, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Calendar, Clock, MapPin, Receipt, ArrowRight, ShieldCheck, AlertCircle } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
 
 export default function BookingSuccessPage() {
   const [searchParams] = useSearchParams();
@@ -37,9 +40,9 @@ export default function BookingSuccessPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mb-4"></div>
-        <p className="text-gray-600 font-medium">Verifying payment confirmation...</p>
+      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
+        <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-[#64748B]">Verifying payment confirmation...</p>
       </div>
     );
   }
@@ -49,104 +52,112 @@ export default function BookingSuccessPage() {
   const totalAmount = Number(booking?.totalCost || booking?.totalAmount || payment?.amount || 0);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden text-center p-8 md:p-10">
-        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
-          <CheckCircle size={44} strokeWidth={2.5} />
+    <div className="max-w-xl mx-auto px-4 sm:px-6 py-12 pb-20">
+      <Card padding="lg" className="text-center">
+        {/* Success Icon */}
+        <div className="w-14 h-14 bg-emerald-50 text-[#16845B] border border-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 size={32} />
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200 mb-3">
-          <ShieldCheck size={14} /> Payment Confirmed (Test Mode)
-        </span>
+        <Badge variant="success" size="sm" className="mb-3">
+          <ShieldCheck size={12} className="mr-1" /> Payment Verified
+        </Badge>
 
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-          Reservation Secured!
+        <h1 className="text-2xl font-bold text-[#17243A] mb-2">
+          Reservation Confirmed
         </h1>
-        <p className="text-gray-500 text-sm max-w-md mx-auto mb-8">
-          Your parking spot is guaranteed. A digital receipt and access instructions are ready below.
+        <p className="text-xs sm:text-sm text-[#64748B] max-w-sm mx-auto mb-6">
+          Your parking bay is locked and guaranteed. Details and transaction references are summarized below.
         </p>
 
         {error && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs text-left">
-            Notice: {error} (Reservation is saved in your dashboard).
+          <div className="mb-6 p-3 bg-[#FFFBEB] border border-[#FDE68A] rounded-lg text-[#D97706] text-xs text-left flex items-start gap-2">
+            <AlertCircle size={15} className="shrink-0 mt-0.5" />
+            <span>Note: {error} (Your reservation remains stored in your dashboard).</span>
           </div>
         )}
 
         {/* Receipt Box */}
-        <div className="bg-gray-50 rounded-2xl p-6 text-left border border-gray-100 mb-8 space-y-4">
-          <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+        <div className="bg-[#F8FAFC] rounded-lg p-4 sm:p-5 text-left border border-[#DDE3EA] mb-6 space-y-3.5 text-xs">
+          <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
             <div>
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
+              <span className="text-[11px] text-[#94A3B8] font-medium uppercase tracking-wider block">
                 Transaction Reference
-              </p>
-              <p className="text-xs font-mono font-semibold text-gray-700 mt-0.5">
+              </span>
+              <span className="font-mono text-xs font-semibold text-[#17243A] mt-0.5 block">
                 {payment?.stripePaymentIntentId || payment?.stripeSessionId || sessionId || `txn_${bookingId.slice(-6)}`}
-              </p>
+              </span>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-400 font-medium uppercase tracking-wider">
-                Total Paid
-              </p>
-              <p className="text-xl font-black text-green-600">
+              <span className="text-[11px] text-[#94A3B8] font-medium uppercase tracking-wider block">
+                Amount Paid
+              </span>
+              <span className="text-lg font-bold text-[#16845B]">
                 ${totalAmount.toFixed(2)}
-              </p>
+              </span>
             </div>
           </div>
 
-          <div className="space-y-2 text-sm text-gray-600">
-            <p className="flex items-center gap-2">
-              <MapPin size={16} className="text-blue-500 flex-shrink-0" />
-              <span className="font-medium text-gray-800">
-                {booking?.spot?.title || booking?.spot?.address || "Reserved Bay"}
-              </span>
-            </p>
-            {booking?.spot?.address && (
-              <p className="text-xs text-gray-500 pl-6">{booking.spot.address}</p>
-            )}
+          <div className="space-y-2 text-xs text-[#475569]">
+            <div className="flex items-start gap-2">
+              <MapPin size={14} className="text-[#2563EB] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold text-[#17243A] block">
+                  {booking?.spot?.title || booking?.spot?.address || "Reserved Bay"}
+                </span>
+                {booking?.spot?.address && (
+                  <span className="text-[#64748B] text-[11px]">{booking.spot.address}</span>
+                )}
+              </div>
+            </div>
 
             {booking?.startTime && (
-              <p className="flex items-center gap-2 pt-1">
-                <Calendar size={16} className="text-blue-500 flex-shrink-0" />
+              <div className="flex items-center gap-2">
+                <Calendar size={14} className="text-[#2563EB] shrink-0" />
                 <span>
-                  {new Date(booking.startTime).toLocaleDateString("en-US", {
+                  {new Date(booking.startTime).toLocaleDateString(undefined, {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
                     year: "numeric",
                   })}
                 </span>
-              </p>
+              </div>
             )}
 
             {booking?.startTime && booking?.endTime && (
-              <p className="flex items-center gap-2">
-                <Clock size={16} className="text-blue-500 flex-shrink-0" />
+              <div className="flex items-center gap-2">
+                <Clock size={14} className="text-[#2563EB] shrink-0" />
                 <span>
-                  {new Date(booking.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{" "}
+                  {new Date(booking.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} –{" "}
                   {new Date(booking.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
-              </p>
+              </div>
             )}
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition"
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          <Button
+            variant="primary"
+            size="md"
+            href="/dashboard"
           >
-            <Receipt size={18} /> View in My Bookings
-          </Link>
-          <Link
-            to="/find"
-            className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-6 py-3 rounded-xl transition"
+            <Receipt size={14} />
+            <span>View in My Bookings</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="md"
+            href="/find"
           >
-            Find Another Spot <ArrowRight size={16} />
-          </Link>
+            <span>Book Another Space</span>
+            <ArrowRight size={14} />
+          </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
-

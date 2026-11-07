@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
@@ -7,6 +7,20 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import {
+  MapPin,
+  Car,
+  DollarSign,
+  ShieldCheck,
+  Zap,
+  Sparkles,
+  CheckCircle2,
+  ArrowLeft,
+  Navigation,
+} from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import PageHeader from "../components/ui/PageHeader";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -15,11 +29,11 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Reverse geocode helper using OpenStreetMap
 const fetchAddress = async (lat, lng) => {
   try {
     const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+      { headers: { "Accept-Language": "en" } }
     );
     const data = await res.json();
     return data.display_name || `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`;
@@ -28,7 +42,6 @@ const fetchAddress = async (lat, lng) => {
   }
 };
 
-// Marker logic: drag or click to move
 function DraggableMarker({ position, setPosition, onAddressUpdate }) {
   const markerRef = useRef(null);
 
@@ -65,13 +78,25 @@ function DraggableMarker({ position, setPosition, onAddressUpdate }) {
 function FlyToHelper({ target }) {
   const map = useMap();
   useEffect(() => {
-    if (target && map) map.flyTo(target, 16, { duration: 1.2 });
+    if (target && map) map.flyTo(target, 16, { duration: 1.0 });
   }, [target, map]);
   return null;
 }
 
-const EditSpotPage = () => {
+const AMENITIES_OPTIONS = [
+  { key: "covered", label: "Covered Parking", icon: ShieldCheck },
+  { key: "ev_charging", label: "EV Charging", icon: Zap },
+  { key: "cctv", label: "24/7 CCTV", icon: ShieldCheck },
+  { key: "disabled_access", label: "Accessible Bay", icon: CheckCircle2 },
+  { key: "valet", label: "Valet Attendant", icon: Car },
+  { key: "gated", label: "Gated Barrier", icon: ShieldCheck },
+  { key: "lit_lot", label: "Well-Lit Lot", icon: Sparkles },
+];
+
+export default function EditSpotPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     address: "",
@@ -82,13 +107,13 @@ const EditSpotPage = () => {
     amenities: [],
     accessInstructions: "",
   });
-  const [position, setPosition] = useState([28.6139, 77.209]); // Default Delhi
+
+  const [position, setPosition] = useState([28.6139, 77.209]);
   const [mapCenter, setMapCenter] = useState([28.6139, 77.209]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const mapRef = useRef(null);
-  const navigate = useNavigate();
 
-  // Load existing spot
   useEffect(() => {
     const fetchSpot = async () => {
       try {
@@ -123,11 +148,19 @@ const EditSpotPage = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // My Location Button
-  const handleMyLocation = async () => {
-    if (!navigator.geolocation) return toast.error("Geolocation not supported");
+  const toggleAmenity = (key) => {
+    setFormData((prev) => ({
+      ...prev,
+      amenities: prev.amenities.includes(key)
+        ? prev.amenities.filter((a) => a !== key)
+        : [...prev.amenities, key],
+    }));
+  };
 
-    toast.loading("Fetching your current location...", { id: "geo" });
+  const handleMyLocation = () => {
+    if (!navigator.geolocation) return toast.error("Geolocation is not supported");
+
+    toast.loading("Locating GPS coordinates...", { id: "geo" });
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
@@ -135,280 +168,296 @@ const EditSpotPage = () => {
         const coords = [lat, lng];
         setPosition(coords);
         setMapCenter(coords);
-        const address = await fetchAddress(lat, lng);
-        setFormData((prev) => ({ ...prev, address }));
-        toast.success("Location updated successfully!", { id: "geo" });
-      },
-      () => toast.error("Failed to get location", { id: "geo" }),
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
 
-  // Update address + coordinates after drag/click
-  const handleAddressUpdate = (address, lat, lng) => {
-    setFormData((prev) => ({ ...prev, address }));
-    if (lat !== undefined && lng !== undefined) {
-      setPosition([lat, lng]);
-    }
+        try {
+          const addr = await fetchAddress(lat, lng);
+          setFormData((prev) => ({ ...prev, address: addr }));
+        } catch {
+          toast.error("Unable to resolve address");
+        }
+
+        if (mapRef.current) {
+          mapRef.current.flyTo(coords, 16, { duration: 1.0 });
+        }
+        toast.success("Location updated to GPS position", { id: "geo" });
+      },
+      () => {
+        toast.dismiss("geo");
+        toast.error("Unable to access GPS location");
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.address || !formData.pricePerHour) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
     try {
-      await axios.put(`/api/spots/${id}`, {
-        ...formData,
-        latitude: position[0],
-        longitude: position[1],
-      });
-      toast.success("Spot updated successfully");
+      setSaving(true);
+      const [latitude, longitude] = position;
+      await axios.put(
+        `/api/spots/${id}`,
+        { ...formData, latitude, longitude },
+        { withCredentials: true }
+      );
+      toast.success("Parking space updated successfully!");
       navigate("/host/dashboard");
     } catch (err) {
-      console.error(err);
+      console.error("Update spot error:", err);
       toast.error(err.response?.data?.message || "Failed to update spot");
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="text-center text-gray-600 mt-20 text-lg">
-        Loading spot details...
+      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-2">
+        <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-[#64748B]">Loading spot listing for editing...</p>
       </div>
     );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <section className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-10 text-center shadow">
-        <h1 className="text-3xl font-bold mb-2">Edit Parking Spot</h1>
-        <p className="text-blue-100 text-sm">
-          Update spot details, pricing, and location
-        </p>
-      </section>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-6">
+      <PageHeader
+        title="Edit Parking Space"
+        description="Update your listing's address, rate, vehicle specifications, or entrance map coordinates."
+        breadcrumbs={[
+          { label: "Host Dashboard", href: "/host/dashboard" },
+          { label: "Edit Space" },
+        ]}
+      />
 
-      <div className="max-w-5xl mx-auto mt-10 px-6 grid lg:grid-cols-2 gap-8">
-        {/* Map Section */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 relative">
-          <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Adjust Spot Location
+      <form onSubmit={handleSubmit} className="grid lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: FORM SECTIONS (7 COLS) */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* Section 1: Basic Information */}
+          <Card padding="default">
+            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+              1. Basic Space Information
             </h2>
-            <p className="text-xs text-gray-500">
-              Click or drag the marker to reposition your spot.
-            </p>
-          </div>
+            <div className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Space Title
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
 
-          {/* My Location Button */}
-          <button
-            onClick={handleMyLocation}
-            className="absolute top-25 left-15 z-[1000] bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded-md shadow-md transition"
-          >
-            📍 My Location
-          </button>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#475569] font-medium mb-1">
+                    Space Classification
+                  </label>
+                  <select
+                    name="spotType"
+                    value={formData.spotType}
+                    onChange={handleChange}
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  >
+                    <option value="p2p">Peer-to-Peer (Driveway/Residential)</option>
+                    <option value="operator">Commercial Hub / Structured Lot</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[#475569] font-medium mb-1">
+                    Vehicle Compatibility
+                  </label>
+                  <select
+                    name="vehicleSize"
+                    value={formData.vehicleSize}
+                    onChange={handleChange}
+                    className="w-full border border-[#DDE3EA] rounded-lg px-2.5 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  >
+                    <option value="any">Any Vehicle Size</option>
+                    <option value="compact">Compact / Hatchback</option>
+                    <option value="sedan">Sedan</option>
+                    <option value="suv">SUV / Truck</option>
+                  </select>
+                </div>
+              </div>
 
-          <div className="h-[65vh]">
-            <MapContainer
-              center={mapCenter}
-              zoom={15}
-              scrollWheelZoom
-              style={{ height: "100%", width: "100%" }}
-              whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <FlyToHelper target={mapCenter} />
-              <DraggableMarker
-                position={position}
-                setPosition={setPosition}
-                onAddressUpdate={handleAddressUpdate}
-              />
-            </MapContainer>
-          </div>
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Street Address
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
 
-          <div className="p-4 border-t text-sm text-gray-600 bg-gray-50">
-            <p>
-              Latitude:{" "}
-              <span className="font-medium">{position[0].toFixed(5)}</span> | Longitude:{" "}
-              <span className="font-medium">{position[1].toFixed(5)}</span>
-            </p>
-          </div>
-        </div>
-
-        {/* Form Section */}
-        <div className="bg-white rounded-2xl shadow-md p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Spot Title / Name
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-                placeholder="e.g. Connaught Place Premium Garage"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Address
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Enter address"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                name="description"
-                rows="3"
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Describe your spot"
-              ></textarea>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Spot Type
-              </label>
-              <select
-                name="spotType"
-                value={formData.spotType}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                <option value="p2p">P2P (Host-Owned Spot)</option>
-                <option value="operator">Operator (Commercial Lot)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Price Per Hour ($)
-              </label>
-              <input
-                type="number"
-                name="pricePerHour"
-                value={formData.pricePerHour}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder="Enter price per hour"
-                min="0"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Vehicle Compatibility
-              </label>
-              <select
-                name="vehicleSize"
-                value={formData.vehicleSize}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white"
-              >
-                <option value="any">Any Vehicle</option>
-                <option value="compact">Compact / Hatchback</option>
-                <option value="sedan">Sedan</option>
-                <option value="suv">SUV / Truck</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Amenities & Features
-              </label>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {[
-                  { key: "covered", label: "Covered Parking" },
-                  { key: "ev_charging", label: "EV Supercharging" },
-                  { key: "cctv", label: "24/7 CCTV / Security" },
-                  { key: "disabled_access", label: "Accessible / Disabled Bay" },
-                  { key: "valet", label: "Valet Service" },
-                  { key: "gated", label: "Gated Access Barrier" },
-                ].map((item) => {
-                  const isChecked = formData.amenities?.includes(item.key);
-                  return (
-                    <label
-                      key={item.key}
-                      className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
-                        isChecked
-                          ? "bg-blue-50 border-blue-300 text-blue-700 font-medium"
-                          : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            amenities: isChecked
-                              ? prev.amenities.filter((k) => k !== item.key)
-                              : [...prev.amenities, item.key],
-                          }));
-                        }}
-                        className="accent-blue-600"
-                      />
-                      <span>{item.label}</span>
-                    </label>
-                  );
-                })}
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Description
+                </label>
+                <textarea
+                  rows={2}
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                />
               </div>
             </div>
+          </Card>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Access & Entry Instructions
-              </label>
-              <input
-                type="text"
-                name="accessInstructions"
-                value={formData.accessInstructions}
-                onChange={handleChange}
-                className="w-full border rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-                placeholder="e.g. Ring intercom 3B or enter code #1234"
-              />
+          {/* Section 2: Pricing & Instructions */}
+          <Card padding="default">
+            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+              2. Hourly Pricing & Access Rules
+            </h2>
+            <div className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Base Hourly Rate ($ USD)
+                </label>
+                <div className="relative max-w-xs">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8] font-semibold">
+                    $
+                  </span>
+                  <input
+                    type="number"
+                    step="0.5"
+                    min="1"
+                    name="pricePerHour"
+                    value={formData.pricePerHour}
+                    onChange={handleChange}
+                    className="w-full pl-7 pr-3 py-2 border border-[#DDE3EA] rounded-lg text-xs font-semibold text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Driver Access Instructions
+                </label>
+                <textarea
+                  rows={2}
+                  name="accessInstructions"
+                  value={formData.accessInstructions}
+                  onChange={handleChange}
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                />
+              </div>
             </div>
+          </Card>
 
-            <div className="flex justify-between gap-3 mt-8">
+          {/* Section 3: Amenities */}
+          <Card padding="default">
+            <h2 className="text-sm font-bold text-[#17243A] mb-3 pb-2 border-b border-[#F1F5F9]">
+              3. Available Amenities & Security
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {AMENITIES_OPTIONS.map((item) => {
+                const isSelected = formData.amenities.includes(item.key);
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => toggleAmenity(item.key)}
+                    className={`p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2 transition cursor-pointer text-left ${
+                      isSelected
+                        ? "bg-blue-50 border-blue-200 text-[#2563EB]"
+                        : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
+                    }`}
+                  >
+                    <Icon size={14} className={isSelected ? "text-[#2563EB]" : "text-[#94A3B8]"} />
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Submit Row */}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              variant="ghost"
+              size="md"
+              href="/host/dashboard"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              disabled={saving}
+            >
+              {saving ? "Saving Changes..." : "Save Changes"}
+            </Button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: MAP LOCATION (5 COLS) */}
+        <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-20">
+          <Card padding="default">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="text-xs font-bold text-[#17243A]">
+                  Adjust Location Marker
+                </h3>
+                <p className="text-[11px] text-[#64748B]">
+                  Drag the marker or click on the map.
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={() => navigate(-1)}
-                className="w-1/2 py-2 rounded-md border border-gray-300 hover:bg-gray-50 transition"
+                onClick={handleMyLocation}
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2563EB] hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
               >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="w-1/2 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Save Changes
+                <Navigation size={12} /> Near Me
               </button>
             </div>
-          </form>
+
+            <div className="h-72 w-full rounded-lg overflow-hidden border border-[#DDE3EA] relative">
+              <MapContainer
+                center={mapCenter}
+                zoom={15}
+                style={{ height: "100%", width: "100%" }}
+                whenCreated={(mapInstance) => (mapRef.current = mapInstance)}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://openstreetmap.org">OSM</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <DraggableMarker
+                  position={position}
+                  setPosition={setPosition}
+                  onAddressUpdate={(addr) =>
+                    setFormData((prev) => ({ ...prev, address: addr }))
+                  }
+                />
+                <FlyToHelper target={mapCenter} />
+              </MapContainer>
+            </div>
+
+            <div className="mt-3 p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-1">
+              <span className="text-[11px] font-semibold text-[#16845B] flex items-center gap-1">
+                <CheckCircle2 size={12} /> Coordinates Selected
+              </span>
+              <p className="text-[#64748B] text-[11px] truncate font-mono">
+                {position[0].toFixed(5)}, {position[1].toFixed(5)}
+              </p>
+            </div>
+          </Card>
         </div>
-      </div>
+      </form>
     </div>
   );
-};
-
-export default EditSpotPage;
+}

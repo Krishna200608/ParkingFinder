@@ -1,90 +1,163 @@
 import React from "react";
-import { Users, Globe2, Target, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  Car,
+  MapPin,
+  Lock,
+  TrendingUp,
+  ShieldCheck,
+  CheckCircle2,
+  ArrowRight,
+  Search,
+} from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import PageHeader from "../components/ui/PageHeader";
 
-const AboutPage = () => {
+export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-16 pb-20">
-      {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-20 text-center">
-        <h1 className="text-4xl font-bold mb-3">About ParkingFinder</h1>
-        <p className="text-blue-100 max-w-2xl mx-auto text-lg">
-          Smart, seamless, and sustainable parking solutions built for drivers
-          and hosts worldwide.
-        </p>
-      </section>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-12">
+      {/* ── HEADER ─────────────────────────────────────────────── */}
+      <PageHeader
+        title="About ParkingFinder"
+        description="A peer-to-peer and commercial urban parking marketplace engineered with concurrency write-locks and algorithmic yield simulation."
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "About" },
+        ]}
+      />
 
-      {/* Mission */}
-      <section className="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-12 items-center">
-        <div>
-          <h2 className="text-3xl font-semibold text-gray-800 mb-4">
-            Our Mission
-          </h2>
-          <p className="text-gray-600 leading-relaxed">
-            At <span className="font-medium text-blue-600">ParkingFinder</span>,
-            our mission is to simplify urban mobility by connecting drivers with
-            available parking spaces in real-time. We empower property owners to
-            earn passive income while reducing city congestion and pollution.
+      {/* ── CORE PRODUCT STORY ─────────────────────────────────── */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-[#17243A] tracking-tight">
+          Solving urban parking friction through transparent marketplace mechanics
+        </h2>
+        <div className="grid md:grid-cols-2 gap-6 text-xs text-[#475569] leading-relaxed">
+          <p>
+            Finding parking in high-density urban corridors costs drivers time, generates unnecessary fuel burn, and creates road congestion. Meanwhile, thousands of private residential driveways, parking garages, and commercial bays sit unoccupied throughout the workday.
           </p>
-          <p className="text-gray-600 mt-4 leading-relaxed">
-            Whether you're a driver searching for quick parking or a host
-            looking to list your property, our platform ensures a smooth,
-            transparent, and efficient experience.
+          <p>
+            ParkingFinder bridges this gap by providing an open discovery map and a two-sided marketplace. Drivers reserve exact arrival and departure windows with strict concurrency protection, while hosts monetize idle spaces with automated availability controls.
           </p>
-        </div>
-        <div className="flex justify-center">
-          <img
-            src="/src/assets/logo.svg"
-            alt="About ParkingFinder"
-            className="w-80 h-80 object-contain drop-shadow-lg"
-          />
         </div>
       </section>
 
-      {/* Values */}
-      <section className="bg-white py-16">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-10">
-            Our Core Values
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: <Users size={36} className="text-blue-600" />,
-                title: "Community",
-                desc: "We connect local drivers and hosts for mutual benefit.",
-              },
-              {
-                icon: <Globe2 size={36} className="text-blue-600" />,
-                title: "Sustainability",
-                desc: "Less driving in circles means lower emissions.",
-              },
-              {
-                icon: <Target size={36} className="text-blue-600" />,
-                title: "Innovation",
-                desc: "We bring smart tech into everyday parking problems.",
-              },
-              {
-                icon: <ShieldCheck size={36} className="text-blue-600" />,
-                title: "Trust",
-                desc: "Verified hosts, secure payments, and fair pricing.",
-              },
-            ].map((v, i) => (
-              <div
-                key={i}
-                className="bg-gray-50 rounded-lg p-6 shadow hover:shadow-md transition"
-              >
-                <div className="mb-4 flex justify-center">{v.icon}</div>
-                <h3 className="font-semibold text-lg mb-2 text-gray-800">
-                  {v.title}
-                </h3>
-                <p className="text-gray-600 text-sm">{v.desc}</p>
-              </div>
-            ))}
+      {/* ── TWO-SIDED VALUE PROPOSITIONS ───────────────────────── */}
+      <section className="grid sm:grid-cols-2 gap-5">
+        <Card padding="lg">
+          <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 text-[#2563EB] flex items-center justify-center mb-4">
+            <Car size={18} />
           </div>
+          <h3 className="text-base font-bold text-[#17243A] mb-2">
+            For Urban Drivers
+          </h3>
+          <ul className="space-y-2 text-xs text-[#64748B] mb-5">
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Real-time geospatial search via OpenStreetMap & GPS.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Concurrency write locks guarantee zero overlapping double-bookings.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Instant zero-cost demo reservations or Stripe test-mode checkout.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Filter by EV charging, CCTV, and vehicle compatibility.</span>
+            </li>
+          </ul>
+          <Button variant="outline" size="sm" href="/find">
+            Explore Map Spaces
+          </Button>
+        </Card>
+
+        <Card padding="lg">
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 border border-emerald-100 text-[#16845B] flex items-center justify-center mb-4">
+            <TrendingUp size={18} />
+          </div>
+          <h3 className="text-base font-bold text-[#17243A] mb-2">
+            For Space Hosts
+          </h3>
+          <ul className="space-y-2 text-xs text-[#64748B] mb-5">
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Monetize driveways, commercial garages, or assigned tenant spaces.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Real-time availability toggle to pause or activate listings on demand.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Dynamic pricing simulator with 3-factor yield calculations.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 size={13} className="text-[#16845B] shrink-0 mt-0.5" />
+              <span>Live incoming reservations table with driver identity details.</span>
+            </li>
+          </ul>
+          <Button variant="outline" size="sm" href="/host/add-spot">
+            List Your Space
+          </Button>
+        </Card>
+      </section>
+
+      {/* ── ARCHITECTURAL INTEGRITY ────────────────────────────── */}
+      <section className="space-y-4">
+        <h2 className="text-base font-bold text-[#17243A]">
+          Technical Foundations
+        </h2>
+        <div className="grid sm:grid-cols-3 gap-4 text-xs">
+          <Card padding="default">
+            <h4 className="font-semibold text-[#17243A] mb-1">
+              Geospatial Indexing
+            </h4>
+            <p className="text-[#64748B] leading-relaxed">
+              MongoDB 2dsphere spherical indexes calculate distances in real-time, querying radial bounds up to 50 km.
+            </p>
+          </Card>
+
+          <Card padding="default">
+            <h4 className="font-semibold text-[#17243A] mb-1">
+              Temporal Write Locks
+            </h4>
+            <p className="text-[#64748B] leading-relaxed">
+              Half-open interval overlap detection [start, end) prevents race conditions when multiple drivers reserve simultaneously.
+            </p>
+          </Card>
+
+          <Card padding="default">
+            <h4 className="font-semibold text-[#17243A] mb-1">
+              Free-Tier Sustainable
+            </h4>
+            <p className="text-[#64748B] leading-relaxed">
+              Engineered cleanly to run within zero-cost development tiers (Vercel, Render, and MongoDB Atlas).
+            </p>
+          </Card>
         </div>
       </section>
+
+      {/* ── CALL TO ACTION ─────────────────────────────────────── */}
+      <Card padding="lg" className="text-center bg-[#F8FAFC]">
+        <h3 className="text-lg font-bold text-[#17243A] mb-2">
+          Experience ParkingFinder Today
+        </h3>
+        <p className="text-xs text-[#64748B] max-w-md mx-auto mb-5">
+          Find an active parking space near your destination or list your driveway to earn passive revenue.
+        </p>
+        <div className="flex flex-wrap justify-center items-center gap-2.5">
+          <Button variant="primary" size="md" href="/find">
+            <Search size={14} /> Open Discovery Map
+          </Button>
+          <Button variant="secondary" size="md" href="/register">
+            Create Free Account
+          </Button>
+        </div>
+      </Card>
     </div>
   );
-};
-
-export default AboutPage;
+}

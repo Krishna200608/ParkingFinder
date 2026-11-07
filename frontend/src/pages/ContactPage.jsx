@@ -1,98 +1,176 @@
 import React, { useState } from "react";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, Github, MessageSquare, ExternalLink, Info, AlertCircle, Send } from "lucide-react";
 import toast from "react-hot-toast";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import PageHeader from "../components/ui/PageHeader";
 
-const ContactPage = () => {
+export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    toast.success("Your message has been sent successfully!");
-    setForm({ name: "", email: "", message: "" });
+
+    // Honest handling: Since the backend has no /api/contact endpoint,
+    // we use a mailto link fallback so the user's real email client drafts the message
+    // instead of misleading the user with a fake "Sent successfully" toast.
+    const subject = encodeURIComponent(`ParkingFinder Inquiry from ${form.name}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`
+    );
+
+    window.location.href = `mailto:contact@parkingfinder.demo?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+    toast("Opening your default mail client to dispatch message...", {
+      icon: "✉️",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Hero */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-400 text-white py-20 text-center">
-        <h1 className="text-4xl font-bold mb-3">Contact Us</h1>
-        <p className="text-blue-100 max-w-2xl mx-auto text-lg">
-          Have questions or feedback? We’d love to hear from you.
-        </p>
-      </section>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-8">
+      {/* ── HEADER ─────────────────────────────────────────────── */}
+      <PageHeader
+        title="Contact & Support"
+        description="Connect with the project maintainers, report technical issues, or request assistance."
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Contact" },
+        ]}
+      />
 
-      {/* Contact Info + Form */}
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 mt-16">
-        {/* Info */}
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Get in Touch
-          </h2>
-          <ul className="space-y-4 text-gray-600">
-            <li className="flex items-center gap-3">
-              <MapPin className="text-blue-600" size={20} />
-              <span>123 MG Road, Bengaluru, India</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <Phone className="text-blue-600" size={20} />
-              <span>+91 98765 43210</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <Mail className="text-blue-600" size={20} />
-              <span>support@parkingfinder.com</span>
-            </li>
-          </ul>
+      <div className="grid md:grid-cols-12 gap-8 items-start">
+        {/* LEFT COLUMN: CONTACT CHANNELS (5 COLS) */}
+        <div className="md:col-span-5 space-y-5">
+          <Card padding="default">
+            <h2 className="text-sm font-bold text-[#17243A] mb-3">
+              Developer & Community Channels
+            </h2>
+            <p className="text-xs text-[#64748B] leading-relaxed mb-4">
+              ParkingFinder is an open-source urban parking platform. We welcome feature requests, bug reports, and community contributions.
+            </p>
 
-          <p className="text-gray-500 mt-6 leading-relaxed">
-            Our support team is available Monday–Saturday, 9:00 AM to 7:00 PM
-            IST.
-          </p>
+            <div className="space-y-3 text-xs">
+              <a
+                href="https://github.com/Krishna200608/ParkingFinder"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 p-3 rounded-lg border border-[#DDE3EA] hover:border-[#2563EB] hover:bg-blue-50/20 transition group"
+              >
+                <Github size={18} className="text-[#17243A] group-hover:text-[#2563EB]" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[#17243A]">GitHub Repository</p>
+                  <p className="text-[11px] text-[#64748B] truncate">
+                    Krishna200608/ParkingFinder
+                  </p>
+                </div>
+                <ExternalLink size={13} className="text-[#94A3B8]" />
+              </a>
+
+              <a
+                href="https://github.com/Krishna200608/ParkingFinder/issues"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 p-3 rounded-lg border border-[#DDE3EA] hover:border-[#2563EB] hover:bg-blue-50/20 transition group"
+              >
+                <MessageSquare size={18} className="text-[#17243A] group-hover:text-[#2563EB]" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-[#17243A]">Issues & Bug Reports</p>
+                  <p className="text-[11px] text-[#64748B]">
+                    Submit bug tickets or pull requests
+                  </p>
+                </div>
+                <ExternalLink size={13} className="text-[#94A3B8]" />
+              </a>
+            </div>
+          </Card>
+
+          {/* Honest Backend Disclaimer */}
+          <div className="bg-[#F8FAFC] border border-[#DDE3EA] rounded-xl p-4 text-xs text-[#64748B] space-y-1.5">
+            <div className="font-semibold text-[#17243A] flex items-center gap-1.5">
+              <Info size={14} className="text-[#2563EB]" />
+              <span>Integration Notice</span>
+            </div>
+            <p className="text-[11px] leading-relaxed">
+              The backend REST API does not currently expose an automated contact ingestion endpoint. Submitting the form uses your system's default email client as a reliable communication channel.
+            </p>
+          </div>
         </div>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-lg rounded-xl p-8 space-y-5"
-        >
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Full Name</label>
-            <input
-              type="text"
-              className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Email</label>
-            <input
-              type="email"
-              className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Message</label>
-            <textarea
-              className="w-full border rounded-md py-2 px-3 h-28 resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
-          >
-            Send Message
-          </button>
-        </form>
+        {/* RIGHT COLUMN: CONTACT FORM (7 COLS) */}
+        <div className="md:col-span-7">
+          <Card padding="lg">
+            <h3 className="text-sm font-bold text-[#17243A] mb-1">
+              Send a Direct Message
+            </h3>
+            <p className="text-xs text-[#64748B] mb-5">
+              Fill in your inquiry details below to compose an email to the team.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Your Full Name
+                </label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="e.g. Sarah Jenkins"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="name@example.com"
+                  className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#475569] font-medium mb-1">
+                  Message
+                </label>
+                <textarea
+                  rows={4}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="Describe your inquiry, question, or bug description..."
+                  className="w-full border border-[#DDE3EA] rounded-lg p-2.5 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+                  required
+                />
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="md"
+                  className="w-full justify-center"
+                >
+                  <Send size={13} />
+                  <span>Draft Message in Mail Client</span>
+                </Button>
+              </div>
+
+              {submitted && (
+                <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-lg text-xs text-[#16845B]">
+                  Your message was drafted in your email client. If your client did not launch automatically, you can reach out via GitHub issues.
+                </div>
+              )}
+            </form>
+          </Card>
+        </div>
       </div>
     </div>
   );
-};
-
-export default ContactPage;
+}

@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-import { LogIn, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import logoSvg from "../assets/logo.svg";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 
-const LoginPage = () => {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Login — Parking Finder";
+    document.title = "Sign In — ParkingFinder";
   }, []);
 
   const handleSubmit = async (e) => {
@@ -31,53 +32,50 @@ const LoginPage = () => {
         toast.success("Welcome back!");
         navigate(data.user.role === "host" ? "/host/dashboard" : "/dashboard");
       } else {
-        toast.error("Invalid login response");
+        toast.error("Invalid response from server");
       }
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Login failed");
+      toast.error(err?.response?.data?.message || "Sign in failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left Banner */}
-      <div className="hidden md:flex flex-1 bg-gradient-to-br from-blue-600 to-blue-400 text-white flex-col justify-center items-center px-10">
-        <div className="max-w-sm text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome Back!</h1>
-          <p className="text-blue-100 text-lg mb-10">
-            Log in to find and manage your parking reservations effortlessly.
+    <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6">
+      <div className="w-full max-w-sm">
+        {/* Brand Header */}
+        <div className="text-center mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm">
+              P
+            </div>
+            <span className="font-bold text-lg text-[#17243A] tracking-tight">
+              ParkingFinder
+            </span>
+          </Link>
+          <h1 className="text-2xl font-bold text-[#17243A] tracking-tight">
+            Sign in to your account
+          </h1>
+          <p className="text-xs text-[#64748B] mt-1">
+            Access your reservations and parking listings.
           </p>
-
-          <div className="w-full flex justify-center">
-            <img
-              src={logoSvg}
-              alt="Parking Finder Logo"
-              className="w-64 h-64 object-contain rounded-lg shadow-md"
-            />
-          </div>
         </div>
-      </div>
 
-      {/* Right Form */}
-      <div className="flex-1 flex items-center justify-center bg-gray-50 py-12 px-6">
-        <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
-          <div className="flex items-center justify-center mb-6">
-            <LogIn className="text-blue-600 mr-2" />
-            <h2 className="text-2xl font-semibold text-gray-800">Login</h2>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Card Container */}
+        <Card padding="lg" className="shadow-xs">
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Email</label>
+              <label className="block text-[#475569] font-medium mb-1">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
                 <input
                   type="email"
-                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="you@example.com"
+                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -86,12 +84,14 @@ const LoginPage = () => {
             </div>
 
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Password</label>
+              <label className="block text-[#475569] font-medium mb-1">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -100,33 +100,35 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-2.5 p-1"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
-            >
-              {isLoading ? "Logging in..." : "Login"}
-            </button>
+            <div className="pt-1">
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                disabled={isLoading}
+                className="w-full justify-center"
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Button>
+            </div>
           </form>
 
-          <p className="text-sm text-center mt-6 text-gray-600">
+          <div className="mt-5 pt-4 border-t border-[#F1F5F9] text-center text-xs text-[#64748B]">
             Don’t have an account?{" "}
-            <Link to="/register" className="text-blue-600 hover:underline">
-              Register here
+            <Link to="/register" className="text-[#2563EB] font-semibold hover:underline">
+              Create an account
             </Link>
-          </p>
-        </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

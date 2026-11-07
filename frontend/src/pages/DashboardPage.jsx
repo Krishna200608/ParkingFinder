@@ -11,14 +11,21 @@ import {
   X,
   CheckCircle2,
   Receipt,
-  ShieldCheck,
   RotateCw,
+  ArrowUpRight,
+  AlertCircle,
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
+import { Badge, StatusBadge } from "../components/ui/Badge";
+import PageHeader from "../components/ui/PageHeader";
+import Tabs from "../components/ui/Tabs";
+import EmptyState from "../components/ui/EmptyState";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -27,7 +34,7 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const DashboardPage = () => {
+export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("bookings"); // 'bookings' | 'receipts'
   const [bookings, setBookings] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -42,7 +49,7 @@ const DashboardPage = () => {
       setBookings(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
-      toast.error("Unable to load your bookings");
+      toast.error("Unable to load reservations");
     } finally {
       setLoading(false);
     }
@@ -66,7 +73,7 @@ const DashboardPage = () => {
       fetchBookings();
     } catch (err) {
       console.error("Cancel booking error:", err);
-      toast.error(err.response?.data?.message || "Failed to cancel booking");
+      toast.error(err.response?.data?.message || "Failed to cancel reservation");
     }
   };
 
@@ -77,7 +84,7 @@ const DashboardPage = () => {
         bookingId,
       });
       if (data.url) {
-        toast.success("Redirecting to checkout session...");
+        toast.success("Opening Stripe Checkout session...");
         window.location.href = data.url;
       } else {
         toast.error("Failed to generate checkout link");
@@ -96,352 +103,363 @@ const DashboardPage = () => {
   }, []);
 
   const formatTime = (time) =>
-    new Date(time).toLocaleTimeString("en-IN", {
+    new Date(time).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
-      hour12: true,
     });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 relative">
-      {/* Header */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-12 text-center shadow-md">
-        <h1 className="text-3xl font-extrabold mb-2">Driver Dashboard</h1>
-        <p className="text-blue-100 text-sm max-w-md mx-auto">
-          Manage your reserved parking spots and inspect verified payment receipts.
-        </p>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 pb-20 space-y-6">
+      {/* ── HEADER & TAB CONTROL ───────────────────────────────── */}
+      <PageHeader
+        title="Driver Dashboard"
+        description="Review your active parking reservations, access instructions, and verified Stripe payment receipts."
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Driver Dashboard" },
+        ]}
+      />
 
-        {/* Tab Switcher */}
-        <div className="flex justify-center gap-3 mt-6">
-          <button
-            onClick={() => setActiveTab("bookings")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 ${
-              activeTab === "bookings"
-                ? "bg-white text-blue-600 shadow"
-                : "bg-blue-700/50 text-white hover:bg-blue-700"
-            }`}
-          >
-            <Car size={16} /> My Reservations ({bookings.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("receipts")}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 ${
-              activeTab === "receipts"
-                ? "bg-white text-blue-600 shadow"
-                : "bg-blue-700/50 text-white hover:bg-blue-700"
-            }`}
-          >
-            <Receipt size={16} /> Transactions ({transactions.length})
-          </button>
-        </div>
-      </section>
+      <div className="flex items-center justify-between pb-2 border-b border-[#DDE3EA]">
+        <Tabs
+          tabs={[
+            { id: "bookings", label: `Reservations (${bookings.length})` },
+            { id: "receipts", label: `Payment Receipts (${transactions.length})` },
+          ]}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
 
-      <div className="max-w-6xl mx-auto px-6 mt-10">
-        {activeTab === "bookings" && (
-          <>
-            {loading ? (
-              <div className="text-center text-gray-500 py-20 text-lg">
-                Loading your bookings...
-              </div>
-            ) : bookings.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100 text-center text-gray-600 max-w-md mx-auto">
-                <Car size={44} className="mx-auto mb-3 text-blue-500" />
-                <h3 className="text-xl font-bold mb-1 text-gray-800">No Reservations Yet</h3>
-                <p className="text-sm text-gray-500 mb-6">
-                  You have not reserved any parking bays yet. Explore live spots nearby and get started!
-                </p>
-                <Link
-                  to="/find"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-xl transition inline-block text-sm"
-                >
-                  Find Parking Nearby
-                </Link>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {bookings.map((b) => (
-                  <div
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            fetchBookings();
+            fetchTransactions();
+          }}
+          disabled={loading}
+        >
+          <RotateCw size={13} className={loading ? "animate-spin" : ""} />
+          <span>Refresh</span>
+        </Button>
+      </div>
+
+      {/* ── TAB 1: RESERVATIONS ─────────────────────────────────── */}
+      {activeTab === "bookings" && (
+        <>
+          {loading ? (
+            <div className="py-20 text-center text-sm text-[#64748B]">
+              <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              Loading your parking reservations...
+            </div>
+          ) : bookings.length === 0 ? (
+            <EmptyState
+              icon={Car}
+              title="No Reservations Found"
+              description="You have not booked any parking spaces yet. Discover available bays on the map."
+              actionLabel="Find Parking Near You"
+              actionHref="/find"
+            />
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {bookings.map((b) => {
+                const isPaid = b.paymentStatus === "paid";
+                const isCancelled = b.status === "cancelled";
+
+                return (
+                  <Card
                     key={b._id}
-                    className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all border border-gray-100 p-6 flex flex-col justify-between"
+                    padding="default"
+                    className="flex flex-col justify-between"
                   >
-                    {/* Header Info */}
                     <div>
-                      <div className="flex justify-between items-start mb-3">
-                        <h3 className="font-semibold text-base text-gray-800 flex items-center gap-2 line-clamp-1">
-                          <MapPin size={16} className="text-blue-500 flex-shrink-0" />
-                          {b.spot?.title || b.spot?.address || "Unknown address"}
-                        </h3>
-                        <span
-                          className={`px-2.5 py-0.5 text-xs font-semibold rounded-full capitalize ${
-                            b.status === "confirmed"
-                              ? "bg-blue-100 text-blue-700"
-                              : b.status === "active"
-                              ? "bg-green-100 text-green-700"
-                              : b.status === "cancelled"
-                              ? "bg-red-100 text-red-600"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {b.status}
-                        </span>
+                      {/* Status Row */}
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm text-[#17243A] truncate">
+                            {b.spot?.title || b.spot?.address || "Parking Bay"}
+                          </h3>
+                          <p className="text-xs text-[#64748B] truncate mt-0.5">
+                            {b.spot?.address}
+                          </p>
+                        </div>
+                        <StatusBadge status={b.status} />
                       </div>
 
-                      <p className="text-xs text-gray-500 mb-3 line-clamp-1">
-                        {b.spot?.address}
-                      </p>
-
-                      {/* Time Info */}
-                      <div className="space-y-1.5 text-xs text-gray-600 bg-gray-50 p-3 rounded-xl mb-3">
-                        <p className="flex items-center gap-2">
-                          <Calendar size={14} className="text-blue-500" />
+                      {/* Time Details Box */}
+                      <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs text-[#475569] mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={13} className="text-[#2563EB] shrink-0" />
                           <span>
-                            {new Date(b.startTime).toLocaleDateString("en-US", {
+                            {new Date(b.startTime).toLocaleDateString(undefined, {
                               day: "2-digit",
                               month: "short",
                               year: "numeric",
                             })}
                           </span>
-                        </p>
-
-                        <p className="flex items-center gap-2">
-                          <Clock size={14} className="text-blue-500" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock size={13} className="text-[#2563EB] shrink-0" />
                           <span>
-                            {formatTime(b.startTime)} - {formatTime(b.endTime)} ({b.durationHours} hrs)
+                            {formatTime(b.startTime)} – {formatTime(b.endTime)} ({b.durationHours} hrs)
                           </span>
-                        </p>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Footer */}
+                    {/* Financial Summary & Actions */}
                     <div>
-                      <div className="border-t border-gray-100 my-3"></div>
-                      <div className="flex justify-between items-center text-sm">
-                        <div className="flex items-center gap-1.5">
-                          {b.paymentStatus === "paid" ? (
-                            <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-semibold">
-                              <CheckCircle2 size={12} /> Paid
-                            </span>
+                      <div className="flex items-center justify-between pt-3 border-t border-[#F1F5F9] text-xs">
+                        <div>
+                          {isPaid ? (
+                            <Badge variant="success" size="sm">
+                              <CheckCircle2 size={11} className="mr-1" /> Paid
+                            </Badge>
                           ) : b.paymentStatus === "pending" ? (
-                            <span className="inline-flex items-center gap-1 text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-semibold">
-                              <RotateCw size={12} className="animate-spin" /> Pending
-                            </span>
+                            <Badge variant="warning" size="sm">
+                              Pending
+                            </Badge>
                           ) : (
-                            <span className="inline-flex items-center gap-1 text-xs bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
-                              <ShieldCheck size={12} /> Demo Reserved
-                            </span>
+                            <Badge variant="brand" size="sm">
+                              Demo Reserved
+                            </Badge>
                           )}
                         </div>
-
                         <div className="text-right">
-                          <p className="text-gray-400 text-[11px]">
+                          <span className="text-[11px] text-[#94A3B8] block">
                             ${b.spot?.pricePerHour || b.pricePerHourSnapshot || 0}/hr
-                          </p>
-                          <p className="font-bold text-blue-600 text-base">
+                          </span>
+                          <span className="text-base font-bold text-[#17243A]">
                             ${(b.totalAmount || b.totalCost || 0).toFixed(2)}
-                          </p>
+                          </span>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="mt-4 flex flex-wrap justify-end items-center gap-2 pt-2 border-t border-gray-50">
-                        {b.status !== "cancelled" && b.status !== "completed" && (
-                          <button
-                            onClick={() => handleCancelBooking(b._id)}
-                            className="text-xs border border-red-200 text-red-600 px-2.5 py-1.5 rounded-lg hover:bg-red-50 transition"
-                          >
-                            Cancel
-                          </button>
-                        )}
-
-                        {b.status !== "cancelled" && b.paymentStatus !== "paid" && (
-                          <button
-                            onClick={() => handleInitiatePayment(b._id)}
-                            disabled={payingId === b._id}
-                            className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow-sm disabled:bg-blue-400"
-                          >
-                            <CreditCard size={13} />
-                            {payingId === b._id ? "Opening..." : "Pay with Stripe"}
-                          </button>
-                        )}
-
-                        <button
+                      <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] flex flex-wrap items-center justify-end gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs py-1 px-2.5 text-[#475569]"
                           onClick={() => setSelectedBooking(b)}
-                          className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1.5 rounded-lg transition"
                         >
                           Details
-                        </button>
+                        </Button>
+
+                        {!isCancelled && !isPaid && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="text-xs py-1 px-2.5"
+                            onClick={() => handleInitiatePayment(b._id)}
+                            disabled={payingId === b._id}
+                          >
+                            <CreditCard size={12} />
+                            <span>{payingId === b._id ? "Opening..." : "Pay with Stripe"}</span>
+                          </Button>
+                        )}
+
+                        {!isCancelled && b.status !== "completed" && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="text-xs py-1 px-2"
+                            onClick={() => handleCancelBooking(b._id)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
 
-        {/* Tab 2: Transactions & Receipts */}
-        {activeTab === "receipts" && (
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden p-6 md:p-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-1 flex items-center gap-2">
-              <Receipt className="text-blue-600" size={22} /> Payment Transactions
+      {/* ── TAB 2: TRANSACTIONS & RECEIPTS ────────────────────── */}
+      {activeTab === "receipts" && (
+        <Card padding="none" className="overflow-hidden">
+          <div className="p-4 sm:p-5 border-b border-[#DDE3EA]">
+            <h2 className="text-base font-bold text-[#17243A] flex items-center gap-2">
+              <Receipt className="text-[#2563EB]" size={18} />
+              <span>Payment Receipts</span>
             </h2>
-            <p className="text-xs text-gray-500 mb-6">
-              Verified financial records from Stripe Test Mode and Sandbox checkouts.
+            <p className="text-xs text-[#64748B] mt-0.5">
+              Verified financial transactions executed through Stripe Sandbox & Checkout Simulator.
             </p>
-
-            {transactions.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <CreditCard size={40} className="mx-auto text-gray-300 mb-3" />
-                <p className="font-medium">No payment transactions found</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Complete checkout on any of your active bookings to see receipts here.
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-gray-600">
-                  <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
-                    <tr>
-                      <th className="py-3 px-4">Transaction / Intent ID</th>
-                      <th className="py-3 px-4">Parking Bay</th>
-                      <th className="py-3 px-4">Amount</th>
-                      <th className="py-3 px-4">Method / Mode</th>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {transactions.map((txn) => (
-                      <tr key={txn._id} className="hover:bg-gray-50/50">
-                        <td className="py-3 px-4 font-mono text-xs text-gray-800 font-medium">
-                          {txn.stripePaymentIntentId || txn.stripeSessionId || txn._id}
-                        </td>
-                        <td className="py-3 px-4 text-xs font-medium text-gray-800">
-                          {txn.booking?.spot?.title || txn.booking?.spot?.address || "Dedicated Spot"}
-                        </td>
-                        <td className="py-3 px-4 text-xs font-bold text-green-600">
-                          ${Number(txn.amount || 0).toFixed(2)}
-                        </td>
-                        <td className="py-3 px-4 text-xs capitalize text-gray-500">
-                          <span className="bg-gray-100 px-2 py-0.5 rounded text-[11px] font-mono">
-                            {txn.mode}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-xs text-gray-500">
-                          {new Date(txn.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full font-semibold">
-                            <CheckCircle2 size={12} /> {txn.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </div>
-        )}
-      </div>
 
-      {/* Booking Details Modal */}
+          {transactions.length === 0 ? (
+            <div className="py-16 text-center text-xs text-[#64748B]">
+              <Receipt size={32} className="mx-auto text-[#CBD5E1] mb-2" />
+              <p className="font-medium text-[#17243A]">No payment transactions recorded</p>
+              <p className="text-[#94A3B8] mt-0.5">
+                Complete payment on any reserved booking to view receipts here.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-[#475569]">
+                <thead className="bg-[#F8FAFC] text-[11px] font-semibold text-[#64748B] uppercase tracking-wider border-b border-[#DDE3EA]">
+                  <tr>
+                    <th className="py-2.5 px-4">Transaction Reference</th>
+                    <th className="py-2.5 px-4">Parking Bay</th>
+                    <th className="py-2.5 px-4">Amount</th>
+                    <th className="py-2.5 px-4">Mode</th>
+                    <th className="py-2.5 px-4">Date</th>
+                    <th className="py-2.5 px-4">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F1F5F9]">
+                  {transactions.map((txn) => (
+                    <tr key={txn._id} className="hover:bg-[#F8FAFC]/60 transition">
+                      <td className="py-3 px-4 font-mono text-[11px] text-[#17243A]">
+                        {txn.stripePaymentIntentId || txn.stripeSessionId || txn._id}
+                      </td>
+                      <td className="py-3 px-4 font-medium text-[#17243A]">
+                        {txn.booking?.spot?.title || txn.booking?.spot?.address || "Dedicated Bay"}
+                      </td>
+                      <td className="py-3 px-4 font-semibold text-[#16845B]">
+                        ${Number(txn.amount || 0).toFixed(2)}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="font-mono text-[10px] uppercase px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]">
+                          {txn.mode}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-[#64748B]">
+                        {new Date(txn.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4">
+                        <StatusBadge status={txn.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* ── RESERVATION DETAILS DIALOG ────────────────────────── */}
       {selectedBooking && (
         <div
-          className="fixed inset-0 flex justify-center items-center z-50 p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-[#17243A]/40 backdrop-blur-xs"
           role="dialog"
+          aria-modal="true"
         >
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100 animate-slideUp">
-            <div className="flex justify-between items-center p-5 border-b border-gray-100">
-              <h3 className="font-bold text-lg text-gray-800">Reservation Details</h3>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg border border-[#DDE3EA] overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="flex justify-between items-center px-5 py-4 border-b border-[#DDE3EA]">
+              <h3 className="font-bold text-sm text-[#17243A]">
+                Reservation Details
+              </h3>
               <button
+                type="button"
                 onClick={() => setSelectedBooking(null)}
-                className="text-gray-400 hover:text-gray-600 p-1"
+                className="text-[#94A3B8] hover:text-[#17243A] p-1 cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-sm">
+            <div className="p-5 space-y-4 overflow-y-auto text-xs">
               <div>
-                <p className="text-xs text-gray-400 font-semibold uppercase">Address</p>
-                <p className="font-semibold text-gray-800">{selectedBooking.spot?.address}</p>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#94A3B8] block mb-1">
+                  Location
+                </span>
+                <p className="font-semibold text-sm text-[#17243A]">
+                  {selectedBooking.spot?.address}
+                </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-3.5 rounded-xl text-xs">
+              <div className="grid grid-cols-2 gap-3 bg-[#F8FAFC] p-3 rounded-lg border border-[#E2E8F0]">
                 <div>
-                  <p className="text-gray-400">Duration</p>
-                  <p className="font-semibold text-gray-800">{selectedBooking.durationHours} hours</p>
+                  <span className="text-[11px] text-[#64748B] block">Duration</span>
+                  <span className="font-semibold text-[#17243A]">
+                    {selectedBooking.durationHours} hours
+                  </span>
                 </div>
                 <div>
-                  <p className="text-gray-400">Rate</p>
-                  <p className="font-semibold text-gray-800">
+                  <span className="text-[11px] text-[#64748B] block">Hourly Rate</span>
+                  <span className="font-semibold text-[#17243A]">
                     ${selectedBooking.pricePerHourSnapshot || selectedBooking.spot?.pricePerHour}/hr
-                  </p>
+                  </span>
                 </div>
                 <div>
-                  <p className="text-gray-400">Start</p>
-                  <p className="font-semibold text-gray-800">{formatTime(selectedBooking.startTime)}</p>
+                  <span className="text-[11px] text-[#64748B] block">Start</span>
+                  <span className="font-semibold text-[#17243A]">
+                    {formatTime(selectedBooking.startTime)}
+                  </span>
                 </div>
                 <div>
-                  <p className="text-gray-400">End</p>
-                  <p className="font-semibold text-gray-800">{formatTime(selectedBooking.endTime)}</p>
+                  <span className="text-[11px] text-[#64748B] block">End</span>
+                  <span className="font-semibold text-[#17243A]">
+                    {formatTime(selectedBooking.endTime)}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-2">
+              <div className="flex items-center justify-between pt-1">
                 <div>
-                  <p className="text-xs text-gray-400">Payment Status</p>
-                  <p className="font-medium">
+                  <span className="text-[11px] text-[#64748B] block">Payment Status</span>
+                  <div className="mt-0.5">
                     {selectedBooking.paymentStatus === "paid" ? (
-                      <span className="text-green-600 font-bold flex items-center gap-1">
-                        <CheckCircle2 size={14} /> Paid (${(selectedBooking.totalAmount || selectedBooking.totalCost || 0).toFixed(2)})
+                      <span className="text-[#16845B] font-bold flex items-center gap-1">
+                        <CheckCircle2 size={13} /> Paid (${(selectedBooking.totalAmount || selectedBooking.totalCost || 0).toFixed(2)})
                       </span>
                     ) : (
-                      <span className="text-blue-600 font-bold">Demo Reserved (Unpaid)</span>
+                      <span className="text-[#2563EB] font-bold">Demo Reserved (Unpaid)</span>
                     )}
-                  </p>
+                  </div>
                 </div>
+
                 {selectedBooking.status !== "cancelled" && selectedBooking.paymentStatus !== "paid" && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => {
                       setSelectedBooking(null);
                       handleInitiatePayment(selectedBooking._id);
                     }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow"
                   >
-                    <CreditCard size={14} /> Pay with Stripe
-                  </button>
+                    <CreditCard size={13} /> Pay with Stripe
+                  </Button>
                 )}
               </div>
 
               {selectedBooking.spot?._id && (
-                <div className="pt-2 border-t border-gray-100">
+                <div className="pt-2 border-t border-[#F1F5F9]">
                   <Link
                     to={`/spots/${selectedBooking.spot._id}`}
-                    className="text-xs text-blue-600 hover:underline font-semibold"
+                    className="text-xs text-[#2563EB] hover:underline font-semibold flex items-center gap-1"
                   >
-                    → View Parking Space Details & Leave a Review
+                    View Parking Space & Leave Verified Review <ArrowUpRight size={13} />
                   </Link>
                 </div>
               )}
 
-              {/* Map */}
+              {/* Location Map */}
               {selectedBooking.spot?.location?.coordinates && (
-                <div className="mt-3">
-                  <p className="text-xs font-semibold text-gray-500 mb-1.5">Location Map</p>
-                  <div className="rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                <div>
+                  <span className="text-[11px] font-semibold text-[#64748B] block mb-1">
+                    Map Overview
+                  </span>
+                  <div className="h-36 rounded-lg overflow-hidden border border-[#DDE3EA]">
                     <MapContainer
                       center={[
                         selectedBooking.spot.location.coordinates[1],
                         selectedBooking.spot.location.coordinates[0],
                       ]}
                       zoom={15}
-                      style={{ height: "200px", width: "100%" }}
+                      style={{ height: "100%", width: "100%" }}
                       scrollWheelZoom={false}
                     >
                       <TileLayer
-                        attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
+                        attribution='&copy; <a href="https://openstreetmap.org">OSM</a>'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       />
                       <Marker
@@ -460,27 +478,27 @@ const DashboardPage = () => {
               )}
             </div>
 
-            <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
+            <div className="px-5 py-3 border-t border-[#DDE3EA] bg-[#F8FAFC] flex justify-end gap-2">
               {selectedBooking.status !== "cancelled" && selectedBooking.status !== "completed" && (
-                <button
+                <Button
+                  variant="danger"
+                  size="sm"
                   onClick={() => handleCancelBooking(selectedBooking._id)}
-                  className="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold px-4 py-2 rounded-xl transition"
                 >
                   Cancel Reservation
-                </button>
+                </Button>
               )}
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setSelectedBooking(null)}
-                className="bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 text-xs font-semibold px-4 py-2 rounded-xl transition"
               >
                 Close
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-export default DashboardPage;
+}

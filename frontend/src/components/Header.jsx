@@ -5,51 +5,53 @@ import toast from "react-hot-toast";
 import {
   Car,
   Search,
-  PlusCircle,
+  Plus,
   Menu,
   X,
   User,
   LogOut,
   LayoutDashboard,
-  ShieldCheck,
+  Calendar,
   ChevronDown,
 } from "lucide-react";
 
 /**
- * Google Stitch Header
- * - Glassmorphic backdrop with ambient boundary line
- * - Active route indicators with smooth pill transitions
- * - Role-aware host/driver indicators
- * - Quick Search action
+ * Premium Header
+ * Designed with Linear / Airbnb restraint:
+ * - Subtle border bottom (#DDE3EA), clean white surface
+ * - Clear active states, crisp typographic hierarchy
+ * - Contextual role indicators without garish badge colors
+ * - Accessible user dropdown and responsive mobile sheet
  */
-const Header = () => {
+export default function Header() {
   const { userInfo, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false); // mobile drawer
-  const [openUser, setOpenUser] = useState(false); // user menu
-  const userMenuRef = useRef();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const isMapPage = location.pathname === "/find";
 
   useEffect(() => {
-    const onDocClick = (e) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
-        setOpenUser(false);
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setUserDropdownOpen(false);
       }
     };
-    document.addEventListener("click", onDocClick);
-    return () => document.removeEventListener("click", onDocClick);
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
   }, []);
 
   const handleLogout = () => {
     logout();
-    toast.success("Logged out successfully");
+    toast.success("Signed out successfully");
     navigate("/login");
   };
 
   const navLinks = [
     { label: "Find Parking", path: "/find" },
-    { label: "My Bookings", path: "/dashboard", authRequired: true },
-    { label: "Dynamic Pricing", path: "/pricing" },
+    { label: "Pricing", path: "/pricing" },
     { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
   ];
@@ -57,240 +59,257 @@ const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/85 border-b border-slate-200/70 transition-all duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
-                <Car size={22} strokeWidth={2.3} />
-              </div>
+    <header className="sticky top-0 z-50 bg-white border-b border-[#DDE3EA] h-14 sm:h-16 flex items-center transition-colors">
+      <div className={`w-full mx-auto px-4 sm:px-6 flex items-center justify-between ${isMapPage ? "max-w-none" : "max-w-7xl"}`}>
+        {/* Brand */}
+        <div className="flex items-center gap-6">
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-md"
+            aria-label="ParkingFinder Home"
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#17243A] text-white flex items-center justify-center transition-colors group-hover:bg-blue-600">
+              <Car size={18} strokeWidth={2.2} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-bold tracking-tight text-[#17243A]">
+                Parking<span className="text-blue-600">Finder</span>
+              </span>
+            </div>
+          </Link>
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
-                    Parking<span className="text-blue-600">Finder</span>
-                  </span>
-                  <span className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/60">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
-                    v2.0
-                  </span>
-                </div>
-                <p className="text-[11px] font-medium text-slate-400 -mt-1 hidden sm:block">
-                  Smart Urban Discovery & Booking
-                </p>
-              </div>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/50">
-            {navLinks.map((item) => {
-              if (item.authRequired && !userInfo) return null;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
-                    isActive(item.path)
-                      ? "bg-white text-blue-600 shadow-sm"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Right Action Stack */}
-          <div className="flex items-center gap-2.5">
-            {/* Quick Find Shortcut Button */}
-            <Link
-              to="/find"
-              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition"
-              title="Search Map"
-            >
-              <Search size={14} /> Quick Search
-            </Link>
-
-            {/* Role-Specific Actions */}
-            {!userInfo ? (
-              <Link
-                to="/register"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
-              >
-                Become a Host
-              </Link>
-            ) : userInfo.role === "host" || userInfo.role === "admin" ? (
-              <Link
-                to="/host/add-spot"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 transition shadow-xs"
-              >
-                <PlusCircle size={14} /> List New Spot
-              </Link>
-            ) : null}
-
-            {/* Auth Buttons or User Avatar */}
-            {!userInfo ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/login"
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 text-xs font-bold text-white rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm shadow-blue-500/20 hover:shadow-md transition-all"
-                >
-                  Get Started
-                </Link>
-              </div>
-            ) : (
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setOpenUser((s) => !s)}
-                  aria-expanded={openUser}
-                  className="flex items-center gap-2 rounded-xl p-1.5 hover:bg-slate-100/80 transition border border-transparent hover:border-slate-200"
-                >
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-xs">
-                    {userInfo?.username?.[0]?.toUpperCase() || "U"}
-                  </div>
-                  <div className="hidden sm:flex flex-col text-left">
-                    <span className="text-xs font-bold text-slate-900 leading-tight">
-                      {userInfo?.username || "Driver"}
-                    </span>
-                    <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
-                      {userInfo?.role || "driver"}
-                    </span>
-                  </div>
-                  <ChevronDown size={14} className="text-slate-400" />
-                </button>
-
-                {/* Dropdown Menu */}
-                {openUser && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200/80 rounded-2xl shadow-xl py-1.5 z-50 animate-slideUp overflow-hidden">
-                    <div className="px-4 py-2 border-b border-slate-100 bg-slate-50/50">
-                      <p className="text-xs font-bold text-slate-800">{userInfo?.username}</p>
-                      <p className="text-[11px] text-slate-400 truncate">{userInfo?.email}</p>
-                    </div>
-
-                    <Link
-                      to={userInfo.role === "host" || userInfo.role === "admin" ? "/host/dashboard" : "/dashboard"}
-                      onClick={() => setOpenUser(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
-                    >
-                      <LayoutDashboard size={15} />
-                      {userInfo.role === "host" || userInfo.role === "admin"
-                        ? "Host Dashboard"
-                        : "Driver Reservations"}
-                    </Link>
-
-                    {userInfo.role === "host" && (
-                      <Link
-                        to="/host/add-spot"
-                        onClick={() => setOpenUser(false)}
-                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
-                      >
-                        <PlusCircle size={15} /> Add Space Listing
-                      </Link>
-                    )}
-
-                    <Link
-                      to="/profile"
-                      onClick={() => setOpenUser(false)}
-                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
-                    >
-                      <User size={15} /> Profile Settings
-                    </Link>
-
-                    <div className="border-t border-slate-100 my-1"></div>
-
-                    <button
-                      onClick={() => {
-                        setOpenUser(false);
-                        handleLogout();
-                      }}
-                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition"
-                    >
-                      <LogOut size={15} /> Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Mobile Menu Toggle Button */}
-            <button
-              onClick={() => setOpen((s) => !s)}
-              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
-              aria-label="Toggle navigation menu"
-            >
-              {open ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Drawer */}
-      {open && (
-        <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-2 animate-fadeIn">
-          {navLinks.map((item) => {
-            if (item.authRequired && !userInfo) return null;
-            return (
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
+            {navLinks.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setOpen(false)}
-                className={`block px-3 py-2 rounded-xl text-sm font-semibold transition ${
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   isActive(item.path)
-                    ? "bg-blue-50 text-blue-600"
-                    : "text-slate-700 hover:bg-slate-50"
+                    ? "bg-[#F4F6F8] text-blue-600 font-semibold"
+                    : "text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8]"
                 }`}
               >
                 {item.label}
               </Link>
-            );
-          })}
+            ))}
+          </nav>
+        </div>
 
-          <div className="border-t border-slate-100 pt-3">
-            {!userInfo ? (
+        {/* Right Action Stack */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Quick Search trigger (hidden on map page) */}
+          {!isMapPage && (
+            <Link
+              to="/find"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8] transition-colors border border-[#DDE3EA]"
+            >
+              <Search size={13} aria-hidden="true" />
+              <span>Explore Map</span>
+            </Link>
+          )}
+
+          {/* Role CTA */}
+          {userInfo ? (
+            userInfo.role === "host" || userInfo.role === "admin" ? (
+              <Link
+                to="/host/add-spot"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-[#DDE3EA] text-[#17243A] hover:bg-[#F4F6F8] transition-colors shadow-2xs"
+              >
+                <Plus size={14} className="text-blue-600" />
+                <span>List Space</span>
+              </Link>
+            ) : (
+              <Link
+                to="/dashboard"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#17243A] hover:bg-[#F4F6F8] border border-[#DDE3EA] transition-colors shadow-2xs"
+              >
+                <Calendar size={13} className="text-blue-600" />
+                <span>My Bookings</span>
+              </Link>
+            )
+          ) : (
+            <Link
+              to="/register"
+              className="hidden sm:inline-flex items-center gap-1 text-xs font-medium text-[#64748B] hover:text-[#17243A] px-3 py-1.5"
+            >
+              Become a Host
+            </Link>
+          )}
+
+          {/* Auth State */}
+          {!userInfo ? (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="text-xs font-semibold text-[#17243A] px-3 py-1.5 hover:text-blue-600 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg shadow-2xs transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
+          ) : (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 p-1 rounded-lg hover:bg-[#F4F6F8] border border-transparent hover:border-[#DDE3EA] transition-colors"
+                aria-expanded={userDropdownOpen}
+                aria-haspopup="true"
+                aria-label="User Account Menu"
+              >
+                <div className="w-7 h-7 rounded-md bg-[#17243A] text-white flex items-center justify-center text-xs font-semibold">
+                  {userInfo.username?.[0]?.toUpperCase() || "U"}
+                </div>
+                <div className="hidden sm:flex flex-col text-left">
+                  <span className="text-xs font-semibold text-[#17243A] leading-tight max-w-[110px] truncate">
+                    {userInfo.username || "Account"}
+                  </span>
+                  <span className="text-[10px] text-[#64748B] font-medium capitalize">
+                    {userInfo.role || "Driver"}
+                  </span>
+                </div>
+                <ChevronDown size={14} className="text-[#64748B]" />
+              </button>
+
+              {/* Dropdown Menu */}
+              {userDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-[#DDE3EA] rounded-xl shadow-lg py-1.5 z-50 text-xs">
+                  <div className="px-3 py-2 border-b border-[#DDE3EA] bg-[#F8FAFC]">
+                    <p className="font-semibold text-[#17243A] truncate">{userInfo.username}</p>
+                    <p className="text-[11px] text-[#64748B] truncate">{userInfo.email}</p>
+                  </div>
+
+                  <Link
+                    to={userInfo.role === "host" || userInfo.role === "admin" ? "/host/dashboard" : "/dashboard"}
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                  >
+                    <LayoutDashboard size={14} className="text-[#64748B]" />
+                    <span>{userInfo.role === "host" || userInfo.role === "admin" ? "Host Dashboard" : "Reservations"}</span>
+                  </Link>
+
+                  {userInfo.role === "host" && (
+                    <Link
+                      to="/host/add-spot"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                    >
+                      <Plus size={14} className="text-[#64748B]" />
+                      <span>List New Space</span>
+                    </Link>
+                  )}
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setUserDropdownOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-[#17243A] hover:bg-[#F4F6F8] transition-colors"
+                  >
+                    <User size={14} className="text-[#64748B]" />
+                    <span>Account Settings</span>
+                  </Link>
+
+                  <div className="border-t border-[#DDE3EA] my-1" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      handleLogout();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[#DC4545] hover:bg-red-50 transition-colors text-left"
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Mobile Menu Hamburger */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-1.5 rounded-lg text-[#64748B] hover:text-[#17243A] hover:bg-[#F4F6F8]"
+            aria-label="Toggle navigation drawer"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Sheet */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-x-0 top-14 sm:top-16 bg-white border-b border-[#DDE3EA] shadow-xl p-4 space-y-3 z-40">
+          <nav className="space-y-1">
+            {navLinks.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-3 py-2 rounded-lg text-sm font-medium ${
+                  isActive(item.path)
+                    ? "bg-[#F4F6F8] text-blue-600 font-semibold"
+                    : "text-[#17243A] hover:bg-[#F4F6F8]"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="border-t border-[#DDE3EA] pt-3">
+            {userInfo ? (
+              <div className="space-y-1">
+                <Link
+                  to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-2 text-sm font-medium text-[#17243A] hover:bg-[#F4F6F8] rounded-lg"
+                >
+                  {userInfo.role === "host" ? "Host Dashboard" : "My Bookings"}
+                </Link>
+                {userInfo.role === "host" && (
+                  <Link
+                    to="/host/add-spot"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-sm font-medium text-[#17243A] hover:bg-[#F4F6F8] rounded-lg"
+                  >
+                    + Add New Space
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm font-medium text-[#DC4545] hover:bg-red-50 rounded-lg"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
               <div className="grid grid-cols-2 gap-2">
                 <Link
                   to="/login"
-                  onClick={() => setOpen(false)}
-                  className="text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-200 text-slate-700"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-center py-2 rounded-lg border border-[#DDE3EA] text-xs font-semibold text-[#17243A]"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/register"
-                  onClick={() => setOpen(false)}
-                  className="text-center py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-center py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold"
                 >
                   Get Started
                 </Link>
-              </div>
-            ) : (
-              <div className="space-y-1">
-                <Link
-                  to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
-                  onClick={() => setOpen(false)}
-                  className="block px-3 py-2 text-sm font-semibold text-slate-800"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={() => {
-                    setOpen(false);
-                    handleLogout();
-                  }}
-                  className="w-full text-left px-3 py-2 text-sm font-semibold text-rose-600"
-                >
-                  Sign Out
-                </button>
               </div>
             )}
           </div>
@@ -298,6 +317,4 @@ const Header = () => {
       )}
     </header>
   );
-};
-
-export default Header;
+}

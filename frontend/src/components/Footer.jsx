@@ -1,133 +1,129 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import {
-  Car,
-  ShieldCheck,
-  Github,
-  Twitter,
-  Linkedin,
-  Heart,
-  ExternalLink,
-  Zap,
-} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Car, Github, ArrowUpRight } from "lucide-react";
 
-const Footer = () => {
+export default function Footer() {
+  const location = useLocation();
+
+  // Hide footer completely on map page to maximize viewport
+  if (location.pathname === "/find") {
+    return null;
+  }
+
   return (
-    <footer className="bg-slate-900 text-slate-300 mt-20 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-6 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand Column */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
-                <Car size={22} strokeWidth={2.4} />
+    <footer className="bg-white border-t border-[#DDE3EA] text-[#64748B] text-xs mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 pb-10 border-b border-[#DDE3EA]">
+          {/* Brand & Mission */}
+          <div className="col-span-2 space-y-3">
+            <Link to="/" className="inline-flex items-center gap-2 text-[#17243A]">
+              <div className="w-6 h-6 rounded bg-[#17243A] text-white flex items-center justify-center">
+                <Car size={14} />
               </div>
-              <span className="text-xl font-black text-white tracking-tight">
-                Parking<span className="text-blue-500">Finder</span>
+              <span className="font-bold text-sm tracking-tight">
+                Parking<span className="text-blue-600">Finder</span>
               </span>
-            </div>
-
-            <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
-              Next-generation two-sided urban parking marketplace. Powered by atomic concurrency write locks, OpenStreetMap geospatial discovery, algorithmic dynamic pricing, and zero-cost serverless infrastructure.
+            </Link>
+            <p className="text-xs text-[#64748B] max-w-sm leading-relaxed">
+              An urban mobility marketplace connecting drivers with verified parking spaces and local property hosts. Built with open-source engineering standards.
             </p>
-
-            {/* Platform Status Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-slate-300 font-medium text-[11px]">
-                Platform Status: <strong className="text-emerald-400 font-semibold">Operational (Vercel Edge)</strong>
-              </span>
-            </div>
+            <p className="text-[11px] text-[#94A3B8]">
+              MIT License • Full-stack MERN & Vercel deployment.
+            </p>
           </div>
 
-          {/* Product Links */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Product</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Drivers */}
+          <div className="space-y-2.5">
+            <p className="font-semibold text-[#17243A] uppercase tracking-wider text-[11px]">
+              Drivers
+            </p>
+            <ul className="space-y-2">
               <li>
-                <Link to="/find" className="hover:text-white transition">
+                <Link to="/find" className="hover:text-[#17243A] transition-colors">
                   Find Parking
                 </Link>
               </li>
               <li>
-                <Link to="/pricing" className="hover:text-white transition flex items-center gap-1">
-                  Pricing Simulator <Zap size={12} className="text-amber-400" />
+                <Link to="/pricing" className="hover:text-[#17243A] transition-colors">
+                  Pricing Simulator
                 </Link>
               </li>
               <li>
-                <Link to="/find" className="hover:text-white transition">
-                  Demand Heatmap
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard" className="hover:text-white transition">
+                <Link to="/dashboard" className="hover:text-[#17243A] transition-colors">
                   My Reservations
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* For Hosts Links */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">For Hosts</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Hosts */}
+          <div className="space-y-2.5">
+            <p className="font-semibold text-[#17243A] uppercase tracking-wider text-[11px]">
+              Hosts
+            </p>
+            <ul className="space-y-2">
               <li>
-                <Link to="/register" className="hover:text-white transition">
-                  List Your Space
+                <Link to="/register" className="hover:text-[#17243A] transition-colors">
+                  List a Space
                 </Link>
               </li>
               <li>
-                <Link to="/host/dashboard" className="hover:text-white transition">
+                <Link to="/host/dashboard" className="hover:text-[#17243A] transition-colors">
                   Host Dashboard
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-white transition">
-                  Host Protection Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white transition">
-                  Commercial Fleet Inquiries
+                <Link to="/about" className="hover:text-[#17243A] transition-colors">
+                  How Hosting Works
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Technology & Open Source */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-white">Architecture</h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          {/* Platform & Resources */}
+          <div className="space-y-2.5">
+            <p className="font-semibold text-[#17243A] uppercase tracking-wider text-[11px]">
+              Platform
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/about" className="hover:text-[#17243A] transition-colors">
+                  About Project
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-[#17243A] transition-colors">
+                  Support & Contact
+                </Link>
+              </li>
               <li>
                 <a
                   href="https://github.com/Krishna200608/ParkingFinder"
                   target="_blank"
                   rel="noreferrer"
-                  className="hover:text-white transition flex items-center gap-1.5"
+                  className="inline-flex items-center gap-1 hover:text-[#17243A] transition-colors"
                 >
-                  <Github size={13} /> GitHub Repository <ExternalLink size={10} />
+                  <Github size={13} />
+                  <span>GitHub Repository</span>
+                  <ArrowUpRight size={11} className="text-[#94A3B8]" />
                 </a>
               </li>
-              <li className="text-[11px] text-slate-500">React 19 & Vite 7</li>
-              <li className="text-[11px] text-slate-500">Node.js & Express API</li>
-              <li className="text-[11px] text-slate-500">MongoDB Atlas Replica Set</li>
-              <li className="text-[11px] text-slate-500">Stripe Test Mode Gateway</li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} ParkingFinder. Released under the MIT License.</p>
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#94A3B8]">
+          <p>© {new Date().getFullYear()} ParkingFinder. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              Crafted with <Heart size={12} className="text-rose-500 fill-rose-500" /> for Urban Drivers
-            </span>
+            <Link to="/about" className="hover:text-[#64748B]">Architecture</Link>
+            <span>•</span>
+            <Link to="/pricing" className="hover:text-[#64748B]">Rates</Link>
+            <span>•</span>
+            <Link to="/contact" className="hover:text-[#64748B]">Help</Link>
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

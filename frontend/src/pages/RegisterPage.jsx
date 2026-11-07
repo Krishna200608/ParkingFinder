@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
-import { UserPlus, Mail, Lock, User, Eye, EyeOff, Info } from "lucide-react";
-import logoSvg from "../assets/logo.svg";
+import { Mail, Lock, User, Eye, EyeOff, Info, ArrowRight } from "lucide-react";
+import Button from "../components/ui/Button";
+import Card from "../components/ui/Card";
 
-const RegisterPage = () => {
+export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +16,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "Register — Parking Finder";
+    document.title = "Create Account — ParkingFinder";
   }, []);
 
   const handleRegister = async (e) => {
@@ -34,22 +35,17 @@ const RegisterPage = () => {
         role,
       });
 
-      toast.success("Registered successfully! Please login.");
+      toast.success("Account created successfully! Please sign in.");
       navigate("/login");
     } catch (err) {
       console.error("Registration Error:", err);
       const serverMsg = err?.response?.data?.message || "Registration failed";
 
-      // ✅ Handle duplicate username error
       if (serverMsg.includes("E11000") && serverMsg.includes("username")) {
         toast.error("Username already taken — please choose a different one.");
-      }
-      // ✅ Handle duplicate email error (optional if email is unique too)
-      else if (serverMsg.includes("E11000") && serverMsg.includes("email")) {
-        toast.error("Email already registered — try logging in instead.");
-      }
-      // ✅ Handle validation errors
-      else if (serverMsg.includes("validation failed")) {
+      } else if (serverMsg.includes("E11000") && serverMsg.includes("email")) {
+        toast.error("Email already registered — try signing in instead.");
+      } else if (serverMsg.includes("validation failed")) {
         const cleanMsg = serverMsg
           .replace("Server error: User validation failed:", "")
           .replace(/username:/gi, "Username:")
@@ -65,47 +61,39 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left gradient banner */}
-      <div className="hidden md:flex flex-1 bg-gradient-to-br from-blue-600 to-blue-400 text-white flex-col justify-center items-center px-10">
-        <div className="max-w-sm text-center">
-          <h1 className="text-4xl font-bold mb-4">Join ParkingFinder</h1>
-          <p className="text-blue-100 text-lg mb-10">
-            Register to start finding parking or hosting your own spot today.
+    <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6">
+      <div className="w-full max-w-sm">
+        {/* Brand Header */}
+        <div className="text-center mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-sm">
+              P
+            </div>
+            <span className="font-bold text-lg text-[#17243A] tracking-tight">
+              ParkingFinder
+            </span>
+          </Link>
+          <h1 className="text-2xl font-bold text-[#17243A] tracking-tight">
+            Create an account
+          </h1>
+          <p className="text-xs text-[#64748B] mt-1">
+            Join thousands of urban commuters and space hosts.
           </p>
-
-          <div className="w-full flex justify-center">
-            <img
-              src={logoSvg}
-              alt="Parking Finder Logo"
-              className="w-64 h-64 object-contain rounded-lg shadow-md"
-            />
-          </div>
         </div>
-      </div>
 
-      {/* Right form section */}
-      <div className="flex-1 flex items-center justify-center bg-gray-50 py-12 px-6">
-        <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
-          <div className="flex items-center justify-center mb-6">
-            <UserPlus className="text-blue-600 mr-2" />
-            <h2 className="text-2xl font-semibold text-gray-800">
-              Create Account
-            </h2>
-          </div>
-
-          <form onSubmit={handleRegister} className="space-y-5">
-            {/* Username */}
+        {/* Card Container */}
+        <Card padding="lg" className="shadow-xs">
+          <form onSubmit={handleRegister} className="space-y-4 text-xs">
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">
+              <label className="block text-[#475569] font-medium mb-1">
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
                 <input
                   type="text"
-                  className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="John_Doe"
+                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  placeholder="alex_driver"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -113,15 +101,16 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Email */}
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Email</label>
+              <label className="block text-[#475569] font-medium mb-1">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
                 <input
                   type="email"
-                  className="w-full border rounded-md py-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  placeholder="you@example.com"
+                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-3 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -129,16 +118,15 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Password */}
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">
+              <label className="block text-[#475569] font-medium mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]" size={15} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full border rounded-md py-2 pl-10 pr-12 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full border border-[#DDE3EA] rounded-lg pl-9 pr-10 py-2 text-xs text-[#17243A] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB]"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -147,53 +135,68 @@ const RegisterPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#94A3B8] hover:text-[#17243A] cursor-pointer"
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-2.5 p-1"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
+              <p className="text-[11px] text-[#94A3B8] mt-1">
+                Must be at least 6 characters long.
+              </p>
+            </div>
 
-              {/* Password requirements */}
-              <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
-                <Info size={14} className="text-blue-500" />
-                <span>Password must be at least 6 characters long.</span>
+            <div>
+              <label className="block text-[#475569] font-medium mb-1">
+                Account Purpose
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRole("driver")}
+                  className={`py-2 px-3 rounded-lg border text-xs font-semibold text-center transition cursor-pointer ${
+                    role === "driver"
+                      ? "bg-blue-50 border-blue-200 text-[#2563EB]"
+                      : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
+                  }`}
+                >
+                  Driver (Search & Park)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("host")}
+                  className={`py-2 px-3 rounded-lg border text-xs font-semibold text-center transition cursor-pointer ${
+                    role === "host"
+                      ? "bg-blue-50 border-blue-200 text-[#2563EB]"
+                      : "bg-white border-[#DDE3EA] text-[#475569] hover:bg-[#F8FAFC]"
+                  }`}
+                >
+                  Host (Monetize Space)
+                </button>
               </div>
             </div>
 
-            {/* Role */}
-            <div>
-              <label className="text-sm text-gray-600 mb-1 block">Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full border rounded-md py-2 px-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            <div className="pt-1">
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                disabled={isLoading}
+                className="w-full justify-center"
               >
-                <option value="driver">Driver</option>
-                <option value="host">Host</option>
-              </select>
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
             </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition"
-            >
-              {isLoading ? "Creating..." : "Create Account"}
-            </button>
           </form>
 
-          <p className="text-sm text-center mt-6 text-gray-600">
+          <div className="mt-5 pt-4 border-t border-[#F1F5F9] text-center text-xs text-[#64748B]">
             Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 hover:underline">
-              Login here
+            <Link to="/login" className="text-[#2563EB] font-semibold hover:underline">
+              Sign in
             </Link>
-          </p>
-        </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
-};
-
-export default RegisterPage;
+}

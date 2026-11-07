@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import Input from "../form/Input";
-import Button from "../form/Button";
 
 /**
- * CreateSpotForm used for both creating and editing.
+ * CreateSpotForm used for basic spot creation/editing.
  * Props:
  *  - initialData (optional): spot object to edit
  *  - onSaved(): callback after successful save
  */
-const CreateSpotForm = ({ initialData = null, onSaved = () => {} }) => {
+export default function CreateSpotForm({ initialData = null, onSaved = () => {} }) {
   const [address, setAddress] = useState(initialData?.address || "");
   const [description, setDescription] = useState(initialData?.description || "");
-  const [pricePerHour, setPricePerHour] = useState(initialData?.pricePerHour || 50);
+  const [pricePerHour, setPricePerHour] = useState(initialData?.pricePerHour || 15);
   const [lat, setLat] = useState(initialData?.location?.coordinates?.[1] || "");
   const [lng, setLng] = useState(initialData?.location?.coordinates?.[0] || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +20,7 @@ const CreateSpotForm = ({ initialData = null, onSaved = () => {} }) => {
     if (initialData) {
       setAddress(initialData.address || "");
       setDescription(initialData.description || "");
-      setPricePerHour(initialData.pricePerHour || 50);
+      setPricePerHour(initialData.pricePerHour || 15);
       setLat(initialData.location?.coordinates?.[1] || "");
       setLng(initialData.location?.coordinates?.[0] || "");
     }
@@ -48,10 +46,10 @@ const CreateSpotForm = ({ initialData = null, onSaved = () => {} }) => {
 
       if (initialData && (initialData._id || initialData.id)) {
         await axios.put(`/api/spots/${initialData._id || initialData.id}`, payload);
-        toast.success("Spot updated");
+        toast.success("Parking spot updated successfully");
       } else {
         await axios.post("/api/spots", payload);
-        toast.success("Spot created");
+        toast.success("Parking spot created successfully");
       }
 
       onSaved();
@@ -64,41 +62,69 @@ const CreateSpotForm = ({ initialData = null, onSaved = () => {} }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 bg-white p-4 rounded">
+    <form onSubmit={handleSubmit} className="space-y-3.5 bg-white p-5 rounded-xl border border-[#DDE3EA] text-xs">
       <div>
-        <label className="text-sm text-gray-600">Address</label>
-        <Input value={address} onChange={(e) => setAddress(e.target.value)} required />
+        <label className="block text-[#475569] font-medium mb-1">Street Address</label>
+        <input
+          type="text"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+          required
+        />
       </div>
 
       <div>
-        <label className="text-sm text-gray-600">Description</label>
-        <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+        <label className="block text-[#475569] font-medium mb-1">Description</label>
+        <textarea
+          rows={2}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full border border-[#DDE3EA] rounded-lg p-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+        />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div>
-          <label className="text-sm text-gray-600">Price / hour (USD)</label>
-          <Input
+          <label className="block text-[#475569] font-medium mb-1">Rate ($/hr)</label>
+          <input
             type="number"
+            step="0.5"
             value={pricePerHour}
             onChange={(e) => setPricePerHour(Number(e.target.value))}
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs font-semibold text-[#17243A] focus:outline-none focus:border-[#2563EB]"
             required
           />
         </div>
         <div>
-          <label className="text-sm text-gray-600">Latitude</label>
-          <Input value={lat} onChange={(e) => setLat(e.target.value)} required />
+          <label className="block text-[#475569] font-medium mb-1">Latitude</label>
+          <input
+            type="text"
+            value={lat}
+            onChange={(e) => setLat(e.target.value)}
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-[#475569] font-medium mb-1">Longitude</label>
+          <input
+            type="text"
+            value={lng}
+            onChange={(e) => setLng(e.target.value)}
+            className="w-full border border-[#DDE3EA] rounded-lg px-3 py-2 text-xs text-[#17243A] focus:outline-none focus:border-[#2563EB]"
+            required
+          />
         </div>
       </div>
 
-      <div>
-        <label className="text-sm text-gray-600">Longitude</label>
-        <Input value={lng} onChange={(e) => setLng(e.target.value)} required />
-      </div>
-
-      <Button isLoading={isLoading}>{initialData ? "Update Spot" : "Create Spot"}</Button>
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full bg-[#2563EB] hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition disabled:opacity-50 cursor-pointer"
+      >
+        {isLoading ? "Saving..." : initialData ? "Update Space" : "Create Space"}
+      </button>
     </form>
   );
-};
-
-export default CreateSpotForm;
+}
