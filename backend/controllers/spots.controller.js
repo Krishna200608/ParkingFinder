@@ -396,6 +396,21 @@ export const createSpotReview = async (req, res) => {
       return handleError(res, 400, 'You have already reviewed this parking spot');
     }
 
+    // Verified Driver policy: user must have a confirmed, active, or completed booking on this spot
+    const hasBooking = await Booking.findOne({
+      user: req.user._id,
+      spot: spot._id,
+      status: { $in: ['confirmed', 'completed', 'active'] },
+    });
+
+    if (!hasBooking && req.user.role !== 'admin') {
+      return handleError(
+        res,
+        403,
+        'Only verified drivers with a confirmed or completed reservation on this spot may leave a review.'
+      );
+    }
+
     const review = {
       user: req.user._id,
       rating: numRating,

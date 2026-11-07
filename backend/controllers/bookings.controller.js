@@ -453,3 +453,20 @@ export const cancelBooking = async (req, res) => {
     return handleError(res, 500, `Server error: ${error.message}`);
   }
 };
+
+// @desc    Get all bookings on parking spots owned by the logged-in host
+// @route   GET /api/bookings/host
+// @access  Private (Host or Admin)
+export const getHostBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ host: req.user._id })
+      .populate('user', 'username email')
+      .populate('spot', 'title address pricePerHour location spotType vehicleSize')
+      .sort({ startTime: -1 });
+
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Error fetching host bookings:', error);
+    return handleError(res, 500, `Server error: ${error.message}`);
+  }
+};

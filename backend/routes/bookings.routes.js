@@ -2,12 +2,13 @@ import express from 'express';
 import {
   createBooking,
   getMyBookings,
+  getHostBookings,
   getBookingById,
   cancelBooking,
   getBookedSlotsForSpot,
   getSpotAvailability,
 } from '../controllers/bookings.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
+import { protect, isHostOrAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ router.get('/spot/:spotId', getBookedSlotsForSpot);
 router.post('/', protect, createBooking);
 router.get('/me', protect, getMyBookings);
 router.get('/mybookings', protect, getMyBookings); // backwards-compatible alias
+router.get('/host', protect, isHostOrAdmin, getHostBookings);
 router.get('/:id', protect, getBookingById);
 router.put('/:id/cancel', protect, cancelBooking);
 

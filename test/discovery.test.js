@@ -5,6 +5,7 @@ import app from '../backend/app.js';
 import connectDB from '../backend/db.js';
 import User from '../backend/models/user.model.js';
 import ParkingSpot from '../backend/models/parkingSpot.model.js';
+import Booking from '../backend/models/booking.model.js';
 
 describe('Stage 4: Parking Discovery, Geocoding & Filters Suite', () => {
   let hostUser;
@@ -197,7 +198,35 @@ describe('Stage 4: Parking Discovery, Geocoding & Filters Suite', () => {
     expect(res.body.owner.username).toBe('discovery_host');
   });
 
-  it('allows authenticated driver to submit a review and updates average rating', async () => {
+  it('enforces verified booking prerequisite and allows driver to submit a review', async () => {
+    // 1. Attempt review without booking -> Expected 403 Forbidden
+    const unverifiedRes = await request(app)
+      .post(`/api/spots/${spotA._id}/reviews`)
+      .set('Cookie', driverCookie)
+      .send({ rating: 5, comment: 'Spam review without booking' });
+
+    expect(unverifiedRes.status).toBe(403);
+    expect(unverifiedRes.body.message).toContain('verified drivers');
+
+    // 2. Create confirmed booking for driverUser on spotA
+    const bookingStart = new Date(Date.now() + 100000);
+    const bookingEnd = new Date(Date.now() + 107200000);
+    await Booking.create({
+      user: driverUser._id,
+      spot: spotA._id,
+      host: hostUser._id,
+      startTime: bookingStart,
+      endTime: bookingEnd,
+      durationHours: 2,
+      pricePerHourSnapshot: 15,
+      totalCost: 30,
+      totalAmount: 30,
+      status: 'confirmed',
+      paymentStatus: 'unpaid_demo',
+      paymentMethod: 'demo',
+    });
+
+    // 3. Resubmit review as verified driver -> Expected 201 Created
     const res = await request(app)
       .post(`/api/spots/${spotA._id}/reviews`)
       .set('Cookie', driverCookie)

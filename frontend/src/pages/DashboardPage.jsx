@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Calendar, Clock, MapPin, CreditCard, Car, X } from "lucide-react";
@@ -144,6 +145,8 @@ const DashboardPage = () => {
 										<span>
 											{b.paymentStatus === "paid" ? (
 												<span className="text-green-600 font-medium">Paid</span>
+											) : b.paymentStatus === "unpaid_demo" ? (
+												<span className="text-blue-600 font-medium">Demo Reservation</span>
 											) : (
 												<span className="text-yellow-600 font-medium">
 													Pending
@@ -153,11 +156,11 @@ const DashboardPage = () => {
 									</div>
 
 									<div className="text-right">
-										<p className="text-gray-600">
-											₹{b.spot?.pricePerHour || 0}/hr
+										<p className="text-gray-600 text-xs">
+											${b.spot?.pricePerHour || b.pricePerHourSnapshot || 0}/hr
 										</p>
 										<p className="font-semibold text-blue-600 text-base">
-											₹{b.totalCost || 0}
+											${(b.totalAmount || b.totalCost || 0).toFixed(2)}
 										</p>
 									</div>
 								</div>
@@ -265,10 +268,21 @@ const DashboardPage = () => {
 								<p>
 									<span className="font-medium">Total Cost:</span>{" "}
 									<span className="text-blue-600 font-semibold">
-										₹{selectedBooking.totalCost || 0}
+										${(selectedBooking.totalAmount || selectedBooking.totalCost || 0).toFixed(2)}
 									</span>
 								</p>
 							</div>
+
+							{selectedBooking.spot?._id && (
+								<div className="pt-1">
+									<Link
+										to={`/spots/${selectedBooking.spot._id}`}
+										className="text-xs text-blue-600 hover:underline font-semibold"
+									>
+										→ View Parking Space Details & Leave a Review
+									</Link>
+								</div>
+							)}
 
 							{/* Map */}
 							{selectedBooking.spot?.location?.coordinates && (

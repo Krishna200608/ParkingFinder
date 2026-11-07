@@ -98,8 +98,15 @@ const bookingSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Virtual alias: totalAmount reflects totalCost
+bookingSchema.virtual('totalAmount').get(function () {
+  return this.totalCost;
+});
 
 // Compound indexes for fast conflict queries and dashboard aggregation
 bookingSchema.index({ spot: 1, status: 1, startTime: 1, endTime: 1 });
