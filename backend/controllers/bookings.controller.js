@@ -47,8 +47,20 @@ const executeWithRetry = async (operation, maxRetries = 3) => {
       await session.endSession();
       return result;
     } catch (error) {
-      if (session.inTransaction()) {
+      if (session && session.inTransaction()) {
         await session.abortTransaction().catch(() => {});
+      }
+
+      // Standalone MongoDB fallback (e.g. CI or local test instance without replica set)
+      if (
+        error.message &&
+        (error.message.includes('Transaction numbers are only allowed on a replica set') ||
+         error.message.includes('replica set member'))
+      ) {
+        if (session) {
+          await session.endSession().catch(() => {});
+        }
+        return await operation(null);
       }
 
       const isTransient =
@@ -63,7 +75,9 @@ const executeWithRetry = async (operation, maxRetries = 3) => {
         continue;
       }
 
-      await session.endSession().catch(() => {});
+      if (session) {
+        await session.endSession().catch(() => {});
+      }
       throw error;
     }
   }

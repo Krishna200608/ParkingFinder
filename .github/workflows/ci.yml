@@ -26,10 +26,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20 LTS
+      - name: Setup Node.js 22 LTS
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies
@@ -47,4 +47,3 @@ jobs:
 
       - name: Verify Production Build
         run: npm run build
-
