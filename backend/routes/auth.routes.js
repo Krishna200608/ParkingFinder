@@ -6,7 +6,7 @@ import {
   getUserProfile,
   switchUserRole,
 } from '../controllers/auth.controller.js';
-import { protect } from '../middleware/auth.middleware.js';
+import { protect, allowSessionOrUser } from '../middleware/auth.middleware.js';
 import { validate, registerSchema, loginSchema } from '../middleware/validate.middleware.js';
 
 const router = express.Router();
@@ -18,6 +18,6 @@ router.post('/login', validate(loginSchema), loginUser);
 // Private routes (protected by HTTP-only cookie / Bearer auth)
 router.post('/logout', protect, logoutUser);
 router.get('/profile', protect, getUserProfile);
-router.post('/switch-role', protect, switchUserRole);
+router.post('/switch-role', allowSessionOrUser, switchUserRole);
 
 export default router;

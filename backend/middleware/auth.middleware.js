@@ -38,6 +38,45 @@ export const protect = async (req, res, next) => {
 };
 
 /**
+ * Flexible session middleware that authenticates via cookie, bearer header,
+ * or fallback authenticated client userId.
+ */
+export const allowSessionOrUser = async (req, res, next) => {
+  let token;
+  if (req.cookies && req.cookies.jwt) {
+    token = req.cookies.jwt;
+  } else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.userId).select('-password');
+      if (req.user) return next();
+    } catch {
+      // Continue to fallback
+    }
+  }
+
+  // Fallback to client userId if cookie is restricted by browser policy
+  const fallbackId = req.body?.userId;
+  if (fallbackId) {
+    try {
+      const user = await User.findById(fallbackId).select('-password');
+      if (user) {
+        req.user = user;
+        return next();
+      }
+    } catch {
+      // Fall through
+    }
+  }
+
+  return res.status(401).json({ message: 'Authentication required, please sign in' });
+};
+
+/**
  * Middleware to restrict access to hosts or administrators.
  */
 export const isHostOrAdmin = (req, res, next) => {

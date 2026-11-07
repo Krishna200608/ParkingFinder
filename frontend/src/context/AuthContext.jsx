@@ -15,15 +15,22 @@ export const AuthProvider = ({ children }) => {
 
   // Synchronize user session from HTTP-only cookie on mount
   useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+    }
+
     const verifySession = async () => {
       try {
-        const { data } = await axios.get("/api/auth/profile");
+        const { data } = await axios.get("/api/auth/profile", { withCredentials: true });
         setUserInfo(data);
         localStorage.setItem("userInfo", JSON.stringify(data));
       } catch {
         // If cookie is invalid or absent, clear cached user info
         setUserInfo(null);
         localStorage.removeItem("userInfo");
+        localStorage.removeItem("authToken");
+        delete axios.defaults.headers.common["Authorization"];
       } finally {
         setLoading(false);
       }
@@ -31,26 +38,38 @@ export const AuthProvider = ({ children }) => {
     verifySession();
   }, []);
 
-  // Called after login / registration
+  // Called after login / registration / role-switch
   const login = (data) => {
     const user = data?.user || data;
+    const token = data?.token;
     if (user?._id) {
       localStorage.setItem("userInfo", JSON.stringify(user));
       setUserInfo(user);
     }
+    if (token) {
+      localStorage.setItem("authToken", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
   };
 
   // Backwards-compatible helper
-  const setAuthToken = () => {};
+  const setAuthToken = (token) => {
+    if (token) {
+      localStorage.setItem("authToken", token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  };
 
   // Logout clears server-side cookie and local state
   const logout = async () => {
     try {
-      await axios.post("/api/auth/logout");
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
     } catch (err) {
       console.warn("Logout request failed:", err.message);
     }
     localStorage.removeItem("userInfo");
+    localStorage.removeItem("authToken");
+    delete axios.defaults.headers.common["Authorization"];
     setUserInfo(null);
   };
 

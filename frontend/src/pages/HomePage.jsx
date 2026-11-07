@@ -55,16 +55,27 @@ export default function HomePage() {
   const handleUpgradeToHost = async () => {
     try {
       setIsUpgrading(true);
-      const { data } = await axios.post("/api/auth/switch-role", { role: "host" });
+      const targetUserId = userInfo?._id || userInfo?.user?._id;
+      const { data } = await axios.post(
+        "/api/auth/switch-role",
+        { role: "host", userId: targetUserId },
+        { withCredentials: true }
+      );
       if (data?.user) {
-        login(data.user);
-        toast.success("Host account activated! Welcome to the space host marketplace.");
+        login(data);
+        toast.success(data.message || "Host account activated! Welcome to the space host marketplace.");
         setShowHostUpgradeModal(false);
         navigate("/host/add-spot");
       }
     } catch (err) {
       console.error("Upgrade error:", err);
-      toast.error(err?.response?.data?.message || "Failed to activate host account");
+      if (err?.response?.status === 401) {
+        toast.error("Your session has expired. Please sign in again.");
+        setShowHostUpgradeModal(false);
+        navigate("/login");
+      } else {
+        toast.error(err?.response?.data?.message || "Failed to activate host account");
+      }
     } finally {
       setIsUpgrading(false);
     }

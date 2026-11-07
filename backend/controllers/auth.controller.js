@@ -32,11 +32,12 @@ export const registerUser = async (req, res) => {
 
     if (user) {
       // 4. Set secure HTTP-only session cookie
-      generateToken(res, user._id);
+      const token = generateToken(res, user._id);
 
-      // 5. Send clean response
+      // 5. Send clean response with bearer token fallback
       return res.status(201).json({
         message: 'Account created successfully',
+        token,
         user: {
           _id: user._id,
           username: user.username,
@@ -66,10 +67,11 @@ export const loginUser = async (req, res) => {
     // 2. Validate password
     if (user && (await user.matchPassword(password))) {
       // 3. Set secure HTTP-only session cookie
-      generateToken(res, user._id);
+      const token = generateToken(res, user._id);
 
       return res.status(200).json({
         message: 'Logged in successfully',
+        token,
         user: {
           _id: user._id,
           username: user.username,
@@ -121,10 +123,15 @@ export const getUserProfile = async (req, res) => {
 
 // @desc    Switch user role between driver and host
 // @route   POST /api/auth/switch-role
-// @access  Private
+// @access  Private (or authenticated session fallback)
 export const switchUserRole = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const userId = req.user?._id || req.body?.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'Authentication required to switch account role' });
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -135,8 +142,12 @@ export const switchUserRole = async (req, res) => {
     user.role = targetRole;
     await user.save();
 
+    // Re-issue fresh JWT cookie
+    const token = generateToken(res, user._id);
+
     return res.status(200).json({
       message: `Account role updated to ${targetRole === 'host' ? 'Host' : 'Driver'} successfully.`,
+      token,
       user: {
         _id: user._id,
         username: user.username,

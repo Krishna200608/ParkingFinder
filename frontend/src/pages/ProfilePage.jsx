@@ -10,7 +10,7 @@ import { Badge } from "../components/ui/Badge";
 import PageHeader from "../components/ui/PageHeader";
 
 export default function ProfilePage() {
-  const { logout, login } = useAuth();
+  const { logout, login, userInfo } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSwitchingRole, setIsSwitchingRole] = useState(false);
@@ -45,15 +45,25 @@ export default function ProfilePage() {
   const handleSwitchRole = async (targetRole) => {
     try {
       setIsSwitchingRole(true);
-      const { data } = await axios.post("/api/auth/switch-role", { role: targetRole });
+      const targetUserId = profile?._id || userInfo?._id;
+      const { data } = await axios.post(
+        "/api/auth/switch-role",
+        { role: targetRole, userId: targetUserId },
+        { withCredentials: true }
+      );
       if (data?.user) {
-        login(data.user);
+        login(data);
         setProfile(data.user);
         toast.success(data.message || `Switched to ${targetRole} mode`);
       }
     } catch (err) {
       console.error(err);
-      toast.error(err?.response?.data?.message || "Failed to switch role");
+      if (err?.response?.status === 401) {
+        toast.error("Your session has expired. Please sign in again.");
+        navigate("/login");
+      } else {
+        toast.error(err?.response?.data?.message || "Failed to switch role");
+      }
     } finally {
       setIsSwitchingRole(false);
     }
