@@ -86,9 +86,9 @@ describe('Payment Gateway & Test Mode Suite', () => {
   });
 
   afterAll(async () => {
-    if (testSpot) await ParkingSpot.findByIdAndDelete(testSpot._id);
-    if (testBooking) await Booking.findByIdAndDelete(testBooking._id);
-    await Payment.deleteMany({ user: driverUser._id });
+    if (testSpot?._id) await ParkingSpot.findByIdAndDelete(testSpot._id);
+    if (testBooking?._id) await Booking.findByIdAndDelete(testBooking._id);
+    if (driverUser?._id) await Payment.deleteMany({ user: driverUser._id });
     await User.deleteMany({
       email: { $in: ['pay_host@test.com', 'pay_driver@test.com', 'pay_other@test.com'] },
     });

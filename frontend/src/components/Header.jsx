@@ -1,32 +1,43 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import {
+  Car,
+  Search,
+  PlusCircle,
+  Menu,
+  X,
+  User,
+  LogOut,
+  LayoutDashboard,
+  ShieldCheck,
+  ChevronDown,
+} from "lucide-react";
 
 /**
- * Modern Header
- * - Responsive (desktop / mobile)
- * - Role-aware links (driver / host / admin)
- * - CTA buttons: Find Parking, Become a Host / Add Spot
- * - User menu with Logout
+ * Google Stitch Header
+ * - Glassmorphic backdrop with ambient boundary line
+ * - Active route indicators with smooth pill transitions
+ * - Role-aware host/driver indicators
+ * - Quick Search action
  */
-
 const Header = () => {
   const { userInfo, logout } = useAuth();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // mobile menu
-  const [openUser, setOpenUser] = useState(false); // user dropdown
+  const location = useLocation();
+  const [open, setOpen] = useState(false); // mobile drawer
+  const [openUser, setOpenUser] = useState(false); // user menu
   const userMenuRef = useRef();
 
   useEffect(() => {
-    // close user dropdown on outside click
-    const onDoc = (e) => {
+    const onDocClick = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setOpenUser(false);
       }
     };
-    document.addEventListener("click", onDoc);
-    return () => document.removeEventListener("click", onDoc);
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
   }, []);
 
   const handleLogout = () => {
@@ -35,100 +46,106 @@ const Header = () => {
     navigate("/login");
   };
 
+  const navLinks = [
+    { label: "Find Parking", path: "/find" },
+    { label: "My Bookings", path: "/dashboard", authRequired: true },
+    { label: "Dynamic Pricing", path: "/pricing" },
+    { label: "About", path: "/about" },
+    { label: "Contact", path: "/contact" },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <header className="bg-white/95 backdrop-blur-sm border-b sticky top-0 z-50">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/85 border-b border-slate-200/70 transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left: Logo */}
-          <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 text-white shadow">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 13l4-4 4 4 4-4 4 4" />
-                </svg>
+          {/* Brand Logo */}
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+                <Car size={22} strokeWidth={2.3} />
               </div>
 
               <div>
-                <h1 className="text-lg font-semibold text-slate-800">ParkingFinder</h1>
-                <p className="text-xs text-slate-400 -mt-0.5">Find & reserve parking near you</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                    Parking<span className="text-blue-600">Finder</span>
+                  </span>
+                  <span className="hidden xl:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/60">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
+                    v2.0
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-slate-400 -mt-1 hidden sm:block">
+                  Smart Urban Discovery & Booking
+                </p>
               </div>
             </Link>
           </div>
 
-          {/* Middle: Desktop nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link to="/find" className="text-sm text-slate-700 hover:text-blue-600 transition">
-              Find Parking
-            </Link>
-
-            <Link to="/dashboard" className="text-sm text-slate-700 hover:text-blue-600 transition">
-              My Bookings
-            </Link>
-
-            <Link to="/about" className="text-sm text-slate-700 hover:text-blue-600 transition">
-              About
-            </Link>
-
-            <Link to="/pricing" className="text-sm text-slate-700 hover:text-blue-600 transition">
-              Pricing
-            </Link>
-
-            <Link to="/contact" className="text-sm text-slate-700 hover:text-blue-600 transition">
-              Contact
-            </Link>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100/70 p-1 rounded-full border border-slate-200/50">
+            {navLinks.map((item) => {
+              if (item.authRequired && !userInfo) return null;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-150 ${
+                    isActive(item.path)
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right: CTAs / Auth */}
-          <div className="flex items-center gap-3">
-            {/* Become host / Add spot */}
+          {/* Right Action Stack */}
+          <div className="flex items-center gap-2.5">
+            {/* Quick Find Shortcut Button */}
+            <Link
+              to="/find"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition"
+              title="Search Map"
+            >
+              <Search size={14} /> Quick Search
+            </Link>
+
+            {/* Role-Specific Actions */}
             {!userInfo ? (
               <Link
                 to="/register"
-                className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium border border-slate-200 hover:shadow-sm transition"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
               >
                 Become a Host
               </Link>
             ) : userInfo.role === "host" || userInfo.role === "admin" ? (
               <Link
                 to="/host/add-spot"
-                className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow hover:from-blue-700 transition"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 transition shadow-xs"
               >
-                + Add Spot
+                <PlusCircle size={14} /> List New Spot
               </Link>
-            ) : (
-              <Link
-                to="/register"
-                className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium border border-slate-200 hover:shadow-sm transition"
-              >
-                Become a Host
-              </Link>
-            )}
+            ) : null}
 
-            {/* Primary CTA */}
-            <Link
-              to="/find"
-              className="hidden sm:inline-flex items-center px-4 py-2 rounded-md text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"
-            >
-              Find Parking
-            </Link>
-
-            {/* Auth / User */}
+            {/* Auth Buttons or User Avatar */}
             {!userInfo ? (
               <div className="flex items-center gap-2">
-                <Link to="/login" className="text-sm text-slate-700 hover:text-blue-600 transition">
-                  Login
+                <Link
+                  to="/login"
+                  className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 transition"
+                >
+                  Sign In
                 </Link>
                 <Link
                   to="/register"
-                  className="ml-2 inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition"
+                  className="px-4 py-2 text-xs font-bold text-white rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm shadow-blue-500/20 hover:shadow-md transition-all"
                 >
-                  Sign Up
+                  Get Started
                 </Link>
               </div>
             ) : (
@@ -136,115 +153,143 @@ const Header = () => {
                 <button
                   onClick={() => setOpenUser((s) => !s)}
                   aria-expanded={openUser}
-                  className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-slate-100 transition"
+                  className="flex items-center gap-2 rounded-xl p-1.5 hover:bg-slate-100/80 transition border border-transparent hover:border-slate-200"
                 >
-                  <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-xs">
                     {userInfo?.username?.[0]?.toUpperCase() || "U"}
                   </div>
                   <div className="hidden sm:flex flex-col text-left">
-                    <span className="text-sm font-medium text-slate-800">{userInfo?.username || "User"}</span>
-                    <span className="text-xs text-slate-400">{userInfo?.role || "driver"}</span>
+                    <span className="text-xs font-bold text-slate-900 leading-tight">
+                      {userInfo?.username || "Driver"}
+                    </span>
+                    <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">
+                      {userInfo?.role || "driver"}
+                    </span>
                   </div>
+                  <ChevronDown size={14} className="text-slate-400" />
                 </button>
 
-                {/* User dropdown */}
+                {/* Dropdown Menu */}
                 {openUser && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200/80 rounded-2xl shadow-xl py-1.5 z-50 animate-slideUp overflow-hidden">
+                    <div className="px-4 py-2 border-b border-slate-100 bg-slate-50/50">
+                      <p className="text-xs font-bold text-slate-800">{userInfo?.username}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{userInfo?.email}</p>
+                    </div>
+
                     <Link
                       to={userInfo.role === "host" || userInfo.role === "admin" ? "/host/dashboard" : "/dashboard"}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                      onClick={() => setOpenUser(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
                     >
-                      {userInfo.role === "host" || userInfo.role === "admin" ? "Dashboard" : "Booking Dashboard"}
+                      <LayoutDashboard size={15} />
+                      {userInfo.role === "host" || userInfo.role === "admin"
+                        ? "Host Dashboard"
+                        : "Driver Reservations"}
                     </Link>
 
                     {userInfo.role === "host" && (
                       <Link
                         to="/host/add-spot"
-                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                        onClick={() => setOpenUser(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
                       >
-                        Add Spot
+                        <PlusCircle size={15} /> Add Space Listing
                       </Link>
                     )}
 
-                    <Link to="/profile" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                      Profile
+                    <Link
+                      to="/profile"
+                      onClick={() => setOpenUser(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition"
+                    >
+                      <User size={15} /> Profile Settings
                     </Link>
 
+                    <div className="border-t border-slate-100 my-1"></div>
+
                     <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
+                      onClick={() => {
+                        setOpenUser(false);
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium text-rose-600 hover:bg-rose-50 transition"
                     >
-                      Logout
+                      <LogOut size={15} /> Sign Out
                     </button>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Mobile hamburger */}
+            {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setOpen((s) => !s)}
-              className="md:hidden ml-2 p-2 rounded-md hover:bg-slate-100 transition"
-              aria-label="Toggle menu"
+              className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition"
+              aria-label="Toggle navigation menu"
             >
-              <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {open ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {open ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile Drawer */}
       {open && (
-        <div className="md:hidden border-t bg-white">
-          <div className="px-4 pt-4 pb-6 space-y-3">
-            <Link to="/find" onClick={() => setOpen(false)} className="block text-slate-700 py-2">
-              Find Parking
-            </Link>
-            <Link to="/about" onClick={() => setOpen(false)} className="block text-slate-700 py-2">
-              About
-            </Link>
-            <Link to="/pricing" onClick={() => setOpen(false)} className="block text-slate-700 py-2">
-              Pricing
-            </Link>
-            <Link to="/contact" onClick={() => setOpen(false)} className="block text-slate-700 py-2">
-              Contact
-            </Link>
+        <div className="md:hidden border-t border-slate-200 bg-white/95 backdrop-blur-xl px-4 pt-3 pb-6 space-y-2 animate-fadeIn">
+          {navLinks.map((item) => {
+            if (item.authRequired && !userInfo) return null;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setOpen(false)}
+                className={`block px-3 py-2 rounded-xl text-sm font-semibold transition ${
+                  isActive(item.path)
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
 
+          <div className="border-t border-slate-100 pt-3">
             {!userInfo ? (
-              <div className="pt-2">
-                <Link to="/login" onClick={() => setOpen(false)} className="block font-medium py-2">
-                  Login
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-200 text-slate-700"
+                >
+                  Sign In
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setOpen(false)}
-                  className="block mt-2 bg-blue-600 text-white text-center px-4 py-2 rounded"
+                  className="text-center py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600"
                 >
-                  Sign Up
+                  Get Started
                 </Link>
               </div>
             ) : (
-              <div className="pt-2 space-y-1">
+              <div className="space-y-1">
                 <Link
                   to={userInfo.role === "host" ? "/host/dashboard" : "/dashboard"}
                   onClick={() => setOpen(false)}
-                  className="block py-2"
+                  className="block px-3 py-2 text-sm font-semibold text-slate-800"
                 >
                   Dashboard
                 </Link>
-                {userInfo.role === "host" && (
-                  <Link to="/host/add-spot" onClick={() => setOpen(false)} className="block py-2">
-                    Add Spot
-                  </Link>
-                )}
-                <button onClick={() => { setOpen(false); handleLogout(); }} className="w-full text-left py-2 text-rose-600">
-                  Logout
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm font-semibold text-rose-600"
+                >
+                  Sign Out
                 </button>
               </div>
             )}

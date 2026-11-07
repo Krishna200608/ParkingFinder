@@ -101,8 +101,10 @@ describe('Stage 4: Parking Discovery, Geocoding & Filters Suite', () => {
   });
 
   afterAll(async () => {
-    await ParkingSpot.deleteMany({ _id: { $in: [spotA._id, spotB._id, spotC._id] } });
-    await User.deleteMany({ _id: { $in: [hostUser._id, driverUser._id] } });
+    const spotIds = [spotA?._id, spotB?._id, spotC?._id].filter(Boolean);
+    const userIds = [hostUser?._id, driverUser?._id].filter(Boolean);
+    if (spotIds.length > 0) await ParkingSpot.deleteMany({ _id: { $in: spotIds } });
+    if (userIds.length > 0) await User.deleteMany({ _id: { $in: userIds } });
   });
 
   it('allows public retrieval of parking spots without an auth cookie', async () => {

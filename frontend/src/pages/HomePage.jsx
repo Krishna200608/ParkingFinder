@@ -1,301 +1,477 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-	Car,
-	MapPin,
-	Clock,
-	DollarSign,
-	Users,
-	Smartphone,
-	ShieldCheck,
-	Building2,
-	Star,
-	Briefcase,
+  Car,
+  MapPin,
+  Clock,
+  DollarSign,
+  ShieldCheck,
+  Zap,
+  Star,
+  Search,
+  ArrowRight,
+  CheckCircle2,
+  Lock,
+  Layers,
+  Sparkles,
+  TrendingUp,
 } from "lucide-react";
-import logoPng from "../assets/logo.png";
 
 const fadeIn = (delay = 0) => ({
-	hidden: { opacity: 0, y: 30 },
-	show: {
-		opacity: 1,
-		y: 0,
-		transition: { delay, duration: 0.7, ease: "easeOut" },
-	},
+  hidden: { opacity: 0, y: 25 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { delay, duration: 0.6, ease: "easeOut" },
+  },
 });
 
-const HomePage = () => {
-	return (
-		<div className="flex flex-col space-y-24 pb-20 overflow-hidden">
-			{/* 🌇 HERO SECTION */}
-			<section className="relative bg-gradient-to-r from-blue-600 to-blue-400 text-white py-24 overflow-hidden">
-				<div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center relative z-10">
-					<motion.div
-						variants={fadeIn(0.1)}
-						initial="hidden"
-						whileInView="show"
-					>
-						<h1 className="text-5xl md:text-6xl font-bold leading-tight mb-6">
-							Smart Parking, <br /> Simplified for You.
-						</h1>
-						<p className="text-blue-100 text-lg mb-8">
-							Find and book parking in seconds — whether you’re a driver or a
-							host.
-						</p>
-						<div className="flex gap-4">
-							<Link
-								to="/find"
-								className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg shadow hover:bg-blue-50 transition"
-							>
-								🚗 Find Parking
-							</Link>
-							<Link
-								to="/register"
-								className="border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition"
-							>
-								🅿️ Become a Host
-							</Link>
-						</div>
-					</motion.div>
+export default function HomePage() {
+  const navigate = useNavigate();
+  const [quickQuery, setQuickQuery] = useState("");
+  const [activePersona, setActivePersona] = useState("driver"); // 'driver' | 'host'
 
-					<motion.div
-						variants={fadeIn(0.3)}
-						initial="hidden"
-						whileInView="show"
-						className="relative flex justify-center"
-					>
-						<motion.img
-							src={logoPng}
-							alt="Parking Finder Illustration"
-							className="w-96 drop-shadow-2xl"
-							animate={{ y: [0, -10, 0] }}
-							transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-						/>
-					</motion.div>
-				</div>
+  const handleHeroSearch = (e) => {
+    e.preventDefault();
+    if (quickQuery.trim()) {
+      navigate(`/find?search=${encodeURIComponent(quickQuery.trim())}`);
+    } else {
+      navigate("/find");
+    }
+  };
 
-				<div className="absolute inset-0 opacity-15 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-			</section>
+  const METRO_PRESETS = [
+    { label: "Connaught Place, Delhi", query: "Connaught Place" },
+    { label: "Aerocity Airport", query: "Aerocity" },
+    { label: "Cyber City, Gurugram", query: "Cyber City" },
+    { label: "Indiranagar, Bengaluru", query: "Indiranagar" },
+    { label: "BKC, Mumbai", query: "Bandra Kurla Complex" },
+    { label: "Manhattan, NYC", query: "Manhattan" },
+  ];
 
-			{/* 🌟 FEATURES SECTION */}
-			<section className="max-w-6xl mx-auto px-6 text-center">
-				<motion.h2
-					variants={fadeIn()}
-					initial="hidden"
-					whileInView="show"
-					className="text-3xl font-bold mb-10 text-gray-800"
-				>
-					Why Choose Parking Finder?
-				</motion.h2>
+  return (
+    <div className="flex flex-col space-y-24 pb-20 overflow-hidden">
+      {/* 🌇 GOOGLE STITCH HERO SECTION */}
+      <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-28 overflow-hidden">
+        {/* Ambient Gradient Background Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-tr from-blue-400/15 via-indigo-400/15 to-transparent blur-3xl pointer-events-none -z-10 rounded-full" />
 
-				<motion.div
-					variants={fadeIn(0.2)}
-					initial="hidden"
-					whileInView="show"
-					className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8"
-				>
-					{[
-						{
-							icon: <MapPin size={32} className="text-blue-600" />,
-							title: "Real-Time Availability",
-							desc: "View and reserve parking instantly near your destination.",
-						},
-						{
-							icon: <Clock size={32} className="text-blue-600" />,
-							title: "Smart Scheduling",
-							desc: "Flexible booking durations that fit your daily routine.",
-						},
-						{
-							icon: <DollarSign size={32} className="text-blue-600" />,
-							title: "Transparent Pricing",
-							desc: "Pay per use — no hidden fees, no surprises.",
-						},
-						{
-							icon: <Users size={32} className="text-blue-600" />,
-							title: "Community Driven",
-							desc: "Earn by sharing your own parking space securely.",
-						},
-					].map((f, i) => (
-						<motion.div
-							key={i}
-							whileHover={{ scale: 1.05 }}
-							className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition"
-						>
-							<div className="mb-4 flex justify-center">{f.icon}</div>
-							<h3 className="font-semibold text-lg mb-2 text-gray-800">
-								{f.title}
-							</h3>
-							<p className="text-gray-600 text-sm">{f.desc}</p>
-						</motion.div>
-					))}
-				</motion.div>
-			</section>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+          {/* Announcement Pill */}
+          <motion.div
+            variants={fadeIn(0.05)}
+            initial="hidden"
+            animate="show"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-blue-50/80 text-blue-700 border border-blue-200/60 shadow-xs mb-6 backdrop-blur-md"
+          >
+            <Sparkles size={14} className="text-blue-600 animate-spin-slow" />
+            <span>Google Stitch UI 2.0 • Real-Time Urban Parking Marketplace</span>
+          </motion.div>
 
-			{/* 🧭 HOW IT WORKS */}
-			<section className="bg-gray-50 py-16">
-				<motion.div
-					variants={fadeIn()}
-					initial="hidden"
-					whileInView="show"
-					className="max-w-5xl mx-auto px-6 text-center"
-				>
-					<h2 className="text-3xl font-bold text-gray-800 mb-10">
-						How Parking Finder Works
-					</h2>
-					<div className="grid md:grid-cols-4 gap-6">
-						{[
-							{
-								step: "Locate",
-								icon: <MapPin size={28} />,
-								desc: "Search nearby spots.",
-							},
-							{
-								step: "Book",
-								icon: <Clock size={28} />,
-								desc: "Reserve instantly.",
-							},
-							{
-								step: "Park",
-								icon: <Car size={28} />,
-								desc: "Arrive hassle-free.",
-							},
-							{
-								step: "Earn",
-								icon: <DollarSign size={28} />,
-								desc: "List & earn securely.",
-							},
-						].map((item, i) => (
-							<motion.div
-								key={i}
-								whileHover={{ y: -6 }}
-								className="bg-white p-6 rounded-lg shadow text-center transition"
-							>
-								<div className="mx-auto mb-3 flex items-center justify-center bg-blue-100 w-12 h-12 rounded-full text-blue-600">
-									{item.icon}
-								</div>
-								<h3 className="font-semibold text-lg text-gray-800">
-									{item.step}
-								</h3>
-								<p className="text-gray-600 text-sm mt-2">{item.desc}</p>
-							</motion.div>
-						))}
-					</div>
-				</motion.div>
-			</section>
+          {/* Hero Display Typography */}
+          <motion.h1
+            variants={fadeIn(0.15)}
+            initial="hidden"
+            animate="show"
+            className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.08] mb-6"
+          >
+            Find, Reserve & Park. <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500">
+              Guaranteed in Seconds.
+            </span>
+          </motion.h1>
 
-			{/* 💼 BUSINESS SECTION */}
-			<section className="max-w-6xl mx-auto px-6 text-center">
-				<motion.h2
-					variants={fadeIn()}
-					initial="hidden"
-					whileInView="show"
-					className="text-3xl font-bold text-gray-800 mb-10"
-				>
-					ParkingFinder for Businesses
-				</motion.h2>
-				<motion.div
-					variants={fadeIn(0.3)}
-					initial="hidden"
-					whileInView="show"
-					className="grid md:grid-cols-2 gap-8 items-center"
-				>
-					<img
-						src="https://images.unsplash.com/photo-1616363088386-31c4a8414858?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170"
-						alt="Corporate Parking Spaces"
-						className="rounded-xl shadow-lg"
-					/>
-					<div className="text-left space-y-4">
-						<h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-							<Building2 className="text-blue-600" /> For Corporates & Malls
-						</h3>
-						<p className="text-gray-600 leading-relaxed">
-							Manage fleets, automate parking access, and monitor occupancy with
-							real-time analytics.
-						</p>
-						<Link
-							to="/contact"
-							className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
-						>
-							Get in Touch
-						</Link>
-					</div>
-				</motion.div>
-			</section>
+          <motion.p
+            variants={fadeIn(0.25)}
+            initial="hidden"
+            animate="show"
+            className="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
+          >
+            A high-reliability two-sided mobility platform. Reserve prime parking bays with concurrency write locks, or monetize unused driveways with automated payments.
+          </motion.p>
 
-			{/* ⭐ TESTIMONIALS */}
-			<section className="bg-gray-50 py-16">
-				<motion.div
-					variants={fadeIn()}
-					initial="hidden"
-					whileInView="show"
-					className="max-w-5xl mx-auto px-6 text-center"
-				>
-					<h2 className="text-3xl font-bold mb-10 text-gray-800">
-						What Our Users Say
-					</h2>
-					<div className="grid md:grid-cols-3 gap-6">
-						{[
-							{
-								name: "Amit Sharma",
-								text: "Finding parking has never been this easy!",
-							},
-							{
-								name: "Riya Patel",
-								text: "Smooth UI and transparent prices. Love it!",
-							},
-							{
-								name: "Saurabh Mehta",
-								text: "Listed my spot and started earning within hours!",
-							},
-						].map((t, i) => (
-							<motion.div
-								key={i}
-								whileHover={{ scale: 1.05 }}
-								className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition text-gray-700"
-							>
-								<Star className="mx-auto mb-3 text-yellow-400" />
-								<p className="text-sm mb-4">“{t.text}”</p>
-								<p className="font-semibold text-gray-800">{t.name}</p>
-							</motion.div>
-						))}
-					</div>
-				</motion.div>
-			</section>
+          {/* Hero Quick Search Box */}
+          <motion.div
+            variants={fadeIn(0.35)}
+            initial="hidden"
+            animate="show"
+            className="max-w-2xl mx-auto mb-6"
+          >
+            <form
+              onSubmit={handleHeroSearch}
+              className="p-2 sm:p-2.5 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-2 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all"
+            >
+              <div className="flex items-center gap-2.5 px-3 w-full">
+                <MapPin className="text-blue-600 flex-shrink-0" size={20} />
+                <input
+                  type="text"
+                  value={quickQuery}
+                  onChange={(e) => setQuickQuery(e.target.value)}
+                  placeholder="Enter destination, area, or metro landmark..."
+                  className="w-full text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none bg-transparent"
+                />
+              </div>
 
-			{/* 📱 MOBILE CTA */}
-			<section className="bg-blue-600 text-white py-20 text-center relative overflow-hidden">
-				<motion.div
-					variants={fadeIn()}
-					initial="hidden"
-					whileInView="show"
-					className="relative z-10"
-				>
-					<Smartphone className="mx-auto mb-4" size={42} />
-					<h2 className="text-3xl font-bold mb-4">Parking Finder On the Go</h2>
-					<p className="text-blue-100 mb-6">
-						Book and manage your parking reservations anywhere with our mobile
-						app.
-					</p>
-					<div className="flex justify-center gap-4">
-						<button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition">
-							Download for iOS
-						</button>
-						<button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-blue-50 transition">
-							Download for Android
-						</button>
-					</div>
-				</motion.div>
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all flex-shrink-0"
+              >
+                <Search size={15} /> Find Spots
+              </button>
+            </form>
 
-				<motion.div
-					animate={{ y: [0, -10, 0] }}
-					transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-					className="absolute right-20 bottom-10 opacity-30"
-				>
-					<Car size={200} />
-				</motion.div>
-			</section>
-		</div>
-	);
-};
+            {/* Quick Metro Presets */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3 text-xs text-slate-500">
+              <span className="font-semibold text-slate-400 mr-1">Popular:</span>
+              {METRO_PRESETS.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => navigate(`/find?search=${encodeURIComponent(preset.query)}`)}
+                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 transition text-[11px] font-medium"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
 
-export default HomePage;
+          {/* Key Metrics Ribbon */}
+          <motion.div
+            variants={fadeIn(0.45)}
+            initial="hidden"
+            animate="show"
+            className="pt-8 max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-4"
+          >
+            {[
+              { label: "Live Metro Hubs", value: "9+ Active", icon: MapPin },
+              { label: "Booking Latency", value: "< 250ms", icon: Zap },
+              { label: "Race-Condition Risk", value: "0% Locked", icon: Lock },
+              { label: "Infrastructure Cost", value: "$0 Free Tier", icon: DollarSign },
+            ].map((stat, i) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={i}
+                  className="bg-white/80 backdrop-blur-md p-4 rounded-2xl border border-slate-200/60 shadow-xs flex flex-col items-center"
+                >
+                  <Icon className="text-blue-600 mb-1" size={18} />
+                  <p className="text-lg font-black text-slate-900">{stat.value}</p>
+                  <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                    {stat.label}
+                  </p>
+                </div>
+              );
+            })}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 🌟 DUAL-PERSPECTIVE HOW IT WORKS (STITCH STEPPER) */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
+            Engineered for Both Sides of the Market
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500">
+            Switch between driver reservation and host monetization workflows.
+          </p>
+
+          {/* Stepper Toggle */}
+          <div className="inline-flex p-1 bg-slate-100 rounded-full border border-slate-200/80 mt-5">
+            <button
+              onClick={() => setActivePersona("driver")}
+              className={`px-5 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                activePersona === "driver"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Car size={14} /> For Drivers
+            </button>
+            <button
+              onClick={() => setActivePersona("host")}
+              className={`px-5 py-2 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                activePersona === "host"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <DollarSign size={14} /> For Space Hosts
+            </button>
+          </div>
+        </div>
+
+        {/* Step Cards */}
+        {activePersona === "driver" ? (
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              {
+                step: "01",
+                title: "Locate on Map",
+                desc: "Search by address or GPS with real-time distance calculations and amenity filters.",
+                icon: MapPin,
+              },
+              {
+                step: "02",
+                title: "Select Exact Slot",
+                desc: "Dynamic availability timelines display unoccupied hours without double-booking.",
+                icon: Clock,
+              },
+              {
+                step: "03",
+                title: "Secure Reservation",
+                desc: "Atomic locks write your reservation. Choose demo booking or Stripe test checkout.",
+                icon: Lock,
+              },
+              {
+                step: "04",
+                title: "Park & Review",
+                desc: "Follow instant directions and unlock verified review gating once your booking completes.",
+                icon: Star,
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] transition-all duration-200 relative group"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-2xl font-black text-slate-200 group-hover:text-blue-500 transition-colors">
+                      {item.step}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <Icon size={18} />
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-base text-slate-800 mb-2">{item.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              {
+                step: "01",
+                title: "List Your Space",
+                desc: "Enter your address, upload spot photos, select vehicle sizes, and declare amenities.",
+                icon: MapPin,
+              },
+              {
+                step: "02",
+                title: "Set Hourly Rates",
+                desc: "Use base pricing or consult the Dynamic Pricing model to optimize peak yields.",
+                icon: TrendingUp,
+              },
+              {
+                step: "03",
+                title: "Manage Bookings",
+                desc: "Incoming reservations appear in real-time with driver identity and duration details.",
+                icon: ShieldCheck,
+              },
+              {
+                step: "04",
+                title: "One-Click Controls",
+                desc: "Toggle listing availability anytime or inspect total aggregated earnings.",
+                icon: CheckCircle2,
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={i}
+                  className="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.08)] transition-all duration-200 relative group"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-2xl font-black text-slate-200 group-hover:text-indigo-500 transition-colors">
+                      {item.step}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                      <Icon size={18} />
+                    </div>
+                  </div>
+                  <h3 className="font-bold text-base text-slate-800 mb-2">{item.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* 🚀 BENTO GRID ARCHITECTURE HIGHLIGHTS */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-xl mx-auto mb-12">
+          <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-200/60">
+            Under the Hood
+          </span>
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-3">
+            Core Architectural Differentiators
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Bento Card 1: Concurrency Safety */}
+          <div className="bg-gradient-to-br from-white to-blue-50/50 p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center mb-5 shadow-md shadow-blue-500/20">
+                <Lock size={22} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Atomic Write Lock Concurrency
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                Simultaneous booking requests execute with transactional document versioning and half-open interval checks:
+              </p>
+              <div className="bg-white p-3 rounded-xl border border-slate-200 font-mono text-[11px] text-blue-700">
+                [RequestedStart, RequestedEnd)
+              </div>
+            </div>
+            <p className="text-[11px] font-semibold text-blue-600 mt-6 flex items-center gap-1">
+              Guaranteed Zero Double-Bookings
+            </p>
+          </div>
+
+          {/* Bento Card 2: Dynamic Pricing Simulator */}
+          <div className="bg-gradient-to-br from-white to-amber-50/50 p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-5 shadow-md shadow-amber-500/20">
+                <TrendingUp size={22} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Dynamic Pricing Engine
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                Algorithmic pricing balances demand, time of day, and special event surges using a 3-factor simulator:
+              </p>
+              <div className="bg-white p-3 rounded-xl border border-slate-200 font-mono text-[11px] text-amber-700">
+                P_sim = P_base × (1 + αD + βT + γE)
+              </div>
+            </div>
+            <Link
+              to="/pricing"
+              className="text-[11px] font-bold text-amber-600 mt-6 flex items-center gap-1 hover:underline"
+            >
+              Launch Interactive Simulator →
+            </Link>
+          </div>
+
+          {/* Bento Card 3: Demand Heatmap */}
+          <div className="bg-gradient-to-br from-white to-indigo-50/50 p-8 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center mb-5 shadow-md shadow-indigo-500/20">
+                <Layers size={22} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">
+                Geospatial Demand Heatmap
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                Interactive Leaflet overlay visualizes real-time parking density and occupancy pressure across urban zones.
+              </p>
+              <div className="bg-white p-3 rounded-xl border border-slate-200 font-mono text-[11px] text-indigo-700">
+                GET /api/spots/demand-heatmap
+              </div>
+            </div>
+            <Link
+              to="/find"
+              className="text-[11px] font-bold text-indigo-600 mt-6 flex items-center gap-1 hover:underline"
+            >
+              View Live Heatmap Overlay →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ⭐ VERIFIED REVIEWS CAROUSEL */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Trusted by Urban Commuters
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Verified ratings collected exclusively after completed parking sessions.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            {
+              name: "Rahul Verma",
+              role: "Daily Commuter, Gurugram",
+              quote: "The Indiranagar EV spot had my car fully charged before my client meeting ended. Flawless reservation flow.",
+              rating: 5,
+            },
+            {
+              name: "Priya Nair",
+              role: "Driveway Host, New Delhi",
+              quote: "Monetizing my empty Hauz Khas spot brings steady income while I am at work. The host dashboard is super clean.",
+              rating: 5,
+            },
+            {
+              name: "David Chen",
+              role: "Visitor, Manhattan NYC",
+              quote: "Finding Midtown Manhattan parking for $35/hr without surprise valet fees was a lifesaver. Instant Stripe receipt.",
+              rating: 5,
+            },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="bg-white p-6 rounded-3xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex gap-1 text-amber-400 mb-3">
+                  {[...Array(item.rating)].map((_, idx) => (
+                    <Star key={idx} size={15} fill="currentColor" />
+                  ))}
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed italic mb-4">
+                  "{item.quote}"
+                </p>
+              </div>
+              <div className="border-t border-slate-100 pt-3">
+                <p className="text-xs font-bold text-slate-800">{item.name}</p>
+                <p className="text-[11px] text-slate-400">{item.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 🚀 HIGH-CONVERTING BOTTOM CTA */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-8 sm:p-12 text-center shadow-2xl overflow-hidden">
+          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+              Ready to park without the hassle?
+            </h2>
+            <p className="text-blue-100 text-xs sm:text-sm">
+              Discover active spots near your destination right now or start earning as an urban space host in under two minutes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+              <Link
+                to="/find"
+                className="bg-white text-blue-600 hover:bg-blue-50 font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2"
+              >
+                <Search size={15} /> Open Discovery Map
+              </Link>
+              <Link
+                to="/register"
+                className="bg-blue-700/60 hover:bg-blue-700 border border-blue-400/40 text-white font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2"
+              >
+                Become a Host <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Decorative Background Elements */}
+          <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute -left-10 -top-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-2xl pointer-events-none" />
+        </div>
+      </section>
+    </div>
+  );
+}
