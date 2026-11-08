@@ -1,7 +1,7 @@
 # ParkingFinder 2.0 — Smart Urban Parking Marketplace
 
 [![CI/CD Pipeline](https://github.com/Krishna200608/ParkingFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Krishna200608/ParkingFinder/actions)
-[![Tests Passing](https://img.shields.io/badge/Vitest-64%2F64%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
+[![Tests Passing](https://img.shields.io/badge/Vitest-69%2F69%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Infrastructure: Zero-Cost](https://img.shields.io/badge/Infrastructure-%240%20Free%20Tier-success)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20Shell-orange?logo=pwa&logoColor=white)](./frontend/public/manifest.json)
@@ -155,7 +155,7 @@ flowchart TD
 
 ## Automated Test Coverage
 
-The project includes 64 automated unit and integration tests across 7 comprehensive test suites executed via Vitest against a live MongoDB replica set:
+The project includes 69 automated unit and integration tests across 8 comprehensive test suites executed via Vitest against a live MongoDB replica set:
 
 | Test Suite | Scenarios Verified | Passing |
 | :--- | :--- | :--- |
@@ -166,7 +166,8 @@ The project includes 64 automated unit and integration tests across 7 comprehens
 | `test/admin.test.js` | RBAC middleware gating (401/403 rejection), aggregate platform metrics and economics, paginated user directory with search, role reassignment, self-demotion lockout prevention, spot listing suspension/activation moderation, and global booking audit trail. | **12 / 12** |
 | `test/commuter.test.js` | Commuter pass creation, 15% discount calculations, self-subscription prevention, unauthenticated rejection, pass list retrieval, pause/resume state toggling, unauthorized modification guards (403), scheduled cron renewal execution, redundant booking skipping, collision detection, and subscription cancellation. | **11 / 11** |
 | `test/realtime.test.js` | Pusher channel event triggers on reservation commit (`booking:created`), slot release on cancellation (`booking:cancelled`), host listing toggle broadcast (`spot:updated`), admin moderation broadcast, and graceful simulation fallback without keys. | **6 / 6** |
-| **Total** | **End-to-end full-stack verification across all core marketplace, administrative, scheduler, and real-time live availability workflows** | **64 / 64 Passing** |
+| `test/observability.test.js` | Sentry backend lazy initialization, silent diagnostic fallback when DSN is absent, safe error capturing without throwing, Express centralized error handling integration, and health check diagnostics. | **5 / 5** |
+| **Total** | **End-to-end full-stack verification across all core marketplace, administrative, scheduler, real-time live availability, and observability workflows** | **69 / 69 Passing** |
 
 ---
 
@@ -180,6 +181,7 @@ The project includes 64 automated unit and integration tests across 7 comprehens
 | **Animation** | Framer Motion | 12.x | Hardware-accelerated UI transitions and modal animations |
 | **Mapping** | Leaflet & React-Leaflet | 1.9.x | OpenStreetMap geospatial rendering and interactive markers |
 | **Real-Time WebSockets** | Pusher Channels & Pusher-js | 5.x / 8.x | Live availability sync, instant slot reservation broadcast |
+| **Observability & Tracing** | Sentry Node & Sentry React | 8.x | Production exception tracking, breadcrumbs, performance tracing |
 | **Geocoding** | Nominatim API | v2 | Debounced location and address search |
 | **Backend Runtime** | Node.js | 20+ / 22 LTS | High-performance asynchronous JavaScript runtime |
 | **Web Framework** | Express.js | 4.x | REST API routing and middleware composition |

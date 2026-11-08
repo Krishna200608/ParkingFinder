@@ -36,6 +36,7 @@ export default defineConfig({
           leaflet: ['leaflet', 'react-leaflet'],
           ui: ['lucide-react', 'framer-motion', 'react-hot-toast'],
           realtime: ['pusher-js', 'axios'],
+          sentry: ['@sentry/react'],
         },
       },
     },

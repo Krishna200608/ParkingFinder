@@ -1,6 +1,7 @@
 import React from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import Button from "./ui/Button";
+import { captureFrontendException } from "../utils/sentry";
 
 /**
  * Enterprise React Error Boundary.
@@ -19,6 +20,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("[React ErrorBoundary caught error]:", error, errorInfo);
+    captureFrontendException(error, errorInfo);
   }
 
   handleReset = () => {

@@ -19,6 +19,7 @@ import { processCommuterPassCron } from './controllers/commuter.controller.js';
 import { validateEnv } from './utils/validateEnv.js';
 import { logger, morganStream } from './utils/logger.js';
 import { swaggerUi, swaggerSpec } from './utils/swagger.js';
+import { initSentry, captureException } from './utils/sentry.js';
 
 // Resolve environment variables from backend/.env or root .env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +28,9 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 // Run startup environment validation
 validateEnv();
+
+// Initialize backend error monitoring & observability
+initSentry();
 
 const app = express();
 
@@ -134,8 +138,23 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/commuter', commuterRoutes);
 app.get('/api/cron/commuter-passes', processCommuterPassCron);
 
+// Diagnostic route for observability testing in test mode
+if (process.env.NODE_ENV === 'test') {
+  app.get('/api/test-error', (req, res, next) => {
+    next(new Error('Simulated unhandled runtime failure'));
+  });
+}
+
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {
+  captureException(err, {
+    user: req.user,
+    extra: {
+      path: req.originalUrl,
+      method: req.method,
+      ip: req.ip,
+    },
+  });
   logger.error(`Unhandled server error: ${err.message}`, { stack: err.stack, path: req.originalUrl, method: req.method });
   const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode).json({
