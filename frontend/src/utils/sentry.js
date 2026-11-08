@@ -46,3 +46,4 @@ export const captureFrontendException = (error, errorInfo = {}) => {
 };
 
 export { Sentry };
+

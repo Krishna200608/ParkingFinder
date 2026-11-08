@@ -39,3 +39,4 @@ export const uploadImageToCloudinary = async (file: File): Promise<string> => {
     reader.readAsDataURL(file);
   });
 };
+

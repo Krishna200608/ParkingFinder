@@ -56,3 +56,4 @@ export function calculateCommuterDuration(startTime: string, endTime: string): n
 
   return Number(((endMinutes - startMinutes) / 60).toFixed(2));
 }
+

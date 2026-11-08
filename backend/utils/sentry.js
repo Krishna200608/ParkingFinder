@@ -77,3 +77,4 @@ export const captureException = (error, context = {}) => {
 export const isSentryEnabled = () => isInitialized;
 
 export { Sentry };
+

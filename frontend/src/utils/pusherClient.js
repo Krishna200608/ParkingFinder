@@ -34,3 +34,4 @@ export const EVENTS = {
   BOOKING_CANCELLED: 'booking:cancelled',
   SPOT_UPDATED: 'spot:updated',
 };
+

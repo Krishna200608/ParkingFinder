@@ -29,3 +29,4 @@ export interface GlobalMarketplacePayload {
   spotId: string;
   action: 'reserved' | 'released' | 'status_change';
 }
+

@@ -34,3 +34,4 @@ export interface BookedInterval {
   end: string;
   bookingId?: string;
 }
+

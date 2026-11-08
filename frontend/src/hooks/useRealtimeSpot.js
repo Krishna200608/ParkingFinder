@@ -71,3 +71,4 @@ export function useRealtimeSpot(spotId, callbacks = {}) {
 }
 
 export default useRealtimeSpot;
+

@@ -48,3 +48,4 @@ export interface SpotPaginationEnvelope {
     hasMore: boolean;
   };
 }
+

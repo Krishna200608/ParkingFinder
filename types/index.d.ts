@@ -11,3 +11,4 @@ export interface ApiResponse<T = unknown> {
   error?: string;
   success?: boolean;
 }
+
