@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["vite/client", "node"]
+  },
+  "include": [
+    "types/**/*",
+    "backend/**/*.js",
+    "frontend/src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "frontend/node_modules",
+    "dist"
+  ]
+}
