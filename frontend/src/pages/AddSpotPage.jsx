@@ -29,6 +29,7 @@ import {
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import PageHeader from "../components/ui/PageHeader";
+import ImageUpload from "../components/ui/ImageUpload";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -95,6 +96,7 @@ export default function AddSpotPage() {
     vehicleSize: "any",
     amenities: [],
     accessInstructions: "",
+    images: [],
   });
 
   const [coordinates, setCoordinates] = useState(null);
@@ -373,6 +375,18 @@ export default function AddSpotPage() {
                 );
               })}
             </div>
+          </Card>
+
+          {/* Section 4: Space Photos */}
+          <Card padding="default">
+            <h2 className="text-sm font-bold text-[#0F172A] mb-3 pb-2 border-b border-[#F1F5F9]">
+              4. Space Photography & Visual Verification
+            </h2>
+            <ImageUpload
+              images={formData.images}
+              onChange={(imgs) => setFormData((prev) => ({ ...prev, images: imgs }))}
+              maxImages={5}
+            />
           </Card>
 
           {/* Submission Row */}

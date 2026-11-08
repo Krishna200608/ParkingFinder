@@ -55,10 +55,9 @@ export default function HomePage() {
   const handleUpgradeToHost = async () => {
     try {
       setIsUpgrading(true);
-      const targetUserId = userInfo?._id || userInfo?.user?._id;
       const { data } = await axios.post(
         "/api/auth/switch-role",
-        { role: "host", userId: targetUserId },
+        { role: "host" },
         { withCredentials: true }
       );
       if (data?.user) {

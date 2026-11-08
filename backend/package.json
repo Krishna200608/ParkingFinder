@@ -21,7 +21,12 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
+    "morgan": "^1.12.1",
+    "resend": "^6.37.0",
     "stripe": "^23.1.0",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {

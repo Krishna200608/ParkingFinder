@@ -108,6 +108,12 @@ export const getParkingSpots = async (req, res) => {
       sort,
     } = req.query;
 
+    // Pagination — active when client supplies page or limit query parameters
+    const isPaginated = req.query.page !== undefined || req.query.limit !== undefined;
+    const page  = Math.max(1, parseInt(req.query.page  || '1',  10));
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit || '20', 10)));
+    const skip  = (page - 1) * limit;
+
     let query = {};
 
     // 1. Geospatial "Find Near Me" query using $near with 2dsphere index
@@ -212,6 +218,34 @@ export const getParkingSpots = async (req, res) => {
       }
     }
 
+    // Count total matching documents for client-side pagination UI.
+    // Note: $near requires sorting and is rejected by countDocuments; convert to $geoWithin for counting.
+    let total = 0;
+    try {
+      let countQuery = { ...query };
+      if (countQuery.location && countQuery.location.$near) {
+        const coordinates = countQuery.location.$near.$geometry?.coordinates;
+        const maxDistance = countQuery.location.$near.$maxDistance || 50000;
+        if (coordinates) {
+          countQuery.location = {
+            $geoWithin: {
+              $centerSphere: [coordinates, maxDistance / 6378100],
+            },
+          };
+        } else {
+          delete countQuery.location;
+        }
+      }
+      total = await ParkingSpot.countDocuments(countQuery);
+    } catch (countErr) {
+      console.warn('Count query fallback:', countErr.message);
+    }
+
+    // Apply pagination if requested by client
+    if (isPaginated) {
+      spotQuery = spotQuery.skip(skip).limit(limit);
+    }
+
     let spots = await spotQuery;
 
     // Attach calculated distance in kilometers if lat/lng provided
@@ -241,6 +275,21 @@ export const getParkingSpots = async (req, res) => {
       }
     }
 
+    if (isPaginated) {
+      return res.status(200).json({
+        spots,
+        pagination: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+          hasNextPage: page * limit < total,
+          hasPrevPage: page > 1,
+        },
+      });
+    }
+
+    res.set('X-Total-Count', String(total || spots.length));
     return res.status(200).json(spots);
   } catch (error) {
     console.error('Error fetching parking spots:', error);

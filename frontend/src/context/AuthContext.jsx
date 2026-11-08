@@ -1,36 +1,32 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-// Enable credentials so cookies are sent on all axios requests
+// Enable credentials so HTTP-only cookies are sent on all axios requests
 axios.defaults.withCredentials = true;
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(() => {
+    // Hydrate from localStorage so the UI does not flash "logged out" on reload.
+    // The verifySession effect below immediately validates this against the server.
     const stored = localStorage.getItem("userInfo");
     return stored ? JSON.parse(stored) : null;
   });
   const [loading, setLoading] = useState(true);
 
-  // Synchronize user session from HTTP-only cookie on mount
+  // On mount: validate the HTTP-only cookie by hitting /api/auth/profile.
+  // This is the single authoritative session check — no token in localStorage needed.
   useEffect(() => {
-    const storedToken = localStorage.getItem("authToken");
-    if (storedToken) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-    }
-
     const verifySession = async () => {
       try {
         const { data } = await axios.get("/api/auth/profile", { withCredentials: true });
         setUserInfo(data);
         localStorage.setItem("userInfo", JSON.stringify(data));
       } catch {
-        // If cookie is invalid or absent, clear cached user info
+        // Cookie absent or expired — clear any stale cached state
         setUserInfo(null);
         localStorage.removeItem("userInfo");
-        localStorage.removeItem("authToken");
-        delete axios.defaults.headers.common["Authorization"];
       } finally {
         setLoading(false);
       }
@@ -38,29 +34,20 @@ export const AuthProvider = ({ children }) => {
     verifySession();
   }, []);
 
-  // Called after login / registration / role-switch
+  /**
+   * Called after a successful login, registration, or role-switch response.
+   * Stores only the user object for UI hydration — the JWT is kept in the
+   * HTTP-only cookie set by the server and never stored in JavaScript-accessible storage.
+   */
   const login = (data) => {
     const user = data?.user || data;
-    const token = data?.token;
     if (user?._id) {
       localStorage.setItem("userInfo", JSON.stringify(user));
       setUserInfo(user);
     }
-    if (token) {
-      localStorage.setItem("authToken", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
   };
 
-  // Backwards-compatible helper
-  const setAuthToken = (token) => {
-    if (token) {
-      localStorage.setItem("authToken", token);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-  };
-
-  // Logout clears server-side cookie and local state
+  /** Clears server-side cookie and all local state. */
   const logout = async () => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
@@ -68,8 +55,6 @@ export const AuthProvider = ({ children }) => {
       console.warn("Logout request failed:", err.message);
     }
     localStorage.removeItem("userInfo");
-    localStorage.removeItem("authToken");
-    delete axios.defaults.headers.common["Authorization"];
     setUserInfo(null);
   };
 
@@ -80,7 +65,6 @@ export const AuthProvider = ({ children }) => {
         setUserInfo,
         login,
         logout,
-        setAuthToken,
         loading,
       }}
     >

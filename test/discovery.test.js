@@ -246,6 +246,22 @@ describe('Stage 4: Parking Discovery, Geocoding & Filters Suite', () => {
     expect(updatedSpot.rating).toBe(5);
   });
 
+  it('supports pagination with page and limit parameters returning envelope metadata', async () => {
+    const res = await request(app)
+      .get('/api/spots')
+      .query({ page: 1, limit: 2 });
+
+    expect(res.status).toBe(200);
+    expect(res.body.spots).toBeDefined();
+    expect(Array.isArray(res.body.spots)).toBe(true);
+    expect(res.body.spots.length).toBeLessThanOrEqual(2);
+    expect(res.body.pagination).toBeDefined();
+    expect(res.body.pagination.page).toBe(1);
+    expect(res.body.pagination.limit).toBe(2);
+    expect(res.body.pagination.total).toBeGreaterThanOrEqual(3);
+    expect(res.body.pagination.totalPages).toBeGreaterThanOrEqual(2);
+  });
+
   it('runs demo seed endpoint idempotently', async () => {
     const res = await request(app).post('/api/spots/seed');
     expect([200, 201]).toContain(res.status);

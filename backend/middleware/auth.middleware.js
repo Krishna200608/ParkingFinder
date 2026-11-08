@@ -38,8 +38,8 @@ export const protect = async (req, res, next) => {
 };
 
 /**
- * Flexible session middleware that authenticates via cookie, bearer header,
- * or fallback authenticated client userId.
+ * Flexible session middleware that authenticates via HTTP-only cookie or
+ * Authorization Bearer header. No unauthenticated fallbacks are permitted.
  */
 export const allowSessionOrUser = async (req, res, next) => {
   let token;
@@ -55,21 +55,7 @@ export const allowSessionOrUser = async (req, res, next) => {
       req.user = await User.findById(decoded.userId).select('-password');
       if (req.user) return next();
     } catch {
-      // Continue to fallback
-    }
-  }
-
-  // Fallback to client userId if cookie is restricted by browser policy
-  const fallbackId = req.body?.userId;
-  if (fallbackId) {
-    try {
-      const user = await User.findById(fallbackId).select('-password');
-      if (user) {
-        req.user = user;
-        return next();
-      }
-    } catch {
-      // Fall through
+      // Token invalid or expired — fall through to 401
     }
   }
 

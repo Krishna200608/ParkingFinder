@@ -30,6 +30,7 @@ import BookingModal from "../components/booking/BookingModal";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { Badge, StatusBadge } from "../components/ui/Badge";
+import { SpotDetailSkeleton } from "../components/ui/Skeleton";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -182,12 +183,7 @@ export default function SpotDetailsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-3">
-        <div className="w-8 h-8 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-[#334155]">Loading parking space details...</p>
-      </div>
-    );
+    return <SpotDetailSkeleton />;
   }
 
   if (!spot) {

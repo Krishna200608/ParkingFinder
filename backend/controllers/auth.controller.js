@@ -115,38 +115,146 @@ export const getUserProfile = async (req, res) => {
       username: user.username,
       email: user.email,
       role: user.role,
+      phone: user.phone || '',
+      avatarUrl: user.avatarUrl || '',
+      vehicleInfo: user.vehicleInfo || { make: '', model: '', licensePlate: '' },
+      favorites: user.favorites || [],
     });
   }
 
   return res.status(404).json({ message: 'User not found' });
 };
 
-// @desc    Switch user role between driver and host
-// @route   POST /api/auth/switch-role
-// @access  Private (or authenticated session fallback)
-export const switchUserRole = async (req, res) => {
+// @desc    Update current user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateUserProfile = async (req, res) => {
   try {
-    const userId = req.user?._id || req.body?.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'Authentication required to switch account role' });
-    }
-
-    const user = await User.findById(userId);
+    const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { role } = req.body;
-    const targetRole = role === 'driver' ? 'driver' : 'host';
+    const { username, phone, avatarUrl, vehicleInfo } = req.body;
 
-    user.role = targetRole;
+    if (username && username.trim() !== user.username) {
+      const existing = await User.findOne({ username: username.trim() });
+      if (existing && existing._id.toString() !== user._id.toString()) {
+        return res.status(400).json({ message: 'Username is already taken' });
+      }
+      user.username = username.trim();
+    }
+
+    if (phone !== undefined) user.phone = phone.trim();
+    if (avatarUrl !== undefined) user.avatarUrl = avatarUrl;
+    if (vehicleInfo) {
+      user.vehicleInfo = {
+        make: (vehicleInfo.make ?? user.vehicleInfo?.make ?? '').trim(),
+        model: (vehicleInfo.model ?? user.vehicleInfo?.model ?? '').trim(),
+        licensePlate: (vehicleInfo.licensePlate ?? user.vehicleInfo?.licensePlate ?? '').trim(),
+      };
+    }
+
+    const updatedUser = await user.save();
+
+    return res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        phone: updatedUser.phone,
+        avatarUrl: updatedUser.avatarUrl,
+        vehicleInfo: updatedUser.vehicleInfo,
+        favorites: updatedUser.favorites,
+      },
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    return res.status(500).json({ message: 'Failed to update user profile' });
+  }
+};
+
+// @desc    Get user favorite parking spots
+// @route   GET /api/auth/favorites
+// @access  Private
+export const getUserFavorites = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('favorites');
+    return res.status(200).json(user?.favorites || []);
+  } catch (error) {
+    console.error('Get favorites error:', error);
+    return res.status(500).json({ message: 'Failed to retrieve favorites' });
+  }
+};
+
+// @desc    Add a spot to user favorites
+// @route   POST /api/auth/favorites/:spotId
+// @access  Private
+export const addFavoriteSpot = async (req, res) => {
+  try {
+    const { spotId } = req.params;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $addToSet: { favorites: spotId } },
+      { new: true }
+    ).select('favorites');
+
+    return res.status(200).json({
+      message: 'Spot added to favorites',
+      favorites: user?.favorites || [],
+    });
+  } catch (error) {
+    console.error('Add favorite error:', error);
+    return res.status(500).json({ message: 'Failed to add favorite' });
+  }
+};
+
+// @desc    Remove a spot from user favorites
+// @route   DELETE /api/auth/favorites/:spotId
+// @access  Private
+export const removeFavoriteSpot = async (req, res) => {
+  try {
+    const { spotId } = req.params;
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { favorites: spotId } },
+      { new: true }
+    ).select('favorites');
+
+    return res.status(200).json({
+      message: 'Spot removed from favorites',
+      favorites: user?.favorites || [],
+    });
+  } catch (error) {
+    console.error('Remove favorite error:', error);
+    return res.status(500).json({ message: 'Failed to remove favorite' });
+  }
+};
+
+// @desc    Switch user role between driver and host
+// @route   POST /api/auth/switch-role
+// @access  Private (requires valid session cookie or Bearer token)
+export const switchUserRole = async (req, res) => {
+  try {
+    // req.user is guaranteed by the allowSessionOrUser middleware
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Role is validated upstream by switchRoleSchema — only 'driver' | 'host' allowed
+    const { role } = req.body;
+
+    user.role = role;
     await user.save();
 
-    // Re-issue fresh JWT cookie
+    // Re-issue fresh JWT cookie with updated role claim
     const token = generateToken(res, user._id);
 
     return res.status(200).json({
-      message: `Account role updated to ${targetRole === 'host' ? 'Host' : 'Driver'} successfully.`,
+      message: `Account role updated to ${role === 'host' ? 'Host' : 'Driver'} successfully.`,
       token,
       user: {
         _id: user._id,

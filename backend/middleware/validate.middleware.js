@@ -60,3 +60,14 @@ export const loginSchema = z.object({
     .string({ required_error: 'Password is required' })
     .min(1, 'Password is required'),
 });
+
+/**
+ * Validates the body of POST /api/auth/switch-role.
+ * Strictly restricts the target role to 'driver' or 'host'.
+ * Switching to 'admin' via this endpoint is intentionally disallowed.
+ */
+export const switchRoleSchema = z.object({
+  role: z.enum(['driver', 'host'], {
+    errorMap: () => ({ message: "Role must be either 'driver' or 'host'" }),
+  }),
+});

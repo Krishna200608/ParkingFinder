@@ -26,6 +26,7 @@ import { Badge, StatusBadge } from "../components/ui/Badge";
 import PageHeader from "../components/ui/PageHeader";
 import Tabs from "../components/ui/Tabs";
 import EmptyState from "../components/ui/EmptyState";
+import { CardSkeleton } from "../components/ui/Skeleton";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -148,9 +149,8 @@ export default function DashboardPage() {
       {activeTab === "bookings" && (
         <>
           {loading ? (
-            <div className="py-20 text-center text-sm text-[#334155]">
-              <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              Loading your parking reservations...
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <CardSkeleton count={6} />
             </div>
           ) : bookings.length === 0 ? (
             <EmptyState

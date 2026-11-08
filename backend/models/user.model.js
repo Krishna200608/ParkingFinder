@@ -26,7 +26,26 @@ const userSchema = new mongoose.Schema({
     enum: ['driver', 'host', 'admin'], // 'driver' finds parking, 'host' lists parking (for P2P)
     default: 'driver',
   },
-  // We can add more details later, like vehicle info, payment methods, etc.
+  favorites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ParkingSpot',
+    },
+  ],
+  phone: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  avatarUrl: {
+    type: String,
+    default: '',
+  },
+  vehicleInfo: {
+    make: { type: String, default: '', trim: true },
+    model: { type: String, default: '', trim: true },
+    licensePlate: { type: String, default: '', trim: true },
+  },
 }, {
   timestamps: true, // Adds createdAt and updatedAt
 });

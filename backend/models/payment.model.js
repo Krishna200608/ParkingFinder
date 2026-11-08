@@ -13,6 +13,14 @@ const paymentSchema = new mongoose.Schema(
       required: [true, 'Associated booking reference is required'],
       index: true,
     },
+    paymentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      index: true,
+      default: () => `PND-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -66,6 +74,14 @@ const paymentSchema = new mongoose.Schema(
 );
 
 paymentSchema.index({ user: 1, createdAt: -1 });
+
+// Ensure paymentId is populated before saving
+paymentSchema.pre('save', function (next) {
+  if (!this.paymentId) {
+    this.paymentId = `PND-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  }
+  next();
+});
 
 const Payment = mongoose.model('Payment', paymentSchema);
 export default Payment;

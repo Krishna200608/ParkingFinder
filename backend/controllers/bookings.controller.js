@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import Booking from '../models/booking.model.js';
 import ParkingSpot from '../models/parkingSpot.model.js';
+import {
+  sendBookingConfirmationEmail,
+  sendHostBookingNotificationEmail,
+  sendCancellationEmail,
+} from '../utils/email.js';
 
 // Helper function for consistent error responses
 const handleError = (res, statusCode, message, errors = null) => {
@@ -205,6 +210,38 @@ export const createBooking = async (req, res) => {
       const savedBooking = await booking.save(opts);
       return savedBooking;
     });
+
+    // Send asynchronous confirmation and notification emails (non-blocking)
+    (async () => {
+      try {
+        const spot = await ParkingSpot.findById(result.spot).populate('owner', 'username email');
+        if (req.user?.email) {
+          sendBookingConfirmationEmail({
+            to: req.user.email,
+            driverName: req.user.username,
+            spotTitle: spot?.title || 'Reserved Parking Bay',
+            address: spot?.address || '',
+            startTime: result.startTime,
+            endTime: result.endTime,
+            totalCost: result.totalCost || result.totalAmount,
+            bookingId: result._id.toString(),
+          }).catch(() => {});
+        }
+        if (spot?.owner?.email) {
+          sendHostBookingNotificationEmail({
+            to: spot.owner.email,
+            hostName: spot.owner.username,
+            spotTitle: spot.title,
+            driverName: req.user.username,
+            startTime: result.startTime,
+            endTime: result.endTime,
+            totalEarnings: result.totalCost || result.totalAmount,
+          }).catch(() => {});
+        }
+      } catch {
+        // Never interrupt client response on email notification failure
+      }
+    })();
 
     return res.status(201).json({
       message: 'Reservation created successfully (Demo Reservation)',
@@ -457,6 +494,25 @@ export const cancelBooking = async (req, res) => {
     booking.cancellationReason = req.body.reason || 'Cancelled by driver';
 
     const updatedBooking = await booking.save();
+
+    // Send cancellation notification email asynchronously (non-blocking)
+    (async () => {
+      try {
+        const spot = await ParkingSpot.findById(booking.spot);
+        if (req.user?.email) {
+          sendCancellationEmail({
+            to: req.user.email,
+            recipientName: req.user.username,
+            spotTitle: spot?.title || 'Parking Space',
+            startTime: booking.startTime,
+            endTime: booking.endTime,
+            reason: booking.cancellationReason,
+          }).catch(() => {});
+        }
+      } catch {
+        // Never interrupt client response on email notification failure
+      }
+    })();
 
     return res.status(200).json({
       message: 'Reservation cancelled successfully',

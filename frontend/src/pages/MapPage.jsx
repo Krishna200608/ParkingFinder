@@ -15,6 +15,9 @@ import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useAuth } from "../context/AuthContext";
+import { useGeolocation } from "../hooks/useGeolocation";
+import { useFavorites } from "../hooks/useFavorites";
+import { useSpotSearch } from "../hooks/useSpotSearch";
 import BookingModal from "../components/booking/BookingModal";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
@@ -37,6 +40,8 @@ import {
   Map as MapIcon,
   RefreshCw,
   X,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // Fix Leaflet default marker icons in Vite
@@ -80,16 +85,17 @@ export default function MapPage() {
   const [searchParams] = useSearchParams();
   const { userInfo } = useAuth();
 
-  const [spots, setSpots] = useState([]);
+  // Custom Hooks: Geolocation, Favorites, and Spot Discovery
+  const { position, setPosition, getCurrentLocation } = useGeolocation([28.6139, 77.209]);
+  const { favorites: savedFavorites, toggleFavorite } = useFavorites(userInfo);
+
   const [selectedSpot, setSelectedSpot] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [bookingSpot, setBookingSpot] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [position, setPosition] = useState([28.6139, 77.209]); // Default: Delhi Connaught Place
   const [radiusKm, setRadiusKm] = useState(15);
   const [zoom, setZoom] = useState(13);
 
-  // Filters & Search
+  // Filters & Search State
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [locationSearch, setLocationSearch] = useState("");
   const [locationResults, setLocationResults] = useState([]);
@@ -99,7 +105,6 @@ export default function MapPage() {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [sortBy, setSortBy] = useState("distance");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [savedFavorites, setSavedFavorites] = useState([]);
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [heatmapPoints, setHeatmapPoints] = useState([]);
@@ -112,34 +117,26 @@ export default function MapPage() {
   const cardRefs = useRef({});
   const searchTimeoutRef = useRef(null);
 
-  // Load favorites from localStorage
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem("parkingfinder_saved_spots") || "[]"
-      );
-      setSavedFavorites(saved);
-    } catch {
-      setSavedFavorites([]);
-    }
-  }, []);
-
-  const toggleFavorite = (spotId) => {
-    try {
-      let updated;
-      if (savedFavorites.includes(spotId)) {
-        updated = savedFavorites.filter((id) => id !== spotId);
-        toast("Removed from favorites");
-      } else {
-        updated = [...savedFavorites, spotId];
-        toast.success("Saved to favorites!");
-      }
-      setSavedFavorites(updated);
-      localStorage.setItem("parkingfinder_saved_spots", JSON.stringify(updated));
-    } catch (e) {
-      console.error("Error updating favorites:", e);
-    }
-  };
+  // Hook-managed Spot Discovery Query & Pagination
+  const {
+    spots,
+    isLoading,
+    currentPage,
+    pagination,
+    fetchSpots,
+    spotsPerPage: SPOTS_PER_PAGE,
+  } = useSpotSearch({
+    position,
+    radiusKm,
+    maxPrice,
+    spotType,
+    vehicleSize,
+    selectedAmenities,
+    searchQuery,
+    sortBy,
+    showFavoritesOnly,
+    favorites: savedFavorites,
+  });
 
   // Toggle heatmap overlay
   const toggleHeatmap = async () => {
@@ -155,62 +152,6 @@ export default function MapPage() {
       }
     }
   };
-
-  // Fetch spots with filters
-  const fetchSpots = useCallback(async () => {
-    try {
-      if (!position) return;
-      setIsLoading(true);
-      const radiusMeters = radiusKm * 1000;
-
-      const params = {
-        lat: position[0],
-        lng: position[1],
-        radius: radiusMeters,
-        maxPrice: maxPrice < 50 ? maxPrice : undefined,
-        spotType: spotType !== "all" ? spotType : undefined,
-        vehicleSize: vehicleSize !== "any" ? vehicleSize : undefined,
-        amenities:
-          selectedAmenities.length > 0
-            ? selectedAmenities.join(",")
-            : undefined,
-        search: searchQuery.trim() || undefined,
-        sort: sortBy,
-      };
-
-      const { data } = await axios.get("/api/spots", {
-        params,
-        withCredentials: true,
-      });
-
-      let filtered = Array.isArray(data) ? data : [];
-      if (showFavoritesOnly) {
-        filtered = filtered.filter((s) => savedFavorites.includes(s._id));
-      }
-
-      setSpots(filtered);
-    } catch (err) {
-      console.error("Failed to fetch spots:", err);
-      toast.error("Unable to load spots");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [
-    position,
-    radiusKm,
-    maxPrice,
-    spotType,
-    vehicleSize,
-    selectedAmenities,
-    searchQuery,
-    sortBy,
-    showFavoritesOnly,
-    savedFavorites,
-  ]);
-
-  useEffect(() => {
-    fetchSpots();
-  }, [fetchSpots]);
 
   // Adjust zoom dynamically when radius changes
   useEffect(() => {
@@ -265,30 +206,15 @@ export default function MapPage() {
     }
   };
 
-  // GPS My Location
+  // GPS My Location using useGeolocation hook
   const getUserLocation = () => {
-    if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const coords = [pos.coords.latitude, pos.coords.longitude];
-        setPosition(coords);
-        setLocationSearch("Current Location");
-        setLocationResults([]);
-        if (mapRef.current) {
-          mapRef.current.flyTo(coords, 14, { duration: 1.0 });
-        }
-        toast.success("Centered on your current location");
-      },
-      (err) => {
-        console.warn("Location error:", err);
-        toast.error("Could not obtain location. Check browser permissions.");
-      },
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
+    getCurrentLocation((coords) => {
+      setLocationSearch("Current Location");
+      setLocationResults([]);
+      if (mapRef.current) {
+        mapRef.current.flyTo(coords, 14, { duration: 1.0 });
+      }
+    });
   };
 
   // Seed demo spots
@@ -680,15 +606,15 @@ export default function MapPage() {
           <div className="px-4 py-3 border-b border-[#DDE3EA] flex items-center justify-between bg-[#F8FAFC]">
             <div>
               <span className="text-xs font-semibold text-[#0F172A]">
-                {spots.length} spaces available
+                {pagination ? `${pagination.total} spaces available` : `${spots.length} spaces available`}
               </span>
               <span className="text-[11px] text-[#475569] font-medium ml-1.5">
-                within {radiusKm} km
+                within {radiusKm} km {pagination && pagination.totalPages > 1 && `(Page ${currentPage}/${pagination.totalPages})`}
               </span>
             </div>
             <button
               type="button"
-              onClick={fetchSpots}
+              onClick={() => fetchSpots(currentPage)}
               className="p-1 text-[#475569] hover:text-[#2563EB] transition rounded hover:bg-white cursor-pointer"
               title="Refresh spots"
             >
@@ -890,6 +816,46 @@ export default function MapPage() {
               })
             )}
           </div>
+
+          {/* Pagination Controls Footer */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="px-4 py-2.5 border-t border-[#DDE3EA] bg-[#F8FAFC] flex items-center justify-between text-xs shrink-0">
+              <span className="text-[#475569] font-medium text-[11px]">
+                Showing {(currentPage - 1) * SPOTS_PER_PAGE + 1}–{Math.min(currentPage * SPOTS_PER_PAGE, pagination.total)} of {pagination.total}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!pagination.hasPrevPage || isLoading}
+                  onClick={() => {
+                    const prev = currentPage - 1;
+                    fetchSpots(prev);
+                  }}
+                  className="px-2 py-1 text-[11px] h-7 flex items-center gap-1"
+                >
+                  <ChevronLeft size={13} />
+                  Prev
+                </Button>
+                <span className="px-2 text-[11px] font-semibold text-[#0F172A]">
+                  {currentPage} / {pagination.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!pagination.hasNextPage || isLoading}
+                  onClick={() => {
+                    const next = currentPage + 1;
+                    fetchSpots(next);
+                  }}
+                  className="px-2 py-1 text-[11px] h-7 flex items-center gap-1"
+                >
+                  Next
+                  <ChevronRight size={13} />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* RIGHT: LEAFLET MAP */}

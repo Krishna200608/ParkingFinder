@@ -7,18 +7,30 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import morgan from 'morgan';
 
 import authRoutes from './routes/auth.routes.js';
 import spotRoutes from './routes/spots.routes.js';
 import bookingRoutes from './routes/bookings.routes.js';
 import paymentRoutes from './routes/payments.routes.js';
+import { validateEnv } from './utils/validateEnv.js';
+import { logger, morganStream } from './utils/logger.js';
+import { swaggerUi, swaggerSpec } from './utils/swagger.js';
 
 // Resolve environment variables from backend/.env or root .env
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
+// Run startup environment validation
+validateEnv();
+
 const app = express();
+
+// HTTP request logging via Morgan + Winston (silent in automated test runs)
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan(':method :url :status :response-time ms - :res[content-length]', { stream: morganStream }));
+}
 
 // 1. HTTP Security Headers
 app.use(helmet());
@@ -96,6 +108,10 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Interactive OpenAPI 3.0 Documentation UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/api/docs.json', (req, res) => res.status(200).json(swaggerSpec));
+
 // Root API test route
 app.get('/api', (req, res) => {
   res.status(200).json({ message: 'Parking Finder API is active' });
@@ -114,7 +130,7 @@ app.use('/api/payments', paymentRoutes);
 
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {
-  console.error('Unhandled server error:', err.message);
+  logger.error(`Unhandled server error: ${err.message}`, { stack: err.stack, path: req.originalUrl, method: req.method });
   const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode).json({
     message: err.message || 'Internal Server Error',

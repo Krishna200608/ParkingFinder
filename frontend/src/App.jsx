@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HostRoute from "./components/HostRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
@@ -38,32 +39,34 @@ export default function App() {
       <Header />
 
       <main className={isMapRoute ? "flex-1 w-full min-h-0 relative" : "flex-grow w-full"}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/find" element={<MapPage />} />
-          <Route path="/spots/:id" element={<SpotDetailsPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+        <ErrorBoundary key={location.pathname}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/find" element={<MapPage />} />
+            <Route path="/spots/:id" element={<SpotDetailsPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/contact" element={<ContactPage />} />
 
-          {/* Driver Protected Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/checkout-simulator" element={<CheckoutSimulatorPage />} />
-            <Route path="/booking-success" element={<BookingSuccessPage />} />
-          </Route>
+            {/* Driver Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/checkout-simulator" element={<CheckoutSimulatorPage />} />
+              <Route path="/booking-success" element={<BookingSuccessPage />} />
+            </Route>
 
-          {/* Host Protected Routes */}
-          <Route element={<HostRoute />}>
-            <Route path="/host/dashboard" element={<HostDashboardPage />} />
-            <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
-            <Route path="/host/add-spot" element={<AddSpotPage />} />
-          </Route>
-        </Routes>
+            {/* Host Protected Routes */}
+            <Route element={<HostRoute />}>
+              <Route path="/host/dashboard" element={<HostDashboardPage />} />
+              <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
+              <Route path="/host/add-spot" element={<AddSpotPage />} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
       </main>
 
       <Toaster
