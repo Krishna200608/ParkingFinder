@@ -12,6 +12,9 @@ const hasCertificates = fs.existsSync(keyPath) && fs.existsSync(certPath)
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  optimizeDeps: {
+    include: ['pusher-js'],
+  },
   server: {
     port: 3000,
     https: hasCertificates
