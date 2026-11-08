@@ -34,9 +34,13 @@ A two-sided parking marketplace connecting drivers with urban hosts, featuring a
 | :---: | :---: |
 | ![Homepage](screenshots/homepage.png)<br><sub>Landing page with metro search presets and dynamic pricing simulator link</sub> | ![Map Page](screenshots/map-page.png)<br><sub>Interactive Leaflet map with radius filtering and spot details</sub> |
 
-| Driver and Host Dashboard | User Account Management |
+| Driver and Host Dashboard | Dynamic Pricing Simulator |
 | :---: | :---: |
-| ![Dashboard](screenshots/dashboard.png)<br><sub>Unified dashboard for reservation management, payments, and commuter passes</sub> | ![Profile](screenshots/profile.png)<br><sub>User profile with role switching between driver and host</sub> |
+| ![Dashboard](screenshots/dashboard.png)<br><sub>Unified dashboard for reservation management, payments, and commuter passes</sub> | ![Pricing Simulator](screenshots/pricing.png)<br><sub>Algorithmic pricing tiers and dynamic revenue simulation model</sub> |
+
+| User Account Settings |
+| :---: |
+| ![Profile](screenshots/profile.png)<br><sub>User profile with role switching between driver and host</sub> |
 
 * [Watch the Driver Walkthrough (MP4)](screenshots/Driver_small.mp4)
 * [Watch the Host Walkthrough (MP4)](screenshots/host_small.mp4)
