@@ -111,7 +111,7 @@ While the foundational architecture (React + Vite + Tailwind + Express + Mongoos
     12:41  error  '__dirname' is not defined  no-undef
     13:42  error  '__dirname' is not defined  no-undef
 
-  ✖ 13 problems (9 errors, 4 warnings)
+  X 13 problems (9 errors, 4 warnings)
   ```
 
 ### 4.2 Frontend Production Build (`npm run build --prefix frontend`)
