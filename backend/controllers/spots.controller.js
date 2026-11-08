@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import ParkingSpot from '../models/parkingSpot.model.js';
 import User from '../models/user.model.js';
 import Booking from '../models/booking.model.js';
@@ -540,9 +541,36 @@ export const getMyParkingSpots = async (req, res) => {
 
 // @desc    Seed realistic demo spots for discovery and live demonstrations
 // @route   POST /api/spots/seed
-// @access  Public (Idempotent seed helper)
+// @access  Restricted in production (Admin only); open in development/test
 export const seedDemoSpots = async (req, res) => {
   try {
+    // Disable in production unless explicitly executed by an authenticated administrator
+    if (process.env.NODE_ENV === 'production') {
+      const authHeader = req.headers.authorization;
+      const cookieToken = req.cookies?.jwt;
+      const token = cookieToken || (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
+
+      if (!token) {
+        return res.status(403).json({
+          message: 'Database seeding is disabled in production. Administrator privileges required.',
+        });
+      }
+
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if (!user || user.role !== 'admin') {
+          return res.status(403).json({
+            message: 'Database seeding is disabled in production. Administrator privileges required.',
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          message: 'Database seeding is disabled in production. Invalid or expired administrator credentials.',
+        });
+      }
+    }
+
     const spotCount = await ParkingSpot.countDocuments();
     if (spotCount > 0 && req.query.force !== 'true') {
       return res.status(200).json({

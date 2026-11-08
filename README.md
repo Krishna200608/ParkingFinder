@@ -231,7 +231,7 @@ Interactive OpenAPI 3.0 documentation is available at `/api-docs` (Swagger UI) w
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/spots` | Public | Geospatial discovery with filters (`lat`, `lng`, `radius`, `amenities`) |
 | `GET` | `/api/spots/demand-heatmap` | Public | Regional demand density coordinates |
-| `POST` | `/api/spots/seed` | Public | Seed default metro spots idempotently |
+| `POST` | `/api/spots/seed` | Admin in Prod / Dev | Seed default metro spots (gated behind Admin in production) |
 | `GET` | `/api/spots/my` | Host Only | Return host's listings with aggregated earnings |
 | `GET` | `/api/spots/:id` | Public | Return spot details, host info, and verified reviews |
 | `POST` | `/api/spots` | Host Only | Create listing with coordinates and amenities |
