@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "morgan": "^1.12.1",
+    "pusher": "^5.3.4",
     "resend": "^6.37.0",
     "stripe": "^23.1.0",
     "swagger-jsdoc": "^6.3.0",

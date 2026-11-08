@@ -1,6 +1,7 @@
 import ParkingSpot from '../models/parkingSpot.model.js';
 import User from '../models/user.model.js';
 import Booking from '../models/booking.model.js';
+import { triggerLiveEvent, CHANNELS, EVENTS } from '../utils/pusher.js';
 
 // Helper function for handling errors
 const handleError = (res, statusCode, message) => {
@@ -373,6 +374,18 @@ export const updateParkingSpot = async (req, res) => {
     }
 
     const updatedSpot = await spot.save();
+
+    // Broadcast spot availability modification in real time
+    triggerLiveEvent(CHANNELS.spotChannel(updatedSpot._id), EVENTS.SPOT_UPDATED, {
+      spotId: updatedSpot._id,
+      isAvailable: updatedSpot.isAvailable,
+      pricePerHour: updatedSpot.pricePerHour,
+    });
+    triggerLiveEvent(CHANNELS.GLOBAL_MARKETPLACE, EVENTS.SPOT_UPDATED, {
+      spotId: updatedSpot._id,
+      isAvailable: updatedSpot.isAvailable,
+    });
+
     return res.status(200).json(updatedSpot);
   } catch (error) {
     console.error('Error updating parking spot:', error);

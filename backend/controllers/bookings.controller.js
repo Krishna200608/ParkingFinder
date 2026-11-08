@@ -6,6 +6,7 @@ import {
   sendHostBookingNotificationEmail,
   sendCancellationEmail,
 } from '../utils/email.js';
+import { triggerLiveEvent, CHANNELS, EVENTS } from '../utils/pusher.js';
 
 // Helper function for consistent error responses
 const handleError = (res, statusCode, message, errors = null) => {
@@ -242,6 +243,19 @@ export const createBooking = async (req, res) => {
         // Never interrupt client response on email notification failure
       }
     })();
+
+    // Broadcast real-time availability update across Pusher Channels
+    triggerLiveEvent(CHANNELS.spotChannel(result.spot), EVENTS.BOOKING_CREATED, {
+      spotId: result.spot.toString(),
+      bookingId: result._id.toString(),
+      startTime: result.startTime,
+      endTime: result.endTime,
+      status: 'confirmed',
+    });
+    triggerLiveEvent(CHANNELS.GLOBAL_MARKETPLACE, EVENTS.BOOKING_CREATED, {
+      spotId: result.spot.toString(),
+      action: 'reserved',
+    });
 
     return res.status(201).json({
       message: 'Reservation created successfully (Demo Reservation)',
@@ -513,6 +527,17 @@ export const cancelBooking = async (req, res) => {
         // Never interrupt client response on email notification failure
       }
     })();
+
+    // Broadcast real-time slot release across Pusher Channels
+    triggerLiveEvent(CHANNELS.spotChannel(booking.spot), EVENTS.BOOKING_CANCELLED, {
+      spotId: booking.spot,
+      bookingId: booking._id,
+      status: 'cancelled',
+    });
+    triggerLiveEvent(CHANNELS.GLOBAL_MARKETPLACE, EVENTS.BOOKING_CANCELLED, {
+      spotId: booking.spot,
+      action: 'released',
+    });
 
     return res.status(200).json({
       message: 'Reservation cancelled successfully',

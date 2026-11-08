@@ -108,3 +108,4 @@ commuterPassSchema.index({ status: 1, daysOfWeek: 1 });
 
 const CommuterPass = mongoose.model('CommuterPass', commuterPassSchema);
 export default CommuterPass;
+

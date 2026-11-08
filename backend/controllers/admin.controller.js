@@ -3,6 +3,7 @@ import ParkingSpot from '../models/parkingSpot.model.js';
 import Booking from '../models/booking.model.js';
 import Payment from '../models/payment.model.js';
 import { logger } from '../utils/logger.js';
+import { triggerLiveEvent, CHANNELS, EVENTS } from '../utils/pusher.js';
 
 /**
  * Platform Analytics & Executive Metrics Aggregation
@@ -377,6 +378,16 @@ export const updateSpotStatus = async (req, res) => {
 
     spot.isAvailable = isAvailable;
     await spot.save();
+
+    // Broadcast spot moderation change across real-time channels
+    triggerLiveEvent(CHANNELS.spotChannel(spot._id), EVENTS.SPOT_UPDATED, {
+      spotId: spot._id,
+      isAvailable,
+    });
+    triggerLiveEvent(CHANNELS.GLOBAL_MARKETPLACE, EVENTS.SPOT_UPDATED, {
+      spotId: spot._id,
+      isAvailable,
+    });
 
     logger.info(`Admin toggled spot status: ${spot._id} isAvailable=${isAvailable}`, {
       adminId: req.user._id,

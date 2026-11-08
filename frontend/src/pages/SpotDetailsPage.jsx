@@ -28,6 +28,7 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useAuth } from "../context/AuthContext";
 import BookingModal from "../components/booking/BookingModal";
 import CommuterPassModal from "../components/commuter/CommuterPassModal";
+import { useRealtimeSpot } from "../hooks/useRealtimeSpot";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { Badge, StatusBadge } from "../components/ui/Badge";
@@ -151,6 +152,21 @@ export default function SpotDetailsPage() {
       console.error("Failed to update favorites:", e);
     }
   };
+
+  // Live real-time event updates via Pusher Channels
+  const { isLiveConnected } = useRealtimeSpot(id, {
+    onBookingCreated: () => {
+      fetchAvailability(selectedDate);
+    },
+    onBookingCancelled: () => {
+      fetchAvailability(selectedDate);
+    },
+    onSpotUpdated: (data) => {
+      if (typeof data.isAvailable === "boolean") {
+        setSpot((prev) => (prev ? { ...prev, isAvailable: data.isAvailable } : prev));
+      }
+    },
+  });
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -504,9 +520,17 @@ export default function SpotDetailsPage() {
                 </span>
                 <span className="text-xs text-[#475569] font-normal"> / hour</span>
               </div>
-              <Badge variant="brand" size="sm">
-                Instant Reserve
-              </Badge>
+              <div className="flex items-center gap-1.5">
+                {isLiveConnected && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live Sync
+                  </span>
+                )}
+                <Badge variant="brand" size="sm">
+                  Instant Reserve
+                </Badge>
+              </div>
             </div>
 
             {/* Availability Date Check */}

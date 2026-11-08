@@ -10,7 +10,7 @@ import { Badge } from "../components/ui/Badge";
 import PageHeader from "../components/ui/PageHeader";
 
 export default function ProfilePage() {
-  const { logout, login, userInfo } = useAuth();
+  const { logout, login } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSwitchingRole, setIsSwitchingRole] = useState(false);

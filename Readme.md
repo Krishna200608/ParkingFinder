@@ -1,7 +1,7 @@
 # ParkingFinder 2.0 — Smart Urban Parking Marketplace
 
 [![CI/CD Pipeline](https://github.com/Krishna200608/ParkingFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Krishna200608/ParkingFinder/actions)
-[![Tests Passing](https://img.shields.io/badge/Vitest-58%2F58%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
+[![Tests Passing](https://img.shields.io/badge/Vitest-64%2F64%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Infrastructure: Zero-Cost](https://img.shields.io/badge/Infrastructure-%240%20Free%20Tier-success)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20Shell-orange?logo=pwa&logoColor=white)](./frontend/public/manifest.json)
@@ -24,6 +24,7 @@
   - [7. Zero-Cost Serverless Infrastructure](#7-zero-cost-serverless-infrastructure)
   - [8. Admin Governance & Platform Analytics](#8-admin-governance--platform-analytics)
   - [9. Recurring Commuter Pass & Vercel Cron Engine](#9-recurring-commuter-pass--vercel-cron-engine)
+  - [10. Real-Time Live Availability Engine (Pusher Channels)](#10-real-time-live-availability-engine-pusher-channels)
 - [Automated Test Coverage](#automated-test-coverage)
 - [Technology Stack](#technology-stack)
 - [REST API Reference](#rest-api-reference)
@@ -144,11 +145,17 @@ flowchart TD
 * **Commuter Discount Pricing:** Applies an automated 15% discount across daily rates for drivers committing to recurring weekday intervals (e.g. Monday–Friday 09:00–17:00).
 * **Collision Resolution & Failure Handling:** Prior to committing automated renewals, runs half-open interval overlap checks against existing bookings; if a collision occurs, increments conflict counts, alerts the user, and skips duplicate bookings gracefully.
 
+### 10. Real-Time Live Availability Engine (Pusher Channels)
+* **Serverless Real-Time Broadcast:** Pusher Channels REST triggers broadcast slot reservations (`booking:created`), releases (`booking:cancelled`), and host toggles (`spot:updated`) across dedicated channels (`spot-{spotId}` and `marketplace-spots`).
+* **Zero Infrastructure Cost:** Operates 100% within Pusher free tier (200,000 messages/day, 100 concurrent connections) without stateful WebSocket server expenses on Vercel serverless.
+* **Graceful Degradation:** When Pusher API keys are absent, lazy initializers seamlessly switch to in-memory event simulation with structured logging, ensuring local development and CI testing succeed without external network credentials.
+* **Live Sync UI Badge:** Drivers viewing a spot see a real-time pulsing green "Live Sync" badge with instantaneous calendar revalidation when another user books or releases an interval.
+
 ---
 
 ## Automated Test Coverage
 
-The project includes 58 automated unit and integration tests across 6 comprehensive test suites executed via Vitest against a live MongoDB replica set:
+The project includes 64 automated unit and integration tests across 7 comprehensive test suites executed via Vitest against a live MongoDB replica set:
 
 | Test Suite | Scenarios Verified | Passing |
 | :--- | :--- | :--- |
@@ -158,7 +165,8 @@ The project includes 58 automated unit and integration tests across 6 comprehens
 | `test/payment.test.js` | Stripe checkout session creation, sandbox test-mode payment authorization, immutable Payment ledger writes, session status verification, cryptographic webhook simulation, and driver transaction history retrieval. | **9 / 9** |
 | `test/admin.test.js` | RBAC middleware gating (401/403 rejection), aggregate platform metrics and economics, paginated user directory with search, role reassignment, self-demotion lockout prevention, spot listing suspension/activation moderation, and global booking audit trail. | **12 / 12** |
 | `test/commuter.test.js` | Commuter pass creation, 15% discount calculations, self-subscription prevention, unauthenticated rejection, pass list retrieval, pause/resume state toggling, unauthorized modification guards (403), scheduled cron renewal execution, redundant booking skipping, collision detection, and subscription cancellation. | **11 / 11** |
-| **Total** | **End-to-end full-stack verification across all core marketplace, administrative, and scheduler workflows** | **58 / 58 Passing** |
+| `test/realtime.test.js` | Pusher channel event triggers on reservation commit (`booking:created`), slot release on cancellation (`booking:cancelled`), host listing toggle broadcast (`spot:updated`), admin moderation broadcast, and graceful simulation fallback without keys. | **6 / 6** |
+| **Total** | **End-to-end full-stack verification across all core marketplace, administrative, scheduler, and real-time live availability workflows** | **64 / 64 Passing** |
 
 ---
 
@@ -171,6 +179,7 @@ The project includes 58 automated unit and integration tests across 6 comprehens
 | **Styling** | Tailwind CSS | 4.x | Utility-first responsive design system |
 | **Animation** | Framer Motion | 12.x | Hardware-accelerated UI transitions and modal animations |
 | **Mapping** | Leaflet & React-Leaflet | 1.9.x | OpenStreetMap geospatial rendering and interactive markers |
+| **Real-Time WebSockets** | Pusher Channels & Pusher-js | 5.x / 8.x | Live availability sync, instant slot reservation broadcast |
 | **Geocoding** | Nominatim API | v2 | Debounced location and address search |
 | **Backend Runtime** | Node.js | 20+ / 22 LTS | High-performance asynchronous JavaScript runtime |
 | **Web Framework** | Express.js | 4.x | REST API routing and middleware composition |

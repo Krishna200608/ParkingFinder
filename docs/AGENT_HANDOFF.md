@@ -1,7 +1,7 @@
 # Agent Handoff Document — ParkingFinder
 
 > **Purpose:** This document is the single source of truth for any AI agent (Claude, Gemini, GPT, etc.) taking over work on this project mid-session. Read this before touching any file.
-> **Last updated:** 2026-11-08 by Gemini — Phase 4 Features 1 & 2 (Admin Portal & Recurring Commuter Cron Engine) completed (58/58 tests passing)
+> **Last updated:** 2026-11-08 by Gemini — Phase 4 Feature 4.3 (Real-Time Availability Engine via Pusher Channels) completed (64/64 tests passing)
 > **Repository:** `d:\Web D\ParkingFinder` · GitHub: `https://github.com/Krishna200608/ParkingFinder`
 > **Active branch:** `main`
 
@@ -13,12 +13,13 @@ ParkingFinder is a full-stack MERN parking marketplace. Drivers discover nearby 
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite 7, Tailwind 4, Framer Motion, Leaflet, React Hot Toast |
-| Backend | Node.js, Express 5, Mongoose 8 |
+| Frontend | React 19, Vite 7, Tailwind 4, Framer Motion, Leaflet, Pusher-js, React Hot Toast |
+| Backend | Node.js, Express 5, Mongoose 8, Pusher (REST triggers) |
 | Database | MongoDB Atlas (free tier), 2dsphere geospatial indexes, replica set for transactions |
 | Payments | Stripe Checkout (lazy-init) + local sandbox simulator |
+| Real-Time | Pusher Channels (live booking created/cancelled/updated revalidation) |
 | Auth | HTTP-only JWT cookie (bcryptjs passwords) |
-| CI/CD | GitHub Actions — `.github/workflows/ci.yml` — 58 Vitest tests, all green |
+| CI/CD | GitHub Actions — `.github/workflows/ci.yml` — 64 Vitest tests, all green |
 | Deployment | Vercel (frontend + serverless API via `api/index.js` + Vercel Cron) |
 
 The project is **a portfolio piece** for internship/placement interviews. The user (Krishna) owns it.
@@ -137,7 +138,7 @@ The full improvement report is at:
 |---|---|---|
 | 4.1 Admin Governance & Platform Analytics Portal | `admin.controller.js`, `admin.routes.js`, `AdminRoute.jsx`, `AdminDashboardPage.jsx`, `test/admin.test.js` | Done |
 | 4.2 Recurring Commuter Cron Engine | `commuter.controller.js`, `commuterPass.model.js`, `commuter.routes.js`, `CommuterPassModal.jsx`, `test/commuter.test.js` | Done |
-| 4.3 Real-Time Availability Engine (Pusher Channels) | `backend/utils/pusher.js`, `frontend/src/hooks/useRealtimeSpot.js` | Planned |
+| 4.3 Real-Time Availability Engine (Pusher Channels) | `backend/utils/pusher.js`, `frontend/src/hooks/useRealtimeSpot.js`, `frontend/src/utils/pusherClient.js`, `test/realtime.test.js` | Done |
 | 4.4 Sentry Exception Tracking & Tracing | `@sentry/node`, `@sentry/react` | Planned |
 | 4.5 Gradual TypeScript Migration | `tsconfig.json`, shared types | Planned |
 

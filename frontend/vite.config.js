@@ -35,6 +35,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           leaflet: ['leaflet', 'react-leaflet'],
           ui: ['lucide-react', 'framer-motion', 'react-hot-toast'],
+          realtime: ['pusher-js', 'axios'],
         },
       },
     },

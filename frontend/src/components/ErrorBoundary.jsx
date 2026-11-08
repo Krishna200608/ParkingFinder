@@ -48,7 +48,7 @@ class ErrorBoundary extends React.Component {
               We encountered an unexpected error while rendering this view. Your session and data remain safe.
             </p>
 
-            {process.env.NODE_ENV !== "production" && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mb-4 text-left p-2.5 bg-slate-50 border border-slate-200 rounded text-[11px] font-mono text-red-700 overflow-x-auto max-h-32">
                 {this.state.error.toString()}
               </div>
