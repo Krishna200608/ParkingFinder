@@ -16,6 +16,12 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/commuter-passes",
+      "schedule": "0 18 * * *"
+    }
   ]
 }
 

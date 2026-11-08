@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   MapContainer,
@@ -92,6 +92,7 @@ export default function MapPage() {
   const [selectedSpot, setSelectedSpot] = useState(null);
   const [bookingSpot, setBookingSpot] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
   const [radiusKm, setRadiusKm] = useState(15);
   const [zoom, setZoom] = useState(13);
 
@@ -220,7 +221,7 @@ export default function MapPage() {
   // Seed demo spots
   const handleSeedDemoSpots = async () => {
     try {
-      setIsLoading(true);
+      setIsSeeding(true);
       const { data } = await axios.post(
         "/api/spots/seed?force=true",
         {},
@@ -232,7 +233,7 @@ export default function MapPage() {
       console.error("Failed to seed spots:", err);
       toast.error(err.response?.data?.message || "Unable to seed demo spots");
     } finally {
-      setIsLoading(false);
+      setIsSeeding(false);
     }
   };
 
@@ -648,6 +649,8 @@ export default function MapPage() {
                     variant="primary"
                     size="sm"
                     onClick={handleSeedDemoSpots}
+                    isLoading={isSeeding}
+                    disabled={isSeeding}
                   >
                     Populate Realistic Demo Spots
                   </Button>

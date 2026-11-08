@@ -54,8 +54,8 @@ export default function PricingPage() {
         "Saved favorite spaces & one-tap routing",
         "Digital transaction receipts & exports",
       ],
-      cta: userInfo ? "Access Features in App" : "Start Free Trial",
-      href: userInfo ? "/find" : "/register",
+      cta: userInfo ? "Set Up Commuter Pass" : "Start Free Trial",
+      href: userInfo ? "/dashboard?tab=commuter" : "/register",
       highlight: true,
     },
     {

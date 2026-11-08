@@ -17,7 +17,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'ParkingFinder <notifications@parki
 /**
  * Dispatches an email via Resend or logs simulation details in development / test environments.
  */
-const sendEmail = async ({ to, subject, html, text }) => {
+export const sendEmail = async ({ to, subject, html, text }) => {
   const client = getResendClient();
 
   if (!client) {

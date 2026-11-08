@@ -1,7 +1,7 @@
 # Agent Handoff Document — ParkingFinder
 
 > **Purpose:** This document is the single source of truth for any AI agent (Claude, Gemini, GPT, etc.) taking over work on this project mid-session. Read this before touching any file.
-> **Last updated:** 2026-11-08 by Gemini — Phase 4 Feature 1 (Admin Governance & Analytics Portal) completed (47/47 tests passing)
+> **Last updated:** 2026-11-08 by Gemini — Phase 4 Features 1 & 2 (Admin Portal & Recurring Commuter Cron Engine) completed (58/58 tests passing)
 > **Repository:** `d:\Web D\ParkingFinder` · GitHub: `https://github.com/Krishna200608/ParkingFinder`
 > **Active branch:** `main`
 
@@ -18,8 +18,8 @@ ParkingFinder is a full-stack MERN parking marketplace. Drivers discover nearby 
 | Database | MongoDB Atlas (free tier), 2dsphere geospatial indexes, replica set for transactions |
 | Payments | Stripe Checkout (lazy-init) + local sandbox simulator |
 | Auth | HTTP-only JWT cookie (bcryptjs passwords) |
-| CI/CD | GitHub Actions — `.github/workflows/ci.yml` — 47 Vitest tests, all green |
-| Deployment | Vercel (frontend + serverless API via `api/index.js`) |
+| CI/CD | GitHub Actions — `.github/workflows/ci.yml` — 58 Vitest tests, all green |
+| Deployment | Vercel (frontend + serverless API via `api/index.js` + Vercel Cron) |
 
 The project is **a portfolio piece** for internship/placement interviews. The user (Krishna) owns it.
 
@@ -36,7 +36,8 @@ The project is **a portfolio piece** for internship/placement interviews. The us
 - Dynamic pricing simulator on `PricingPage`
 - Role switching (driver ↔ host) via `POST /api/auth/switch-role`
 - Admin Governance Portal: real-time platform metrics, GMV, 5% fee revenue, spot moderation, user RBAC
-- 47/47 integration tests passing in CI
+- Automated Recurring Commuter Pass Engine: weekday recurring scheduler with Vercel Cron, 15% commuter discount, and collision resolution
+- 58/58 integration tests passing in CI
 - OpenAPI 3.0 Interactive Documentation at `/api-docs`
 - Direct unsigned Cloudinary photo upload with fallback
 - Resend transactional email notification service
@@ -135,7 +136,7 @@ The full improvement report is at:
 | Task | Files | Status |
 |---|---|---|
 | 4.1 Admin Governance & Platform Analytics Portal | `admin.controller.js`, `admin.routes.js`, `AdminRoute.jsx`, `AdminDashboardPage.jsx`, `test/admin.test.js` | Done |
-| 4.2 Recurring Commuter Cron Engine | `backend/cron/commuter.cron.js`, `backend/models/commuterPass.model.js` | Planned |
+| 4.2 Recurring Commuter Cron Engine | `commuter.controller.js`, `commuterPass.model.js`, `commuter.routes.js`, `CommuterPassModal.jsx`, `test/commuter.test.js` | Done |
 | 4.3 Real-Time Availability Engine (Pusher Channels) | `backend/utils/pusher.js`, `frontend/src/hooks/useRealtimeSpot.js` | Planned |
 | 4.4 Sentry Exception Tracking & Tracing | `@sentry/node`, `@sentry/react` | Planned |
 | 4.5 Gradual TypeScript Migration | `tsconfig.json`, shared types | Planned |
@@ -156,7 +157,8 @@ d:\Web D\ParkingFinder\
 │   │   ├── bookings.controller.js  — create/cancel/list bookings, executeWithRetry
 │   │   ├── spots.controller.js     — CRUD spots, geospatial query, heatmap, seed
 │   │   ├── payments.controller.js  — Stripe checkout, sandbox simulator, webhook
-│   │   └── admin.controller.js     — Platform metrics, GMV, user RBAC, spot moderation
+│   │   ├── admin.controller.js     — Platform metrics, GMV, user RBAC, spot moderation
+│   │   └── commuter.controller.js  — Recurring commuter pass subscription & Vercel Cron engine
 │   ├── middleware/
 │   │   ├── auth.middleware.js      — protect, allowSessionOrUser, isHostOrAdmin, isAdmin
 │   │   └── validate.middleware.js  — Zod validate() factory + registerSchema + loginSchema
@@ -164,15 +166,19 @@ d:\Web D\ParkingFinder\
 │   │   ├── user.model.js           — username, email, password (bcrypt), role
 │   │   ├── parkingSpot.model.js    — full spot schema, 2dsphere, text index, bookingSequence
 │   │   ├── booking.model.js        — booking lifecycle, price snapshot, cancellation trail
-│   │   └── payment.model.js        — immutable payment ledger
+│   │   ├── payment.model.js        — immutable payment ledger
+│   │   └── commuterPass.model.js   — recurring commuter subscription schema & schedule
 │   ├── routes/
 │   │   ├── auth.routes.js          — /api/auth/* (register, login, logout, profile, switch-role)
 │   │   ├── spots.routes.js         — /api/spots/* (CRUD + heatmap + seed)
 │   │   ├── bookings.routes.js      — /api/bookings/*
 │   │   ├── payments.routes.js      — /api/payments/*
-│   │   └── admin.routes.js         — /api/admin/* (metrics, users, spots, bookings)
+│   │   ├── admin.routes.js         — /api/admin/* (metrics, users, spots, bookings)
+│   │   └── commuter.routes.js      — /api/commuter/* and /api/cron/commuter-passes
 │   └── utils/
-│       └── generateToken.js        — signs JWT, sets HTTP-only cookie, returns token string
+│       ├── generateToken.js        — signs JWT, sets HTTP-only cookie, returns token string
+│       ├── email.js                — Resend transactional email service
+│       └── logger.js               — Winston + Morgan structured logging
 ├── frontend/
 │   ├── src/
 │   │   ├── App.jsx                 — React Router routes
@@ -183,18 +189,19 @@ d:\Web D\ParkingFinder\
 │   │   │   ├── ui/                 — Button, Card, Badge, EmptyState, Skeleton, ImageUpload
 │   │   │   ├── Header.jsx          — Nav, user dropdown, role indicator, admin link
 │   │   │   ├── AdminRoute.jsx      — Route guard enforcing admin role
+│   │   │   ├── commuter/           — CommuterPassModal (weekday selector, rates, 15% discount)
 │   │   │   └── booking/
 │   │   │       └── BookingModal.jsx — availability calendar + slot picker (394 lines)
 │   │   └── pages/
-│   │       ├── HomePage.jsx        — Hero, search, host-upgrade modal (505 lines)
+│   │       ├── HomePage.jsx        — Hero, search, host-upgrade modal
 │   │       ├── MapPage.jsx         — Leaflet map + spot list + filters
-│   │       ├── SpotDetailsPage.jsx — Spot info, reviews, book CTA
-│   │       ├── DashboardPage.jsx   — Driver: bookings + payments
+│   │       ├── SpotDetailsPage.jsx — Spot info, reviews, commuter setup, book CTA
+│   │       ├── DashboardPage.jsx   — Driver: bookings, commuter subscriptions, receipts
 │   │       ├── HostDashboardPage.jsx — Host: listings CRUD + toggle
 │   │       ├── AdminDashboardPage.jsx — Executive metrics, GMV, spot moderation, user RBAC
 │   │       ├── AddSpotPage.jsx     — Leaflet pin-picker + spot form + Cloudinary
 │   │       ├── EditSpotPage.jsx    — Same as Add but prefilled
-│   │       ├── PricingPage.jsx     — Pricing tiers + dynamic pricing simulator
+│   │       ├── PricingPage.jsx     — Pricing tiers, commuter link, dynamic pricing simulator
 │   │       ├── ProfilePage.jsx     — Vehicle profile + role switch UI
 │   │       ├── BookingSuccessPage.jsx — Post-payment confirmation
 │   │       ├── CheckoutSimulatorPage.jsx — Sandbox payment flow
@@ -204,7 +211,7 @@ d:\Web D\ParkingFinder\
 │   └── public/
 │       ├── sw.js                   — Basic PWA service worker (shell-only cache)
 │       └── manifest.json           — PWA manifest
-├── test/                           — Vitest integration tests (47 tests, 5 suites: booking, discovery, payment, host, admin)
+├── test/                           — Vitest integration tests (58 tests, 6 suites: booking, discovery, payment, host, admin, commuter)
 ├── docs/                           — Architecture, decisions, deployment, progress, roadmap docs
 │   └── AGENT_HANDOFF.md            — THIS FILE
 ├── .github/workflows/ci.yml        — CI: Node 22, MongoDB 7 replica set, lint + test

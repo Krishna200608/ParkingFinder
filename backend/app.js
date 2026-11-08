@@ -14,6 +14,8 @@ import spotRoutes from './routes/spots.routes.js';
 import bookingRoutes from './routes/bookings.routes.js';
 import paymentRoutes from './routes/payments.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import commuterRoutes from './routes/commuter.routes.js';
+import { processCommuterPassCron } from './controllers/commuter.controller.js';
 import { validateEnv } from './utils/validateEnv.js';
 import { logger, morganStream } from './utils/logger.js';
 import { swaggerUi, swaggerSpec } from './utils/swagger.js';
@@ -129,6 +131,8 @@ app.use('/api/spots', spotRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/commuter', commuterRoutes);
+app.get('/api/cron/commuter-passes', processCommuterPassCron);
 
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {

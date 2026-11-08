@@ -27,6 +27,7 @@ import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useAuth } from "../context/AuthContext";
 import BookingModal from "../components/booking/BookingModal";
+import CommuterPassModal from "../components/commuter/CommuterPassModal";
 import Button from "../components/ui/Button";
 import Card from "../components/ui/Card";
 import { Badge, StatusBadge } from "../components/ui/Badge";
@@ -57,6 +58,7 @@ export default function SpotDetailsPage() {
   const [spot, setSpot] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCommuterOpen, setIsCommuterOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Availability preview state
@@ -564,15 +566,34 @@ export default function SpotDetailsPage() {
                 You are the host of this listing.
               </div>
             ) : (
-              <Button
-                variant="primary"
-                size="md"
-                className="w-full justify-center"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <Clock size={15} />
-                <span>Reserve Parking Bay</span>
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="w-full justify-center"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  <Clock size={15} />
+                  <span>Reserve Parking Bay</span>
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-center flex items-center gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-50"
+                  onClick={() => {
+                    if (!userInfo) {
+                      toast.error("Please sign in to set up a commuter pass");
+                      navigate("/login");
+                      return;
+                    }
+                    setIsCommuterOpen(true);
+                  }}
+                >
+                  <Calendar size={13} className="text-blue-600" />
+                  <span>Set Up Commuter Pass (15% Off)</span>
+                </Button>
+              </div>
             )}
 
             <div className="text-center text-[11px] text-[#475569] font-medium space-y-1 pt-3 border-t border-[#F1F5F9] mt-4">
@@ -596,6 +617,13 @@ export default function SpotDetailsPage() {
           }}
         />
       )}
+
+      {/* Commuter Pass Modal */}
+      <CommuterPassModal
+        isOpen={isCommuterOpen}
+        onClose={() => setIsCommuterOpen(false)}
+        initialSpot={spot}
+      />
     </div>
   );
 }

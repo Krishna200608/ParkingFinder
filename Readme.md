@@ -1,7 +1,7 @@
 # ParkingFinder 2.0 — Smart Urban Parking Marketplace
 
 [![CI/CD Pipeline](https://github.com/Krishna200608/ParkingFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Krishna200608/ParkingFinder/actions)
-[![Tests Passing](https://img.shields.io/badge/Vitest-47%2F47%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
+[![Tests Passing](https://img.shields.io/badge/Vitest-58%2F58%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Infrastructure: Zero-Cost](https://img.shields.io/badge/Infrastructure-%240%20Free%20Tier-success)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20Shell-orange?logo=pwa&logoColor=white)](./frontend/public/manifest.json)
@@ -23,6 +23,7 @@
   - [6. Verified Marketplace Reviews](#6-verified-marketplace-reviews)
   - [7. Zero-Cost Serverless Infrastructure](#7-zero-cost-serverless-infrastructure)
   - [8. Admin Governance & Platform Analytics](#8-admin-governance--platform-analytics)
+  - [9. Recurring Commuter Pass & Vercel Cron Engine](#9-recurring-commuter-pass--vercel-cron-engine)
 - [Automated Test Coverage](#automated-test-coverage)
 - [Technology Stack](#technology-stack)
 - [REST API Reference](#rest-api-reference)
@@ -31,6 +32,7 @@
   - [Reservations and Bookings (`/api/bookings`)](#reservations-and-bookings-apibookings)
   - [Payments and Checkout (`/api/payments`)](#payments-and-checkout-apipayments)
   - [Platform Governance & Administration (`/api/admin`)](#platform-governance--administration-apiadmin)
+  - [Recurring Commuter Subscriptions (`/api/commuter`)](#recurring-commuter-subscriptions-apicommuter)
 - [Getting Started](#getting-started)
   - [1. Prerequisites](#1-prerequisites)
   - [2. Clone and Install](#2-clone-and-install)
@@ -137,11 +139,16 @@ flowchart TD
 * **Role-Based Access Control (RBAC):** Privileged endpoints protected by layered `protect` and `isAdmin` middleware, preventing unauthorized access and safeguarding against administrator self-demotion lockout.
 * **Audit Trails:** Real-time visibility into the latest 10 ledger transactions and global platform bookings.
 
+### 9. Recurring Commuter Pass & Vercel Cron Engine
+* **Automated Renewal Scheduler:** Vercel Cron scheduled endpoint (`GET /api/cron/commuter-passes`) evaluates active commuter passes daily at 18:00 UTC, creating confirmed reservations for tomorrow's scheduled commute.
+* **Commuter Discount Pricing:** Applies an automated 15% discount across daily rates for drivers committing to recurring weekday intervals (e.g. Monday–Friday 09:00–17:00).
+* **Collision Resolution & Failure Handling:** Prior to committing automated renewals, runs half-open interval overlap checks against existing bookings; if a collision occurs, increments conflict counts, alerts the user, and skips duplicate bookings gracefully.
+
 ---
 
 ## Automated Test Coverage
 
-The project includes 47 automated unit and integration tests across 5 comprehensive test suites executed via Vitest against a live MongoDB replica set:
+The project includes 58 automated unit and integration tests across 6 comprehensive test suites executed via Vitest against a live MongoDB replica set:
 
 | Test Suite | Scenarios Verified | Passing |
 | :--- | :--- | :--- |
@@ -150,7 +157,8 @@ The project includes 47 automated unit and integration tests across 5 comprehens
 | `test/host.test.js` | Host listings with aggregated earnings from `GET /api/spots/my`, instant availability toggle via `PUT /api/spots/:id`, incoming driver reservations table, active booking deletion guard (`HTTP 400`), and clean listing deletion. | **5 / 5** |
 | `test/payment.test.js` | Stripe checkout session creation, sandbox test-mode payment authorization, immutable Payment ledger writes, session status verification, cryptographic webhook simulation, and driver transaction history retrieval. | **9 / 9** |
 | `test/admin.test.js` | RBAC middleware gating (401/403 rejection), aggregate platform metrics and economics, paginated user directory with search, role reassignment, self-demotion lockout prevention, spot listing suspension/activation moderation, and global booking audit trail. | **12 / 12** |
-| **Total** | **End-to-end full-stack verification across all core marketplace and administrative workflows** | **47 / 47 Passing** |
+| `test/commuter.test.js` | Commuter pass creation, 15% discount calculations, self-subscription prevention, unauthenticated rejection, pass list retrieval, pause/resume state toggling, unauthorized modification guards (403), scheduled cron renewal execution, redundant booking skipping, collision detection, and subscription cancellation. | **11 / 11** |
+| **Total** | **End-to-end full-stack verification across all core marketplace, administrative, and scheduler workflows** | **58 / 58 Passing** |
 
 ---
 
@@ -229,6 +237,16 @@ The project includes 47 automated unit and integration tests across 5 comprehens
 | `GET` | `/api/admin/spots` | Admin Only | Global spot directory across all hosts with status filters. |
 | `PUT` | `/api/admin/spots/:id/status` | Admin Only | Moderation toggle to suspend or activate listing availability. |
 | `GET` | `/api/admin/bookings` | Admin Only | Global booking audit trail with driver, host, and spot details. |
+
+### Recurring Commuter Subscriptions (`/api/commuter`)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/commuter` | Driver Only | Activate recurring weekday commuter pass with 15% discount. |
+| `GET` | `/api/commuter/my` | Driver Only | Retrieve active and paused commuter subscriptions. |
+| `PUT` | `/api/commuter/:id/toggle` | Pass Owner | Pause or resume recurring commuter pass. |
+| `DELETE` | `/api/commuter/:id` | Pass Owner | Cancel commuter pass subscription. |
+| `GET` | `/api/cron/commuter-passes` | Vercel Cron / Admin | Scheduled cron execution reserving bays for tomorrow's commute. |
+| `POST` | `/api/commuter/process-cron` | Cron / Admin | On-demand trigger for commuter scheduler renewal engine. |
 
 ---
 

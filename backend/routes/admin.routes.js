@@ -134,3 +134,4 @@ router.put('/spots/:id/status', updateSpotStatus);
 router.get('/bookings', getAdminBookings);
 
 export default router;
+
