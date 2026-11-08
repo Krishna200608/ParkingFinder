@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Calendar,
   ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
 
 /**
@@ -110,6 +111,16 @@ export default function Header() {
           )}
 
           {/* Role CTA */}
+          {userInfo && userInfo.role === "admin" && (
+            <Link
+              to="/admin/dashboard"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-50 border border-purple-200 text-purple-800 hover:bg-purple-100 transition-colors shadow-2xs"
+            >
+              <ShieldCheck size={14} className="text-purple-600" />
+              <span>Admin Console</span>
+            </Link>
+          )}
+
           {userInfo ? (
             userInfo.role === "host" || userInfo.role === "admin" ? (
               <Link
@@ -193,6 +204,17 @@ export default function Header() {
                     <LayoutDashboard size={14} className="text-[#475569]" />
                     <span>{userInfo.role === "host" || userInfo.role === "admin" ? "Host Dashboard" : "Reservations"}</span>
                   </Link>
+
+                  {userInfo.role === "admin" && (
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setUserDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-purple-700 hover:bg-purple-50 transition-colors font-medium"
+                    >
+                      <ShieldCheck size={14} className="text-purple-600" />
+                      <span>Admin Governance</span>
+                    </Link>
+                  )}
 
                   {userInfo.role === "host" && (
                     <Link
@@ -285,6 +307,15 @@ export default function Header() {
                 >
                   {userInfo.role === "host" ? "Host Dashboard" : "My Bookings"}
                 </Link>
+                {userInfo.role === "admin" && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-sm font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg"
+                  >
+                    Admin Governance Portal
+                  </Link>
+                )}
                 {userInfo.role === "host" && (
                   <Link
                     to="/host/add-spot"

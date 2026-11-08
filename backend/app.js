@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.routes.js';
 import spotRoutes from './routes/spots.routes.js';
 import bookingRoutes from './routes/bookings.routes.js';
 import paymentRoutes from './routes/payments.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 import { validateEnv } from './utils/validateEnv.js';
 import { logger, morganStream } from './utils/logger.js';
 import { swaggerUi, swaggerSpec } from './utils/swagger.js';
@@ -127,6 +128,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/spots', spotRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {

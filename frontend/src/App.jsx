@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HostRoute from "./components/HostRoute";
+import AdminRoute from "./components/AdminRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 import HomePage from "./pages/HomePage";
@@ -23,6 +24,7 @@ import ProfilePage from "./pages/ProfilePage";
 import SpotDetailsPage from "./pages/SpotDetailsPage";
 import CheckoutSimulatorPage from "./pages/CheckoutSimulatorPage";
 import BookingSuccessPage from "./pages/BookingSuccessPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 export default function App() {
   const location = useLocation();
@@ -64,6 +66,11 @@ export default function App() {
               <Route path="/host/dashboard" element={<HostDashboardPage />} />
               <Route path="/host/edit-spot/:id" element={<EditSpotPage />} />
               <Route path="/host/add-spot" element={<AddSpotPage />} />
+            </Route>
+
+            {/* Administrator Protected Routes */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             </Route>
           </Routes>
         </ErrorBoundary>

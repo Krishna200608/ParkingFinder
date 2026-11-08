@@ -1,7 +1,7 @@
 # ParkingFinder 2.0 — Smart Urban Parking Marketplace
 
 [![CI/CD Pipeline](https://github.com/Krishna200608/ParkingFinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Krishna200608/ParkingFinder/actions)
-[![Tests Passing](https://img.shields.io/badge/Vitest-34%2F34%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
+[![Tests Passing](https://img.shields.io/badge/Vitest-47%2F47%20Passing-brightgreen?logo=vitest&logoColor=white)](./test)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Infrastructure: Zero-Cost](https://img.shields.io/badge/Infrastructure-%240%20Free%20Tier-success)](https://vercel.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Offline%20Shell-orange?logo=pwa&logoColor=white)](./frontend/public/manifest.json)
@@ -22,6 +22,7 @@
   - [5. Payment Gateway Reconciliation and Sandbox Simulation](#5-payment-gateway-reconciliation-and-sandbox-simulation)
   - [6. Verified Marketplace Reviews](#6-verified-marketplace-reviews)
   - [7. Zero-Cost Serverless Infrastructure](#7-zero-cost-serverless-infrastructure)
+  - [8. Admin Governance & Platform Analytics](#8-admin-governance--platform-analytics)
 - [Automated Test Coverage](#automated-test-coverage)
 - [Technology Stack](#technology-stack)
 - [REST API Reference](#rest-api-reference)
@@ -29,6 +30,7 @@
   - [Parking Spaces and Discovery (`/api/spots`)](#parking-spaces-and-discovery-apispots)
   - [Reservations and Bookings (`/api/bookings`)](#reservations-and-bookings-apibookings)
   - [Payments and Checkout (`/api/payments`)](#payments-and-checkout-apipayments)
+  - [Platform Governance & Administration (`/api/admin`)](#platform-governance--administration-apiadmin)
 - [Getting Started](#getting-started)
   - [1. Prerequisites](#1-prerequisites)
   - [2. Clone and Install](#2-clone-and-install)
@@ -129,19 +131,26 @@ flowchart TD
 * Global Mongoose connection caching (`global.mongoose = { conn, promise }`) with `maxPoolSize: 10` conserves MongoDB Atlas free-tier connection pools across serverless function invocations.
 * Vite manual chunking separates vendor dependencies, Leaflet mapping assets, and UI components to maintain fast cold-start performance and minimal bundle footprints.
 
+### 8. Admin Governance & Platform Analytics
+* **Executive Metrics Aggregation:** Computes live marketplace health, Gross Merchandise Value (GMV), 5% platform take-rate revenue, host liabilities (95%), active bay inventory, and reservation utilization via parallel MongoDB aggregation pipelines.
+* **Spot Moderation:** Administrative controls to suspend or activate listings across all hosts to enforce content safety and neighborhood compliance.
+* **Role-Based Access Control (RBAC):** Privileged endpoints protected by layered `protect` and `isAdmin` middleware, preventing unauthorized access and safeguarding against administrator self-demotion lockout.
+* **Audit Trails:** Real-time visibility into the latest 10 ledger transactions and global platform bookings.
+
 ---
 
 ## Automated Test Coverage
 
-The project includes 34 automated unit and integration tests across 4 comprehensive test suites executed via Vitest against a live MongoDB replica set:
+The project includes 47 automated unit and integration tests across 5 comprehensive test suites executed via Vitest against a live MongoDB replica set:
 
 | Test Suite | Scenarios Verified | Passing |
 | :--- | :--- | :--- |
 | `test/booking.test.js` | Normal booking creation, price snapshots, demo statuses, overlap collision rejection (`HTTP 409`), contiguous abutting reservations, past-time rejection, host self-booking prevention, cancellation audit trail, unauthorized cancellation rejection, and **simultaneous race condition concurrency locking**. | **10 / 10** |
-| `test/discovery.test.js` | Public spot retrieval without auth cookies, geospatial radius filtering, Haversine `distanceKm` computation, `maxPrice`, `amenities`, `vehicleSize`, text keyword search, sort ordering, spot details by ID, and verified driver review gating. | **10 / 10** |
+| `test/discovery.test.js` | Public spot retrieval without auth cookies, geospatial radius filtering, Haversine `distanceKm` computation, `maxPrice`, `amenities`, `vehicleSize`, text keyword search, sort ordering, spot details by ID, verified driver review gating, and pagination envelopes. | **11 / 11** |
 | `test/host.test.js` | Host listings with aggregated earnings from `GET /api/spots/my`, instant availability toggle via `PUT /api/spots/:id`, incoming driver reservations table, active booking deletion guard (`HTTP 400`), and clean listing deletion. | **5 / 5** |
 | `test/payment.test.js` | Stripe checkout session creation, sandbox test-mode payment authorization, immutable Payment ledger writes, session status verification, cryptographic webhook simulation, and driver transaction history retrieval. | **9 / 9** |
-| **Total** | **End-to-end full-stack verification across all core marketplace workflows** | **34 / 34 Passing** |
+| `test/admin.test.js` | RBAC middleware gating (401/403 rejection), aggregate platform metrics and economics, paginated user directory with search, role reassignment, self-demotion lockout prevention, spot listing suspension/activation moderation, and global booking audit trail. | **12 / 12** |
+| **Total** | **End-to-end full-stack verification across all core marketplace and administrative workflows** | **47 / 47 Passing** |
 
 ---
 
@@ -210,6 +219,16 @@ The project includes 34 automated unit and integration tests across 4 comprehens
 | `POST` | `/api/payments/simulate-success` | Driver Only | Authorizes simulated test card payment in Sandbox mode. |
 | `POST` | `/api/payments/webhook` | Public | Stripe webhook listener with cryptographic HMAC signature verification. |
 | `GET` | `/api/payments/my-transactions` | Driver Only | Retrieves driver verified payment ledger and receipts. |
+
+### Platform Governance & Administration (`/api/admin`)
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/admin/metrics` | Admin Only | Aggregate platform analytics, GMV, platform take (5%), and host liabilities. |
+| `GET` | `/api/admin/users` | Admin Only | Paginated user directory with role and search queries. |
+| `PUT` | `/api/admin/users/:id/role` | Admin Only | Update user role with self-demotion lockout safeguards. |
+| `GET` | `/api/admin/spots` | Admin Only | Global spot directory across all hosts with status filters. |
+| `PUT` | `/api/admin/spots/:id/status` | Admin Only | Moderation toggle to suspend or activate listing availability. |
+| `GET` | `/api/admin/bookings` | Admin Only | Global booking audit trail with driver, host, and spot details. |
 
 ---
 
